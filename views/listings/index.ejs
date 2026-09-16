@@ -1,0 +1,201 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WanderLust</title>
+</head> -->
+<% layout("/layouts/boilerplate") %>
+
+<!-- <body>-->
+    <!-- <h3>All Listings</h3>  -->
+    <!-- <form action="/listings/new" method="get">
+        <button>Create New Listing</button>
+    </form> -->
+    
+<!-- </body> -->
+<!-- </html> -->
+
+  <style>
+    #filters{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter {
+      text-align: center;
+      margin-right: 2rem;
+      margin-top: 2rem;
+      opacity: 0.7;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .filter:hover {
+      opacity: 1;
+      cursor: pointer;
+    }
+
+    .filter.active-filter {
+      opacity: 1;
+      border-bottom: 2px solid #000;
+    }
+
+    .filter p{
+      font-size: 0.8rem;
+    }
+
+    .tax-info{
+      display: none;
+    }
+
+    .tax-toggle{
+      border: 1px solid black;
+      border-radius: 1rem;
+      height: 1rem;
+      padding: 1.5rem;
+      margin-left:5rem ;
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+  </style>
+
+<%
+  const currentSearch = (typeof searchQuery !== "undefined" && searchQuery) ? searchQuery : "";
+  const currentCategory = (typeof category !== "undefined" && category) ? category : "";
+
+  function getFilterUrl(catName) {
+    if (!catName) {
+      return currentSearch ? `/listings/search?q=${encodeURIComponent(currentSearch)}` : '/listings';
+    }
+    return currentSearch 
+      ? `/listings/search?q=${encodeURIComponent(currentSearch)}&category=${encodeURIComponent(catName)}`
+      : `/listings?category=${encodeURIComponent(catName)}`;
+  }
+%>
+
+<div id="filters">
+  <a href="<%= getFilterUrl('') %>" class="filter <%= !currentCategory ? 'active-filter' : '' %>">
+    <div><i class="fa-solid fa-house"></i></div>
+    <p>All</p>
+  </a>
+  <a href="<%= getFilterUrl('Trending') %>" class="filter <%= currentCategory === 'Trending' ? 'active-filter' : '' %>">
+    <div><i class="fa-solid fa-fire"></i></div>
+    <p>Trending</p>
+  </a>
+  <a href="<%= getFilterUrl('Rooms') %>" class="filter <%= currentCategory === 'Rooms' ? 'active-filter' : '' %>">
+    <div><i class="fa-solid fa-bed"></i></div>
+    <p>Rooms</p>
+  </a>
+  <a href="<%= getFilterUrl('Iconic Cities') %>" class="filter <%= currentCategory === 'Iconic Cities' ? 'active-filter' : '' %>">
+    <div><i class="fa-solid fa-mountain-city"></i></div>
+    <p>Iconic Cities</p>
+  </a>
+  <a href="<%= getFilterUrl('Mountains') %>" class="filter <%= currentCategory === 'Mountains' ? 'active-filter' : '' %>">
+    <div><i class="fa-solid fa-mountain"></i></div>
+    <p>Mountains</p>
+  </a>
+  <a href="<%= getFilterUrl('Castles') %>" class="filter <%= currentCategory === 'Castles' ? 'active-filter' : '' %>">
+    <div><i class="fa-solid fa-fort-awesome"></i></div>
+    <p>Castles</p>
+  </a>
+  <a href="<%= getFilterUrl('Amazing Pools') %>" class="filter <%= currentCategory === 'Amazing Pools' ? 'active-filter' : '' %>">
+    <div><i class="fa-solid fa-person-swimming"></i></div>
+    <p>Amazing Pools</p>
+  </a>
+  <a href="<%= getFilterUrl('Camping') %>" class="filter <%= currentCategory === 'Camping' ? 'active-filter' : '' %>">
+    <div><i class="fa-solid fa-campground"></i></div>
+    <p>Camping</p>
+  </a>
+  <a href="<%= getFilterUrl('Farms') %>" class="filter <%= currentCategory === 'Farms' ? 'active-filter' : '' %>">
+    <div><i class="fa-solid fa-cow"></i></div>
+    <p>Farms</p>
+  </a>
+  <a href="<%= getFilterUrl('Arctic') %>" class="filter <%= currentCategory === 'Arctic' ? 'active-filter' : '' %>">
+    <div><i class="fa-solid fa-snowflake"></i></div>
+    <p>Arctic</p>
+  </a>
+  <a href="<%= getFilterUrl('Domes') %>" class="filter <%= currentCategory === 'Domes' ? 'active-filter' : '' %>">
+    <div><i class="fa-solid fa-igloo"></i></div>
+    <p>Domes</p>
+  </a>
+  <a href="<%= getFilterUrl('Boats') %>" class="filter <%= currentCategory === 'Boats' ? 'active-filter' : '' %>">
+    <div><i class="fa-solid fa-snowflake"></i></div>
+    <p>Boats</p>
+  </a>
+
+  <div class="tax-toggle">
+    <div class="form-check-reverse form-switch">
+  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+  <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
+</div>
+  </div>
+</div>
+
+<% if (currentSearch && currentCategory) { %>
+  <div class="mt-3 mb-2">
+    <h4>Search results for "<%= currentSearch %>" in <%= currentCategory %></h4>
+  </div>
+<% } else if (currentSearch) { %>
+  <div class="mt-3 mb-2">
+    <h4>Search results for "<%= currentSearch %>"</h4>
+  </div>
+<% } else if (currentCategory) { %>
+  <div class="mt-3 mb-2">
+    <h4><%= currentCategory %></h4>
+  </div>
+<% } %>
+
+<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+  <% if (allListings.length === 0) { %>
+    <div class="col-12 mt-3 mb-5">
+      <% if (currentSearch && currentCategory) { %>
+        <h5>No listings found for "<%= currentSearch %>" in <%= currentCategory %>.</h5>
+        <p class="text-muted">
+          Try <a href="/listings/search?q=<%= encodeURIComponent(currentSearch) %>">viewing all results for "<%= currentSearch %>"</a> or <a href="/listings">browse all listings</a>.
+        </p>
+      <% } else if (currentSearch) { %>
+        <h5>No listings found for "<%= currentSearch %>".</h5>
+        <p class="text-muted">Try searching with different keywords or <a href="/listings">browse all listings</a>.</p>
+      <% } else if (currentCategory) { %>
+        <h5>No listings found in <%= currentCategory %>.</h5>
+        <p class="text-muted"><a href="/listings">Browse all listings</a></p>
+      <% } else { %>
+        <h5>No listings found.</h5>
+        <p class="text-muted"><a href="/listings">Browse all listings</a></p>
+      <% } %>
+    </div>
+  <% } %>
+  <% for(let listing of allListings) { %>
+    <a href="/listings/<%= listing._id %>" class="listing-link">
+    <div class="card col listing-card" >
+      <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" style="height: 20rem;"/>
+      <div class="card-img-overlay">abcd</div>
+      <div class="card-body">
+        <p class="card-text">
+          <b><%= listing.title %></b> <br />
+          &#8377;<%= listing.price?.toLocaleString("en-IN") || "0" %>/ night
+          <i class="tax-info">&nbsp; &nbsp; +18%GST</i>
+        </p>
+      </div>
+    </div>
+    </a>
+  <% } %>
+</div>
+
+
+<script>
+  let taxSwitch = document.getElementById("flexSwitchCheckDefault");
+  taxSwitch.addEventListener("click",()=>{
+    let taxInfo = document.getElementsByClassName("tax-info");
+    for(info of taxInfo){
+      if(info.style.display != "inline"){
+          info.style.display = "inline";
+      }else{
+        info.style.display = "none";
+      }
+    }
+  })
+</script>

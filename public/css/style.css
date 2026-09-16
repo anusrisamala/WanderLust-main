@@ -1,0 +1,305 @@
+body{
+    font-family: "Plus Jakarta Sans",sans-serif !important;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container{
+    flex:1;
+}
+
+/* navbar */
+
+.navbar{
+    height:5rem;
+    background-color: white;
+}
+.fa-compass{
+    color: #fe424d;
+    font-size: 2rem;
+}
+.nav-link{
+    color:black !important;
+}
+
+/*Footer*/
+.f-info-links a{
+    text-decoration: none;
+    color: #222222;
+}
+.f-info-links a:hover{
+    text-decoration: underline;
+}
+
+.f-info-links,.f-info-socials,.f-info-brand{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.f-info-socials i{
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.f-info{
+    text-align: center;
+    height: 8rem;
+    background-color: #ebebeb;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: space-evenly;
+}
+
+/*card*/
+.listing-card{
+    border: none !important;
+    margin-bottom: 2rem;
+}
+.card-img-top{
+    border-radius: 1rem !important;
+    width:100% !important;
+    object-fit: cover !important;
+}
+
+.card-body{
+    padding: 0 !important;
+}
+
+.card-text p{
+    font-weight: 400 !important;
+}
+
+.listing-link{
+    text-decoration: none;
+}
+
+/*card effect*/
+.card-img-overlay{
+    opacity:0;
+}
+
+.card-img-overlay:hover{
+    opacity: 0.2;
+    background-color: white;
+}
+
+/* make the whole card link text black */
+.listing-link {
+    text-decoration: none !important;
+    color: black !important;
+    display: block;   /* ensures the link covers the whole card */
+}
+
+/* explicitly set inner text color */
+.listing-link p,
+.listing-link b {
+    color: black !important;
+}
+
+/*new page*/
+.add-btn{
+    background-color: #fe424d !important;
+    border: none !important;
+}
+
+/*edit page*/
+.edit-btn{
+    background-color: #fe424d !important;
+    border: none !important;
+}
+/*show page*/
+.show-img{
+    height: 30vh;
+}
+
+.btns{
+    display: flex;
+}
+
+.show-card{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#map {
+  height: 400px;
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 15px;
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  #map {
+    height: 300px;
+  }
+}
+
+/* review section styling */
+.review-card {
+  border: 1px solid #e2e8f0 !important;
+  background-color: #fff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.review-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* wishlist button & heart styling */
+.wishlist-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.6rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.wishlist-btn:hover {
+  transform: scale(1.18);
+}
+
+.wishlist-btn:active {
+  transform: scale(0.92);
+}
+
+.wishlist-heart-filled {
+  color: #fe424d;
+  filter: drop-shadow(0 2px 4px rgba(254, 66, 77, 0.3));
+}
+
+.wishlist-heart-empty {
+  color: #555555;
+}
+
+/* Show page wishlist action button */
+.wishlist-btn-show {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  border-radius: 2rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #222222;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wishlist-btn-show:hover {
+  background-color: #f8fafc;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.wishlist-btn-show:active {
+  transform: scale(0.96);
+}
+
+.wishlist-btn-show .fa-heart {
+  font-size: 1.15rem;
+}
+
+/* Wishlist card styling */
+.wishlist-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border-radius: 1rem !important;
+  overflow: hidden;
+  border: none !important;
+}
+
+.wishlist-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12) !important;
+}
+
+.wishlist-card .card-img-top {
+  height: 18rem;
+  object-fit: cover;
+  border-radius: 1rem 1rem 0 0 !important;
+}
+
+/* Floating heart button on cards */
+.wishlist-floating-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
+  border: none;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wishlist-floating-btn:hover {
+  transform: scale(1.15);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+}
+
+.wishlist-floating-btn .fa-heart {
+  font-size: 1.1rem;
+}
+
+/* Empty wishlist container */
+.empty-wishlist-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem;
+  background: #ffffff;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f1f5f9;
+}
+
+.empty-wishlist-icon {
+  font-size: 3.5rem;
+  color: #fe424d;
+  opacity: 0.9;
+  margin-bottom: 1.25rem;
+  display: inline-block;
+  animation: pulse-heart 2.2s infinite ease-in-out;
+}
+
+@keyframes pulse-heart {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Booking Card & Form Styling */
+.booking-card {
+  border-radius: 1rem !important;
+  border: 1px solid #e2e8f0 !important;
+  background-color: #ffffff;
+}
+
+.booking-inputs-box {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+}
+

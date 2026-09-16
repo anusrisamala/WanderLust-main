@@ -1,0 +1,800 @@
+<% layout("/layouts/boilerplate") %>
+  <div class="row mt-3">
+    <div class="col-12 col-md-8 offset-md-2">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="mb-0"><%= listing.title %></h3>
+        <form method="POST" action="/listings/<%= listing._id %>/wishlist" class="d-inline">
+          <button type="submit" class="wishlist-btn-show" title="<%= (typeof isWishlisted !== 'undefined' && isWishlisted) ? 'Remove from Wishlist' : 'Add to Wishlist' %>">
+            <% if (typeof isWishlisted !== 'undefined' && isWishlisted) { %>
+              <i class="fa-solid fa-heart wishlist-heart-filled"></i>
+              <span class="ms-1 d-none d-sm-inline">Saved</span>
+            <% } else { %>
+              <i class="fa-regular fa-heart wishlist-heart-empty"></i>
+              <span class="ms-1 d-none d-sm-inline">Save</span>
+            <% } %>
+          </button>
+        </form>
+      </div>
+
+      <div class="card show-card listing-card mt-3">
+        <img src="<%= listing.image.url %>" class="card-img-top show-img" alt="listing_image">
+        <div class="card-body">
+          <p class="card-text">Owned By <i>
+              <%= listing.owner ? listing.owner.username : "Unknown" %>
+            </i></p>
+          <p class="card-text">
+            <%= listing.description %>
+          </p>
+          <p class="card-text">&#8377; <%= listing.price.toLocaleString("en-IN") %> / night</p>
+          <p class="card-text">
+            <%= listing.location %>, <%= listing.country %>
+          </p>
+        </div>
+      </div>
+
+      <!-- Owner Edit & Delete Buttons (Directly below listing card) -->
+      <% if(currUser && listing.owner && currUser._id.equals(listing.owner._id)){ %>
+        <div class="d-flex gap-3 my-3">
+          <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark edit-btn">Edit</a>
+          <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+            <button class="btn btn-dark">Delete</button>
+          </form>
+        </div>
+      <% } %>
+
+      <hr>
+
+      <!-- Booking Card Section -->
+      <div class="card booking-card shadow-sm p-4 my-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <span class="fs-4 fw-bold">&#8377;<%= listing.price ? listing.price.toLocaleString("en-IN") : "0" %></span>
+            <span class="text-muted"> / night</span>
+          </div>
+          <div>
+            <span class="badge bg-light text-dark border px-2 py-1"><i class="fa-solid fa-calendar-check text-danger me-1"></i>Reserve Stay</span>
+          </div>
+        </div>
+
+        <form action="/listings/<%= listing._id %>/bookings" method="POST" id="bookingForm" data-listing-id="<%= listing._id %>" data-price="<%= listing.price || 0 %>" data-tax-rate="<%= (typeof taxConfig !== 'undefined' && taxConfig.GST_PERCENT) ? taxConfig.GST_PERCENT : 5 %>" class="needs-validation" novalidate>
+          <div class="booking-inputs-box border rounded-3 p-3 mb-3 bg-light">
+            <div class="row g-3">
+              <!-- CHECK-IN -->
+              <div class="col-12 col-sm-6">
+                <label class="form-label fw-bold small text-uppercase text-secondary mb-2 d-block">
+                  <i class="fa-regular fa-calendar-plus me-1 text-danger"></i>Check-in
+                </label>
+                <div class="mb-2">
+                  <label for="checkInDate" class="form-label small text-muted mb-1">Date</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="checkInDate"
+                    name="booking[checkInDate]"
+                    required
+                  />
+                  <div class="invalid-feedback">Select check-in date</div>
+                </div>
+                <div>
+                  <label for="checkInTime" class="form-label small text-muted mb-1">Time</label>
+                  <input
+                    type="time"
+                    class="form-control"
+                    id="checkInTime"
+                    name="booking[checkInTime]"
+                    value="<%= listing.checkInTime || '14:00' %>"
+                    required
+                  />
+                  <div class="invalid-feedback">Select check-in time</div>
+                </div>
+              </div>
+
+              <!-- CHECK-OUT -->
+              <div class="col-12 col-sm-6">
+                <label class="form-label fw-bold small text-uppercase text-secondary mb-2 d-block">
+                  <i class="fa-regular fa-calendar-minus me-1 text-danger"></i>Check-out
+                </label>
+                <div class="mb-2">
+                  <label for="checkOutDate" class="form-label small text-muted mb-1">Date</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="checkOutDate"
+                    name="booking[checkOutDate]"
+                    required
+                  />
+                  <div class="invalid-feedback">Select check-out date</div>
+                </div>
+                <div>
+                  <label for="checkOutTime" class="form-label small text-muted mb-1">Time</label>
+                  <input
+                    type="time"
+                    class="form-control"
+                    id="checkOutTime"
+                    name="booking[checkOutTime]"
+                    value="<%= listing.checkOutTime || '11:00' %>"
+                    required
+                  />
+                  <div class="invalid-feedback">Select check-out time</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live validation message banner -->
+          <div id="bookingValidationError" class="alert alert-danger py-2 small d-none mb-3" role="alert">
+            <i class="fa-solid fa-circle-exclamation me-1"></i><span id="bookingValidationMsg"></span>
+          </div>
+
+          <!-- GUESTS -->
+          <div class="mb-3">
+            <label for="guests" class="form-label fw-bold small text-uppercase text-secondary mb-1 d-block">Guests</label>
+            <div class="d-flex align-items-center gap-2">
+              <div class="input-group" style="max-width: 170px;">
+                <button type="button" class="btn btn-outline-secondary px-3" id="decreaseGuests" aria-label="Decrease guests">-</button>
+                <input
+                  type="number"
+                  class="form-control text-center fw-bold"
+                  id="guests"
+                  name="booking[guests]"
+                  value="2"
+                  min="1"
+                  max="20"
+                  required
+                />
+                <button type="button" class="btn btn-outline-secondary px-3" id="increaseGuests" aria-label="Increase guests">+</button>
+              </div>
+              <span class="text-muted small">guest(s)</span>
+            </div>
+            <div class="invalid-feedback">At least 1 guest required</div>
+          </div>
+
+          <!-- Price Calculation Breakdown -->
+          <div id="priceBreakdown" class="d-none border-top pt-3 my-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="text-muted" id="priceCalculationText">&#8377;<%= listing.price ? listing.price.toLocaleString("en-IN") : "0" %> &times; 0 nights</span>
+              <span class="fw-semibold text-secondary" id="calculatedBasePrice">&#8377;0</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="text-muted" id="gstLabelText">GST (<%= (typeof taxConfig !== 'undefined' && taxConfig.GST_PERCENT) ? taxConfig.GST_PERCENT : 5 %>%)</span>
+              <span class="fw-semibold text-secondary" id="calculatedGstAmount">&#8377;0</span>
+            </div>
+            <hr class="my-2 text-muted">
+            <div class="d-flex justify-content-between align-items-center fw-bold fs-5">
+              <span>Total</span>
+              <span class="text-dark" id="calculatedTotalPrice">&#8377;0</span>
+            </div>
+          </div>
+
+          <!-- Availability & Selection Status Banner -->
+          <div id="availabilityStatus" class="alert py-2 px-3 small d-none mb-3 shadow-sm" role="status" aria-live="polite">
+            <div class="d-flex align-items-center">
+              <span id="availabilitySpinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+              <span id="availabilityIcon" class="me-2 d-none"></span>
+              <span id="availabilityMsg" class="fw-semibold"></span>
+            </div>
+            <div id="availabilityReason" class="small mt-1 d-none"></div>
+          </div>
+
+          <% if (currUser) { %>
+            <button type="submit" class="btn add-btn text-white w-100 py-2 fw-bold shadow-sm" id="reserveBtn" disabled>
+              Reserve
+            </button>
+          <% } else { %>
+            <a href="/login" class="btn add-btn text-white w-100 py-2 fw-bold text-center text-decoration-none shadow-sm" id="reserveBtn">
+              Log in to Reserve
+            </a>
+            <p class="text-muted small text-center mt-2 mb-0">You must be logged in to make a reservation.</p>
+          <% } %>
+        </form>
+      </div>
+
+      <hr>
+
+      <!-- Map Section -->
+          <div class="mt-4">
+            <h4>Where you'll be staying</h4>
+            <p class="text-muted mb-2">
+              <%= listing.location %>, <%= listing.country %>
+            </p>
+            <div id="map"></div>
+          </div>
+
+          <hr>
+
+          <!-- Review Form -->
+          <div class="mb-4">
+            <% if(currUser){ %>
+              <h4>Leave a Review</h4>
+              <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate class="needs-validation">
+                <div class="mb-3 mt-3">
+                  <label for="rating" class="form-label">Rating</label>
+                  <fieldset class="starability-slot">
+                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked
+                      aria-label="No rating." />
+                    <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                    <label for="first-rate1" title="Terrible">1 star</label>
+                    <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                    <label for="first-rate2" title="Not good">2 stars</label>
+                    <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                    <label for="first-rate3" title="Average">3 stars</label>
+                    <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                    <label for="first-rate4" title="Very good">4 stars</label>
+                    <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                    <label for="first-rate5" title="Amazing">5 stars</label>
+                  </fieldset>
+                </div>
+
+                <div class="mb-3 mt-3">
+                  <label for="comment" class="form-label">Comments</label>
+                  <textarea name="review[comment]" id="comment" cols="30" rows="4" class="form-control"
+                    placeholder="Share your experience..." required></textarea>
+                  <div class="invalid-feedback">
+                    Please add some comment for review
+                  </div>
+                </div>
+                <button class="btn btn-outline-dark">Submit</button>
+              </form>
+              <hr>
+              <% } %>
+
+                <!-- All Reviews -->
+                <% if(listing.reviews && listing.reviews.length> 0){ %>
+                  <h4 class="mb-3">All Reviews</h4>
+                  <div class="row">
+                    <% for(let review of listing.reviews){ %>
+                      <div class="col-12 col-md-6 mb-3">
+                        <div class="card h-100 review-card border rounded-3 p-3 shadow-sm">
+                          <div class="card-body p-0 d-flex flex-column justify-content-between">
+                            <div>
+                              <div class="d-flex align-items-center mb-2">
+                                <i class="fa-solid fa-circle-user fa-2x me-2 text-secondary"></i>
+                                <div>
+                                  <h6 class="card-title mb-0 fw-bold">@<%= review.author ? review.author.username
+                                      : "Anonymous" %>
+                                  </h6>
+                                  <% if(review.createdAt) { %>
+                                    <small class="text-muted">
+                                      <%= new Date(review.createdAt).toLocaleDateString("en-US", { month: "short" ,
+                                        day: "numeric" , year: "numeric" }) %>
+                                    </small>
+                                    <% } %>
+                                </div>
+                              </div>
+                              <p class="starability-result card-text mb-2" data-rating="<%= review.rating %>"></p>
+                              <p class="card-text text-secondary mb-3">
+                                <%= review.comment %>
+                              </p>
+                            </div>
+                            <% if(currUser && review.author && review.author._id.equals(currUser._id)){ %>
+                              <form method="POST"
+                                action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE"
+                                class="mt-auto">
+                                <button class="btn btn-sm btn-dark">Delete</button>
+                              </form>
+                              <% } %>
+                          </div>
+                        </div>
+                      </div>
+                      <% } %>
+                  </div>
+                  <% } %>
+          </div>
+    </div>
+  </div>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+  </script>
+
+  <% if (listing.latitude !=null && listing.longitude !=null) { %>
+    <script>
+      const latitude = parseFloat("<%= listing.latitude %>");
+      const longitude = parseFloat("<%= listing.longitude %>");
+      const listingTitle = "<%= listing.title %>";
+      const listingLocation = "<%= listing.location %>";
+
+      const map = L.map("map").setView([latitude, longitude], 13);
+
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors"
+      }).addTo(map);
+
+      L.marker([latitude, longitude])
+        .addTo(map)
+        .bindPopup(`<b>${listingTitle}</b><br><small>${listingLocation}</small><br>Exact location provided after booking.`)
+        .openPopup();
+    </script>
+    <% } else { %>
+      <script>
+        const mapContainer = document.getElementById("map");
+        if (mapContainer) {
+          mapContainer.innerHTML = "<p class='text-muted mt-2'>Location map unavailable for this listing.</p>";
+          mapContainer.style.height = "auto";
+        }
+      </script>
+      <% } %>
+
+<script>
+  (() => {
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+    const bookingForm = document.getElementById("bookingForm");
+    const checkInDate = document.getElementById("checkInDate");
+    const checkInTime = document.getElementById("checkInTime");
+    const checkOutDate = document.getElementById("checkOutDate");
+    const checkOutTime = document.getElementById("checkOutTime");
+    const guestsInput = document.getElementById("guests");
+    const decreaseGuests = document.getElementById("decreaseGuests");
+    const increaseGuests = document.getElementById("increaseGuests");
+
+    const reserveBtn = document.getElementById("reserveBtn");
+    const availabilityStatus = document.getElementById("availabilityStatus");
+    const availabilitySpinner = document.getElementById("availabilitySpinner");
+    const availabilityIcon = document.getElementById("availabilityIcon");
+    const availabilityMsg = document.getElementById("availabilityMsg");
+    const availabilityReason = document.getElementById("availabilityReason");
+
+    const priceBreakdown = document.getElementById("priceBreakdown");
+    const priceCalculationText = document.getElementById("priceCalculationText");
+    const calculatedBasePrice = document.getElementById("calculatedBasePrice");
+    const calculatedGstAmount = document.getElementById("calculatedGstAmount");
+    const calculatedTotalPrice = document.getElementById("calculatedTotalPrice");
+
+    const pricePerNight = bookingForm ? parseFloat(bookingForm.dataset.price) || 0 : 0;
+    const taxRatePercent = bookingForm ? parseFloat(bookingForm.dataset.taxRate) || 5 : 5;
+
+    let isAvailable = false;
+    let checkTimeout = null;
+    let currentRequestId = 0;
+
+    // 1. Prevent selecting obviously invalid dates (set HTML5 min bounds)
+    if (checkInDate) {
+      checkInDate.min = today;
+    }
+    if (checkOutDate) {
+      checkOutDate.min = today;
+    }
+
+    function setReserveButtonState(enabled) {
+      if (!reserveBtn) return;
+      if (reserveBtn.tagName === "BUTTON") {
+        reserveBtn.disabled = !enabled;
+      } else {
+        if (enabled) {
+          reserveBtn.classList.remove("disabled");
+          reserveBtn.style.pointerEvents = "";
+          reserveBtn.style.opacity = "";
+        } else {
+          reserveBtn.classList.add("disabled");
+          reserveBtn.style.pointerEvents = "none";
+          reserveBtn.style.opacity = "0.65";
+        }
+      }
+    }
+
+    // Initialize Reserve button disabled until checked & verified available
+    setReserveButtonState(false);
+
+    /**
+     * Display one of the 4 clear states:
+     * - 'checking': Checking availability...
+     * - 'available': ✓ Available for these dates
+     * - 'unavailable': ✕ This listing is not available for the selected dates. (with reason)
+     * - 'invalid': Invalid selection (with reason)
+     * - 'error': API/Network error
+     */
+    function showAvailabilityState(state, message, reason) {
+      if (!availabilityStatus || !availabilityMsg) return;
+
+      availabilityStatus.classList.remove("d-none", "alert-info", "alert-success", "alert-danger", "alert-warning");
+
+      if (availabilitySpinner) {
+        availabilitySpinner.classList.add("d-none");
+      }
+      if (availabilityIcon) {
+        availabilityIcon.classList.add("d-none");
+        availabilityIcon.innerHTML = "";
+      }
+      if (availabilityReason) {
+        availabilityReason.classList.add("d-none");
+        availabilityReason.textContent = "";
+      }
+
+      if (state === "checking") {
+        availabilityStatus.classList.add("alert-info");
+        if (availabilitySpinner) {
+          availabilitySpinner.classList.remove("d-none");
+        }
+        availabilityMsg.textContent = message || "Checking availability...";
+      } else if (state === "available") {
+        availabilityStatus.classList.add("alert-success");
+        if (availabilityIcon) {
+          availabilityIcon.classList.remove("d-none");
+          availabilityIcon.innerHTML = '<i class="fa-solid fa-circle-check text-success"></i>';
+        }
+        availabilityMsg.textContent = message || "✓ Available for these dates";
+        if (reason && availabilityReason) {
+          availabilityReason.classList.remove("d-none");
+          availabilityReason.textContent = reason;
+        }
+      } else if (state === "unavailable") {
+        availabilityStatus.classList.add("alert-danger");
+        if (availabilityIcon) {
+          availabilityIcon.classList.remove("d-none");
+          availabilityIcon.innerHTML = '<i class="fa-solid fa-circle-xmark text-danger"></i>';
+        }
+        availabilityMsg.textContent = message || "✕ This listing is not available for the selected dates.";
+        if (availabilityReason) {
+          availabilityReason.classList.remove("d-none");
+          availabilityReason.textContent = reason || "Another reservation overlaps with these dates and times. Please choose different dates or times.";
+        }
+      } else if (state === "invalid") {
+        availabilityStatus.classList.add("alert-warning");
+        if (availabilityIcon) {
+          availabilityIcon.classList.remove("d-none");
+          availabilityIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-warning"></i>';
+        }
+        availabilityMsg.textContent = "Invalid date/time selection";
+        if (availabilityReason) {
+          availabilityReason.classList.remove("d-none");
+          availabilityReason.textContent = message || reason || "Please verify your selected dates and times.";
+        }
+      } else if (state === "error") {
+        availabilityStatus.classList.add("alert-warning");
+        if (availabilityIcon) {
+          availabilityIcon.classList.remove("d-none");
+          availabilityIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-warning"></i>';
+        }
+        availabilityMsg.textContent = message || "✕ Unable to check availability.";
+        if (reason && availabilityReason) {
+          availabilityReason.classList.remove("d-none");
+          availabilityReason.textContent = reason;
+        }
+      } else {
+        availabilityStatus.classList.add("d-none");
+      }
+    }
+
+    function clearAvailabilityState() {
+      if (availabilityStatus) {
+        availabilityStatus.classList.add("d-none");
+        availabilityStatus.classList.remove("alert-info", "alert-success", "alert-danger", "alert-warning");
+      }
+      if (availabilitySpinner) {
+        availabilitySpinner.classList.add("d-none");
+      }
+      if (availabilityIcon) {
+        availabilityIcon.classList.add("d-none");
+        availabilityIcon.innerHTML = "";
+      }
+      if (availabilityMsg) {
+        availabilityMsg.textContent = "";
+      }
+      if (availabilityReason) {
+        availabilityReason.classList.add("d-none");
+        availabilityReason.textContent = "";
+      }
+    }
+
+    function parseDateUTC(dateStr) {
+      if (!dateStr) return null;
+      const parts = dateStr.split("-").map(Number);
+      if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return null;
+      return Date.UTC(parts[0], parts[1] - 1, parts[2]);
+    }
+
+    function validateAndCalculate() {
+      if (!checkInDate || !checkOutDate || !checkInTime || !checkOutTime || !guestsInput) {
+        return false;
+      }
+
+      // Reset validation error styles
+      checkInDate.classList.remove("is-invalid");
+      checkOutDate.classList.remove("is-invalid");
+      checkInTime.classList.remove("is-invalid");
+      checkOutTime.classList.remove("is-invalid");
+      guestsInput.classList.remove("is-invalid");
+
+      checkInDate.setCustomValidity("");
+      checkOutDate.setCustomValidity("");
+      checkInTime.setCustomValidity("");
+      checkOutTime.setCustomValidity("");
+      guestsInput.setCustomValidity("");
+
+      const inDate = checkInDate.value;
+      const inTime = checkInTime.value;
+      const outDate = checkOutDate.value;
+      const outTime = checkOutTime.value;
+      const guests = parseInt(guestsInput.value, 10);
+
+      // Guests validation: at least 1
+      if (isNaN(guests) || guests < 1) {
+        guestsInput.classList.add("is-invalid");
+        guestsInput.setCustomValidity("Guests must be at least 1.");
+        showAvailabilityState("invalid", "Number of guests must be at least 1.");
+        if (priceBreakdown) priceBreakdown.classList.add("d-none");
+        setReserveButtonState(false);
+        isAvailable = false;
+        return false;
+      }
+
+      // If either date is not yet selected, hide price breakdown and return false
+      if (!inDate || !outDate) {
+        if (priceBreakdown) priceBreakdown.classList.add("d-none");
+        clearAvailabilityState();
+        setReserveButtonState(false);
+        isAvailable = false;
+        clearTimeout(checkTimeout);
+        currentRequestId++;
+        return false;
+      }
+
+      // 1. Check-in date cannot be in the past
+      if (inDate < today) {
+        checkInDate.classList.add("is-invalid");
+        checkInDate.setCustomValidity("Check-in date cannot be in the past.");
+        showAvailabilityState("invalid", "Check-in date cannot be in the past. Please select today or a future date.");
+        if (priceBreakdown) priceBreakdown.classList.add("d-none");
+        setReserveButtonState(false);
+        isAvailable = false;
+        return false;
+      }
+
+      // 2. Check-out date must be on or after check-in date
+      if (outDate < inDate) {
+        checkOutDate.classList.add("is-invalid");
+        checkOutDate.setCustomValidity("Check-out date must be on or after check-in date.");
+        showAvailabilityState("invalid", "Check-out date must be on or after check-in date.");
+        if (priceBreakdown) priceBreakdown.classList.add("d-none");
+        setReserveButtonState(false);
+        isAvailable = false;
+        return false;
+      }
+
+      const isSameDay = (outDate === inDate);
+
+      // 3. If check-in and check-out happen on the same date, check-out time must be later than check-in time
+      if (isSameDay) {
+        if (inTime && outTime && outTime <= inTime) {
+          checkOutTime.classList.add("is-invalid");
+          checkOutTime.setCustomValidity("For same-day bookings, check-out time must be later than check-in time.");
+          showAvailabilityState("invalid", "For same-day stays, check-out time must be later than check-in time.");
+          if (priceBreakdown) priceBreakdown.classList.add("d-none");
+          setReserveButtonState(false);
+          isAvailable = false;
+          return false;
+        }
+      }
+
+      // Calculate stay duration & price breakdown
+      const startUTC = parseDateUTC(inDate);
+      const endUTC = parseDateUTC(outDate);
+      const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+      let nights = 0;
+      let label = "";
+
+      if (isSameDay) {
+        nights = 1;
+        label = "1 night (same-day stay)";
+      } else {
+        nights = Math.round((endUTC - startUTC) / MS_PER_DAY);
+        label = nights === 1 ? "1 night" : `${nights} nights`;
+      }
+
+      if (nights > 0 && priceBreakdown) {
+        const basePrice = Math.max(0, nights * pricePerNight);
+        const taxRate = Math.max(0, taxRatePercent);
+        const gstAmount = Math.round(basePrice * (taxRate / 100));
+        const totalPrice = basePrice + gstAmount;
+
+        const formattedPerNight = pricePerNight.toLocaleString("en-IN");
+        const formattedBasePrice = basePrice.toLocaleString("en-IN");
+        const formattedGstAmount = gstAmount.toLocaleString("en-IN");
+        const formattedTotalPrice = totalPrice.toLocaleString("en-IN");
+
+        if (priceCalculationText) {
+          priceCalculationText.innerHTML = `&#8377;${formattedPerNight} &times; ${label}`;
+        }
+        if (calculatedBasePrice) {
+          calculatedBasePrice.innerHTML = `&#8377;${formattedBasePrice}`;
+        }
+        if (calculatedGstAmount) {
+          calculatedGstAmount.innerHTML = `&#8377;${formattedGstAmount}`;
+        }
+        if (calculatedTotalPrice) {
+          calculatedTotalPrice.innerHTML = `&#8377;${formattedTotalPrice}`;
+        }
+        priceBreakdown.classList.remove("d-none");
+      }
+
+      return true;
+    }
+
+    function triggerAvailabilityCheck() {
+      clearTimeout(checkTimeout);
+      isAvailable = false;
+      setReserveButtonState(false);
+
+      const inDate = checkInDate ? checkInDate.value : "";
+      const outDate = checkOutDate ? checkOutDate.value : "";
+      const inTime = checkInTime ? checkInTime.value : "";
+      const outTime = checkOutTime ? checkOutTime.value : "";
+
+      if (!inDate || !outDate || !inTime || !outTime) {
+        clearAvailabilityState();
+        return;
+      }
+
+      showAvailabilityState("checking", "Checking availability...");
+
+      checkTimeout = setTimeout(() => {
+        performAvailabilityCheck();
+      }, 250);
+    }
+
+    async function performAvailabilityCheck() {
+      const reqId = ++currentRequestId;
+      const inDate = checkInDate.value;
+      const inTime = checkInTime.value;
+      const outDate = checkOutDate.value;
+      const outTime = checkOutTime.value;
+      const listingId = bookingForm ? bookingForm.dataset.listingId : null;
+
+      if (!listingId || !inDate || !outDate || !inTime || !outTime) {
+        return;
+      }
+
+      try {
+        const params = new URLSearchParams({
+          checkInDate: inDate,
+          checkInTime: inTime,
+          checkOutDate: outDate,
+          checkOutTime: outTime
+        });
+
+        const response = await fetch(`/listings/${listingId}/availability?${params.toString()}`, {
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        // Discard stale response if newer request was started
+        if (reqId !== currentRequestId) return;
+
+        const data = await response.json();
+
+        if (response.ok && data.available === true) {
+          isAvailable = true;
+          showAvailabilityState("available", "✓ Available for these dates", "You can proceed with your reservation.");
+          setReserveButtonState(true);
+        } else if (response.ok && data.available === false) {
+          isAvailable = false;
+          showAvailabilityState("unavailable", data.message || "✕ This listing is not available for the selected dates.", data.reason || "Another reservation overlaps with these dates and times. Please choose different dates or times.");
+          setReserveButtonState(false);
+        } else {
+          // 4xx or 5xx from server
+          isAvailable = false;
+          const errMsg = data.message || data.error || "✕ Unable to check availability. Please try again.";
+          showAvailabilityState("invalid", errMsg);
+          setReserveButtonState(false);
+        }
+      } catch (err) {
+        if (reqId !== currentRequestId) return;
+        isAvailable = false;
+        showAvailabilityState("error", "✕ Unable to check availability. Please check your connection and try again.");
+        setReserveButtonState(false);
+      }
+    }
+
+    // 5. Handle repeated changes: reset previous availability and require fresh check
+    function handleInputChange() {
+      // Immediately invalidate previous availability state on any input change
+      isAvailable = false;
+      setReserveButtonState(false);
+      clearTimeout(checkTimeout);
+      currentRequestId++;
+
+      const inDate = checkInDate ? checkInDate.value : "";
+      const outDate = checkOutDate ? checkOutDate.value : "";
+
+      // Enforce checkout minimum date dynamically
+      if (inDate && checkOutDate) {
+        checkOutDate.min = inDate;
+      }
+
+      const isValid = validateAndCalculate();
+
+      if (isValid && inDate && outDate) {
+        // Valid date/time selection: trigger backend Availability API check
+        triggerAvailabilityCheck();
+      } else if (!inDate || !outDate) {
+        clearAvailabilityState();
+      }
+    }
+
+    // Listen to both 'change' and 'input' on all date and time inputs for immediate reactivity
+    ["change", "input"].forEach((evt) => {
+      if (checkInDate) {
+        checkInDate.addEventListener(evt, () => {
+          if (checkInDate.value) {
+            checkOutDate.min = checkInDate.value;
+            if (checkOutDate.value && checkOutDate.value < checkInDate.value) {
+              checkOutDate.value = checkInDate.value;
+            }
+          }
+          handleInputChange();
+        });
+      }
+
+      if (checkOutDate) {
+        checkOutDate.addEventListener(evt, () => {
+          handleInputChange();
+        });
+      }
+
+      if (checkInTime) {
+        checkInTime.addEventListener(evt, () => {
+          handleInputChange();
+        });
+      }
+
+      if (checkOutTime) {
+        checkOutTime.addEventListener(evt, () => {
+          handleInputChange();
+        });
+      }
+    });
+
+    if (guestsInput && decreaseGuests && increaseGuests) {
+      decreaseGuests.addEventListener("click", () => {
+        let val = parseInt(guestsInput.value, 10) || 1;
+        if (val > 1) {
+          guestsInput.value = val - 1;
+        }
+        handleInputChange();
+      });
+
+      increaseGuests.addEventListener("click", () => {
+        let val = parseInt(guestsInput.value, 10) || 1;
+        guestsInput.value = val + 1;
+        handleInputChange();
+      });
+
+      guestsInput.addEventListener("input", () => {
+        let val = parseInt(guestsInput.value, 10);
+        if (isNaN(val) || val < 1) {
+          guestsInput.value = 1;
+        }
+        handleInputChange();
+      });
+    }
+
+    if (bookingForm) {
+      bookingForm.addEventListener("submit", (e) => {
+        const isValid = validateAndCalculate();
+        if (!isValid || !isAvailable || !bookingForm.checkValidity()) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!isAvailable) {
+            if (!checkInDate.value || !checkOutDate.value) {
+              showAvailabilityState("invalid", "Please select both check-in and check-out dates.");
+            } else {
+              showAvailabilityState("invalid", "Please select available dates before reserving.");
+            }
+          }
+          return;
+        }
+        bookingForm.classList.add("was-validated");
+      });
+    }
+
+    // Run check on initial load in case inputs are pre-filled
+    if (checkInDate && checkInDate.value && checkOutDate && checkOutDate.value) {
+      handleInputChange();
+    }
+  })();
+</script>

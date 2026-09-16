@@ -1,0 +1,94 @@
+<style
+>
+  .search-btn{
+    background-color: #fe424d;
+    color: #fff;
+    border-radius: 25px;
+    padding: 0 1rem 0 1rem;
+  }
+
+  .search-btn:hover{
+    background-color: #fe424d;
+    color: #fff;
+  }
+
+  .search-btn i{
+    display: inline;
+    margin-right: 0.5rem;
+  }
+
+  .search-inp{
+    border-radius: 25px;
+    padding: 0 3rem 0.5rem 3rem;
+    font-size: 0.8rem;
+  }
+
+</style>
+
+
+
+<nav class="navbar navbar-expand-md  bg-body-light border-bottom sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+
+        <a class="nav-link" href="/listings">Explore</a>
+
+      </div>
+      <div class="navbar-nav ms-auto">
+        <form class="d-flex" role="search" action="/listings/search" method="GET">
+          <% if (typeof category !== 'undefined' && category) { %>
+            <input type="hidden" name="category" value="<%= category %>">
+          <% } %>
+          <input class="form-control me-2 search-inp" type="search" name="q" placeholder="Search your next destinaton" value="<%= typeof searchQuery !== 'undefined' && searchQuery ? searchQuery : '' %>">
+          <button class="btn search-btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+        </form>
+      </div>
+      <div class="navbar-nav ms-auto">
+        <a class="nav-link" href="/listings/new">Airbnb your home</a>
+        <% if(!currUser){ %>
+          <a class="nav-link active" href="/signup"><b>SignUp</b></a>
+          <a class="nav-link" href="/login"><b>LogIn</b></a>
+        <% } %>
+        <% if(currUser){ %>
+          <a class="nav-link" href="/wishlist"><i class="fa-regular fa-heart me-1"></i>Wishlist</a>
+          <a class="nav-link" href="/bookings"><i class="fa-regular fa-calendar-check me-1"></i>My Bookings</a>
+          <a class="nav-link" href="/logout">Logout</a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  (() => {
+    const searchInput = document.querySelector(".search-inp");
+    if (!searchInput) return;
+
+    let isClearing = false;
+    const handleClear = () => {
+      if (isClearing) return;
+      if (searchInput.value.trim() === "") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isSearchActive = window.location.pathname.includes("/search") || urlParams.has("q");
+        if (isSearchActive) {
+          isClearing = true;
+          const hiddenCategoryInput = document.querySelector('form[action="/listings/search"] input[name="category"]');
+          const category = urlParams.get("category") || (hiddenCategoryInput ? hiddenCategoryInput.value : "");
+          if (category && category.trim()) {
+            window.location.href = `/listings?category=${encodeURIComponent(category.trim())}`;
+          } else {
+            window.location.href = "/listings";
+          }
+        }
+      }
+    };
+
+    searchInput.addEventListener("input", handleClear);
+    searchInput.addEventListener("search", handleClear);
+  })();
+</script>

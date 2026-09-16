@@ -1,0 +1,103 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row mt-4 mb-3">
+  <div class="col-12">
+    <h3 class="fw-bold"><i class="fa-solid fa-calendar-days text-danger me-2"></i>My Bookings</h3>
+  </div>
+</div>
+
+<% if (!bookings || bookings.length === 0) { %>
+  <div class="row my-5">
+    <div class="col-12 text-center">
+      <div class="empty-wishlist-container">
+        <i class="fa-regular fa-calendar-xmark empty-wishlist-icon"></i>
+        <h4 class="fw-bold mb-2">You don't have any bookings yet.</h4>
+        <p class="text-muted mb-4">When you book a stay, your reservations will appear here.</p>
+        <a href="/listings" class="btn btn-dark add-btn px-4 py-2">Explore Listings</a>
+      </div>
+    </div>
+  </div>
+<% } else { %>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+    <% for (let booking of bookings) { %>
+      <div class="col">
+        <div class="card h-100 border shadow-sm rounded-4 overflow-hidden">
+          <!-- Listing Image -->
+          <div class="position-relative">
+            <img
+              src="<%= (booking.listing && booking.listing.image && booking.listing.image.url) ? booking.listing.image.url : '/images/default.jpg' %>"
+              class="card-img-top object-fit-cover"
+              style="height: 200px; border-radius: 1rem 1rem 0 0 !important;"
+              alt="<%= booking.listing ? booking.listing.title : 'Listing' %>"
+            />
+            <!-- Status Badge -->
+            <span class="position-absolute top-0 end-0 m-3 badge <%= booking.status === 'CONFIRMED' ? 'bg-success' : (booking.status === 'CANCELLED' ? 'bg-danger' : 'bg-warning text-dark') %> px-3 py-2 shadow-sm">
+              <%= booking.status %>
+            </span>
+          </div>
+
+          <div class="card-body p-4 d-flex flex-column justify-content-between">
+            <div>
+              <h5 class="card-title fw-bold mb-1">
+                <%= booking.listing ? booking.listing.title : "Listing Unavailable" %>
+              </h5>
+              <p class="text-muted small mb-3">
+                <i class="fa-solid fa-location-dot me-1 text-danger"></i>
+                <%= booking.listing ? booking.listing.location : "N/A" %><% if (booking.listing && booking.listing.country) { %>, <%= booking.listing.country %><% } %>
+              </p>
+
+              <div class="bg-light rounded-3 p-3 mb-3 small">
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="text-muted">Check-in:</span>
+                  <span class="fw-semibold"><%= new Date(booking.checkInDate || booking.checkIn).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) %><% if (booking.checkInTime) { %> <small class="text-muted"><%= booking.checkInTime %></small><% } %></span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="text-muted">Check-out:</span>
+                  <span class="fw-semibold"><%= new Date(booking.checkOutDate || booking.checkOut).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) %><% if (booking.checkOutTime) { %> <small class="text-muted"><%= booking.checkOutTime %></small><% } %></span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="text-muted">Guests:</span>
+                  <span class="fw-semibold"><%= booking.guests %> <%= booking.guests === 1 ? 'guest' : 'guests' %></span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="text-muted">Nights:</span>
+                  <span class="fw-semibold"><%= booking.numberOfNights || 1 %> <%= (booking.numberOfNights || 1) === 1 ? 'night' : 'nights' %></span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="text-muted">Base Price:</span>
+                  <span class="fw-semibold">&#8377;<%= (booking.basePrice != null ? booking.basePrice : (booking.totalPrice || 0)).toLocaleString("en-IN") %></span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="text-muted">GST (<%= booking.taxRate != null ? booking.taxRate : 5 %>%):</span>
+                  <span class="fw-semibold">&#8377;<%= (booking.taxAmount != null ? booking.taxAmount : 0).toLocaleString("en-IN") %></span>
+                </div>
+                <div class="d-flex justify-content-between border-top pt-1 mt-1">
+                  <span class="text-muted">Booked on:</span>
+                  <span class="text-muted"><%= new Date(booking.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) %></span>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted small">Total Price:</span>
+                <span class="fs-5 fw-bold text-danger">&#8377;<%= booking.totalPrice ? booking.totalPrice.toLocaleString("en-IN") : "0" %></span>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <a href="/bookings/<%= booking._id %>" class="btn btn-outline-dark flex-grow-1 py-2 fw-semibold">
+                View Booking
+              </a>
+              <% if (booking.status === "PENDING" || booking.status === "CONFIRMED") { %>
+                <form method="POST" action="/bookings/<%= booking._id %>/cancel" class="m-0" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                  <button type="submit" class="btn btn-outline-danger py-2 px-3 fw-semibold" title="Cancel Booking">
+                    Cancel
+                  </button>
+                </form>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+<% } %>
