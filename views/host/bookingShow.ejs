@@ -1,0 +1,280 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row mt-4 mb-5">
+  <div class="col-12 col-lg-10 offset-lg-1">
+    <!-- Top Breadcrumb Navigation -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <a href="/host/bookings" class="text-decoration-none text-muted small fw-medium">
+        <i class="fa-solid fa-arrow-left me-1"></i>Back to Bookings Received
+      </a>
+      <div class="d-flex gap-2">
+        <a href="/host/dashboard" class="text-decoration-none text-muted small fw-medium">
+          <i class="fa-solid fa-gauge-high me-1"></i>Host Dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Container Card -->
+    <div class="card border shadow-sm rounded-4 p-4 p-md-5 bg-white">
+      <!-- Header: Booking ID, Created Date & Status -->
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start pb-4 mb-4 border-bottom gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <h2 class="fw-bold mb-0">Booking Details</h2>
+          </div>
+          <p class="text-muted small mb-1">
+            Booking ID: <span class="font-monospace fw-semibold text-dark"><%= booking._id %></span>
+          </p>
+          <p class="text-muted small mb-0">
+            <i class="fa-regular fa-clock me-1"></i>Booked on <%= booking.createdAt ? new Date(booking.createdAt).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : "N/A" %>
+          </p>
+        </div>
+
+        <div>
+          <% if (booking.status === "CONFIRMED") { %>
+            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 fs-6 fw-semibold">
+              <i class="fa-solid fa-circle-check me-1"></i>Status: Confirmed
+            </span>
+          <% } else if (booking.status === "PENDING") { %>
+            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2 fs-6 fw-semibold">
+              <i class="fa-solid fa-hourglass-half me-1"></i>Status: Pending
+            </span>
+          <% } else if (booking.status === "CANCELLED") { %>
+            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 fs-6 fw-semibold">
+              <i class="fa-solid fa-ban me-1"></i>Status: Cancelled
+            </span>
+          <% } else if (booking.status === "COMPLETED") { %>
+            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 fs-6 fw-semibold">
+              <i class="fa-solid fa-flag-checkered me-1"></i>Status: Completed
+            </span>
+          <% } else { %>
+            <span class="badge bg-light text-dark border px-3 py-2 fs-6">
+              Status: <%= booking.status %>
+            </span>
+          <% } %>
+        </div>
+      </div>
+
+      <% if (booking.status === "PENDING") { %>
+        <!-- Pending Action Required Banner -->
+        <div class="alert alert-warning border border-warning border-opacity-50 rounded-4 p-4 mb-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+              <h5 class="fw-bold mb-1 text-dark">
+                <i class="fa-solid fa-bell text-warning me-2"></i>Booking Request Pending Host Approval
+              </h5>
+              <p class="text-muted small mb-0">
+                Please review the guest, stay, and pricing information. You can approve this reservation or decline the request.
+              </p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap align-items-center">
+              <form method="POST" action="/host/bookings/<%= booking._id %>/confirm" class="m-0">
+                <button type="submit" class="btn btn-success px-4 py-2 fw-semibold shadow-sm">
+                  <i class="fa-solid fa-circle-check me-1"></i>Confirm Booking
+                </button>
+              </form>
+              <form method="POST" action="/host/bookings/<%= booking._id %>/cancel" class="m-0" onsubmit="return confirm('Are you sure you want to decline/cancel this booking request? The reserved dates will become available again.');">
+                <button type="submit" class="btn btn-outline-danger px-4 py-2 fw-semibold">
+                  <i class="fa-solid fa-ban me-1"></i>Cancel Booking
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- SECTION 1: STAY INFORMATION -->
+      <div class="mb-5">
+        <h4 class="fw-bold mb-3 text-dark d-flex align-items-center gap-2">
+          <i class="fa-solid fa-hotel text-danger"></i>Stay Information
+        </h4>
+
+        <!-- Listing Overview Card -->
+        <div class="card mb-4 border-0 bg-light rounded-3 p-3">
+          <div class="row g-3 align-items-center">
+            <% if (booking.listing && booking.listing.image && booking.listing.image.url) { %>
+              <div class="col-12 col-sm-4 col-md-3">
+                <img
+                  src="<%= booking.listing.image.url %>"
+                  class="img-fluid rounded-3 w-100 object-fit-cover shadow-sm"
+                  style="height: 130px;"
+                  alt="<%= booking.listing.title %>"
+                />
+              </div>
+            <% } %>
+            <div class="col-12 <%= (booking.listing && booking.listing.image && booking.listing.image.url) ? 'col-sm-8 col-md-9' : 'col-12' %>">
+              <small class="text-muted text-uppercase fw-semibold">Hosted Property</small>
+              <h4 class="fw-bold mb-1 text-dark">
+                <%= booking.listing ? booking.listing.title : "Listing Unavailable" %>
+              </h4>
+              <p class="text-muted mb-2 small">
+                <i class="fa-solid fa-location-dot me-1 text-danger"></i>
+                <%= booking.listing ? booking.listing.location : "N/A" %><% if (booking.listing && booking.listing.country) { %>, <%= booking.listing.country %><% } %>
+              </p>
+              <div class="d-flex flex-wrap align-items-center gap-3">
+                <span class="fw-semibold text-dark small">
+                  <strong>Listed Rate:</strong> &#8377;<%= (booking.pricePerNight != null ? booking.pricePerNight : (booking.listing ? booking.listing.price : 0)).toLocaleString("en-IN") %> / night
+                </span>
+                <% if (booking.listing && booking.listing._id) { %>
+                  <a href="/listings/<%= booking.listing._id %>" class="btn btn-sm btn-outline-dark px-3 py-1">
+                    <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>View Public Listing
+                  </a>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stay Details Grid (Dates, Times, Guests, Nights) -->
+        <div class="row g-3 bg-light rounded-3 p-4 mx-0">
+          <div class="col-6 col-md-3">
+            <span class="text-muted small text-uppercase fw-semibold d-block mb-1">
+              <i class="fa-regular fa-calendar me-1 text-success"></i>Check-in Date
+            </span>
+            <div class="fw-bold fs-6 text-dark">
+              <%= booking.checkInDate ? new Date(booking.checkInDate).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "N/A" %>
+            </div>
+            <div class="text-muted small mt-1">
+              <i class="fa-regular fa-clock me-1"></i><%= booking.checkInTime || "N/A" %>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <span class="text-muted small text-uppercase fw-semibold d-block mb-1">
+              <i class="fa-regular fa-calendar-check me-1 text-danger"></i>Check-out Date
+            </span>
+            <div class="fw-bold fs-6 text-dark">
+              <%= booking.checkOutDate ? new Date(booking.checkOutDate).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "N/A" %>
+            </div>
+            <div class="text-muted small mt-1">
+              <i class="fa-regular fa-clock me-1"></i><%= booking.checkOutTime || "N/A" %>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <span class="text-muted small text-uppercase fw-semibold d-block mb-1">
+              <i class="fa-solid fa-moon me-1 text-primary"></i>Duration
+            </span>
+            <div class="fw-bold fs-6 text-dark">
+              <%= booking.numberOfNights || nights %> <%= (booking.numberOfNights || nights) === 1 ? 'Night' : 'Nights' %>
+            </div>
+            <div class="text-muted small mt-1">
+              Length of stay
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <span class="text-muted small text-uppercase fw-semibold d-block mb-1">
+              <i class="fa-solid fa-users me-1 text-info"></i>Total Guests
+            </span>
+            <div class="fw-bold fs-6 text-dark">
+              <%= booking.guests %> <%= booking.guests === 1 ? 'Guest' : 'Guests' %>
+            </div>
+            <div class="text-muted small mt-1">
+              Party size
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: GUEST INFORMATION -->
+      <div class="mb-5">
+        <h4 class="fw-bold mb-3 text-dark d-flex align-items-center gap-2">
+          <i class="fa-solid fa-user-check text-primary"></i>Guest Information
+        </h4>
+
+        <div class="card border rounded-3 p-4 bg-white shadow-none">
+          <div class="d-flex align-items-center gap-3">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 58px; height: 58px;">
+              <%= (booking.user && booking.user.username) ? booking.user.username.charAt(0).toUpperCase() : 'G' %>
+            </div>
+            <div class="flex-grow-1">
+              <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                <h5 class="fw-bold mb-0 text-dark">
+                  <%= booking.user ? booking.user.username : 'Anonymous Guest' %>
+                </h5>
+                <span class="badge bg-light text-secondary border px-2 py-1 small">Traveler</span>
+              </div>
+              <% if (booking.user && booking.user.email) { %>
+                <div class="text-muted small mb-0">
+                  <i class="fa-solid fa-envelope me-1 text-secondary"></i>
+                  <a href="mailto:<%= booking.user.email %>" class="text-decoration-none text-muted hover-underline">
+                    <%= booking.user.email %>
+                  </a>
+                </div>
+              <% } else { %>
+                <div class="text-muted small">No contact email provided</div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: PAYMENT SUMMARY -->
+      <div class="mb-4">
+        <h4 class="fw-bold mb-3 text-dark d-flex align-items-center gap-2">
+          <i class="fa-solid fa-receipt text-success"></i>Payment Summary
+        </h4>
+
+        <div class="card border rounded-3 p-4 bg-light bg-opacity-50 shadow-none">
+          <div class="d-flex justify-content-between text-muted mb-2">
+            <span>Price per night:</span>
+            <span class="fw-semibold text-dark">&#8377;<%= (booking.pricePerNight != null ? booking.pricePerNight : (booking.listing ? booking.listing.price : 0)).toLocaleString("en-IN") %></span>
+          </div>
+
+          <div class="d-flex justify-content-between text-muted mb-2">
+            <span>
+              Base price (&#8377;<%= (booking.pricePerNight != null ? booking.pricePerNight : (booking.listing ? booking.listing.price : 0)).toLocaleString("en-IN") %> &times; <%= booking.numberOfNights || nights %> <%= (booking.numberOfNights || nights) === 1 ? 'night' : 'nights' %>):
+            </span>
+            <span class="fw-semibold text-dark">&#8377;<%= (booking.basePrice != null ? booking.basePrice : (booking.totalPrice || 0)).toLocaleString("en-IN") %></span>
+          </div>
+
+          <div class="d-flex justify-content-between text-muted mb-2">
+            <span>GST / Tax (<%= booking.taxRate != null ? booking.taxRate : 5 %>%):</span>
+            <span class="fw-semibold text-dark">&#8377;<%= (booking.taxAmount != null ? booking.taxAmount : 0).toLocaleString("en-IN") %></span>
+          </div>
+
+          <hr class="my-3 text-muted">
+
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="fw-bold fs-5 text-dark">Total Payout:</span>
+              <small class="text-muted d-block" style="font-size: 0.8rem;">Inclusive of applicable taxes</small>
+            </div>
+            <span class="fs-4 fw-bold text-success">&#8377;<%= (booking.totalPrice || 0).toLocaleString("en-IN") %></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions & Navigation Footer -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center pt-3 border-top gap-2">
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="/host/bookings" class="btn btn-outline-dark px-4 py-2 fw-semibold">
+            <i class="fa-solid fa-arrow-left me-1"></i>All Received Bookings
+          </a>
+          <% if (booking.listing && booking.listing._id) { %>
+            <a href="/listings/<%= booking.listing._id %>" class="btn btn-outline-secondary px-4 py-2 fw-semibold">
+              <i class="fa-solid fa-house me-1"></i>View Listing
+            </a>
+          <% } %>
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+          <% if (booking.status === "PENDING") { %>
+            <form method="POST" action="/host/bookings/<%= booking._id %>/confirm" class="m-0">
+              <button type="submit" class="btn btn-success px-4 py-2 fw-semibold shadow-sm">
+                <i class="fa-solid fa-circle-check me-1"></i>Confirm Booking
+              </button>
+            </form>
+            <form method="POST" action="/host/bookings/<%= booking._id %>/cancel" class="m-0" onsubmit="return confirm('Are you sure you want to decline/cancel this booking request?');">
+              <button type="submit" class="btn btn-outline-danger px-4 py-2 fw-semibold">
+                <i class="fa-solid fa-ban me-1"></i>Cancel Booking
+              </button>
+            </form>
+          <% } %>
+          <a href="/host/dashboard" class="btn btn-dark add-btn text-white px-4 py-2 fw-semibold">
+            <i class="fa-solid fa-gauge-high me-1"></i>Host Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

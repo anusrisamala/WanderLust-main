@@ -204,6 +204,12 @@ module.exports.destroyListing = async(req,res)=>{
     console.log(deletedListing);
     req.flash("success","Listing deleted!");
     const referer = req.get("Referrer");
+    if (referer && referer.includes("/host/listings")) {
+        return res.redirect("/host/listings");
+    }
+    if (referer && referer.includes("/host/dashboard")) {
+        return res.redirect("/host/dashboard#my-listings");
+    }
     if (referer && referer.includes("/dashboard")) {
         return res.redirect("/dashboard#my-listings");
     }

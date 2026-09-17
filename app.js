@@ -11,7 +11,7 @@ const methodOverride = require("method-override");
 const ejsMate = require('ejs-mate');
 const ExpressError = require("./utils/ExpressError.js");
 const session = require("express-session");
-const {MongoStore} = require("connect-mongo");
+const { MongoStore } = require("connect-mongo");
 const flash = require("connect-flash");
 const passport = require("passport");
 const localStrategy = require("passport-local");
@@ -34,36 +34,56 @@ const userRouter = require("./routes/user.js");
 const bookingRouter = require("./routes/booking.js");
 
 // const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+// const dbUrl = process.env.ATLASDB_URL || MONGO_URL;
 
-const dbUrl = process.env.ATLASDB_URL;
-
-main()
-    .then(() => {
-        console.log("connected to DB");
-    })
-    .catch((err) => {
-        console.log(err);
-    });
-
-async function main() {
-    await mongoose.connect(dbUrl);
-}
-
-// app.get("/testListing",async (req,res)=>{
-//     let sampleListing = new Listing({
-//         title: "My New Villa",
-//         description : "By the beach",
-//         price:1200,
-//         location : "Calangute Goa",
-//         country: "India",
+// const clientPromise = mongoose.connect(dbUrl, { serverSelectionTimeoutMS: 3000 })
+//     .then((m) => {
+//         console.log("Connected to MongoDB Atlas");
+//         return m.connection.getClient();
+//     })
+//     .catch(async (err) => {
+//         console.warn("MongoDB Atlas connection failed (IP may not be whitelisted). Falling back to local MongoDB...");
+//         const m = await mongoose.connect(MONGO_URL);
+//         console.log("Connected to local MongoDB");
+//         return m.connection.getClient();
 //     });
 
-//     await sampleListing.save();
-//     console.log("sample was saved");
-//     res.send("successful testing");
+// const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+
+// const dbUrl = process.env.ATLASDB_URL || MONGO_URL;
+
+// console.log("MongoDB URL being used:", dbUrl);
+
+// const clientPromise = mongoose.connect(dbUrl, {
+//     serverSelectionTimeoutMS: 5000
 // })
+//     .then((m) => {
+//         console.log("Connected to MongoDB");
+//         return m.connection.getClient();
+//     })
+//     .catch((err) => {
+//         console.log("❌ MongoDB connection error:");
+//         console.log(err);
+//         throw err;
+//     });
+const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+
+const dbUrl = process.env.ATLASDB_URL || MONGO_URL;
+
+const clientPromise = mongoose.connect(dbUrl, {
+    serverSelectionTimeoutMS: 5000
+})
+    .then((m) => {
+        console.log("Connected to MongoDB");
+        return m.connection.getClient();
+    })
+    .catch((err) => {
+        console.log("MongoDB connection error:", err);
+        throw err;
+    });
+
 const store = MongoStore.create({
-    mongoUrl: dbUrl,
+    clientPromise,
     crypto: {
         secret: process.env.SECRET,
     },
@@ -80,15 +100,11 @@ const sessionOptions = {
     resave: false,
     saveUninitialized: true,
     cookie: {
-        expires: Date.now() * 7 * 24 * 60 * 60 * 1000,
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
     }
 }
-
-// app.get("/", (req, res) => {
-//     res.send("Hi, I am root");
-// });
 
 app.use(session(sessionOptions));
 app.use(flash());
@@ -108,6 +124,10 @@ app.use((req, res, next) => {
     next();
 })
 
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
+
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/bookings", bookingRouter);
@@ -118,6 +138,9 @@ app.use((req, res, next) => {
 });
 app.use((err, req, res, next) => {
     let { statusCode = 500, message = "something went wrong" } = err;
+    if (!res.locals.currUser) res.locals.currUser = req.user || null;
+    if (!res.locals.success) res.locals.success = [];
+    if (!res.locals.error) res.locals.error = [];
     res.status(statusCode).render("Error.ejs", { err });
 })
 

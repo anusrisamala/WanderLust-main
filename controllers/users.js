@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Listing = require("../models/listing");
 const Booking = require("../models/booking");
+const mongoose = require("mongoose");
 
 module.exports.renderSignupForm = (req, res) => {
   res.render("users/signup.ejs");
@@ -265,6 +266,304 @@ module.exports.becomeHost = async (req, res) => {
     req.user.role = "HOST";
 
     req.flash("success", "Congratulations! You are now a host on WanderLust.");
-    res.redirect("/dashboard");
+    res.redirect("/host/dashboard");
 };
-
+
+module.exports.renderHostDashboard = async (req, res) => {
+    // SECURITY: Always target the authenticated host's ID
+    const hostId = req.user._id;
+    const now = new Date();
+
+    // 1. Find listings where owner equals req.user._id
+    const hostListings = await Listing.find({ owner: hostId })
+        .select("title location country price image category")
+        .sort({ _id: -1 });
+
+    // 2. Extract listing IDs
+    const hostListingIds = hostListings.map(listing => listing._id);
+
+    // 3. Find bookings where booking.listing belongs to those listing IDs
+    const hostBookings = await Booking.find({ listing: { $in: hostListingIds } })
+        .populate({
+            path: "user",
+            select: "username email"
+        })
+        .populate({
+            path: "listing",
+            select: "title location country image price"
+        })
+        .sort({ createdAt: -1 });
+
+    // Calculate Host Overview metrics strictly for host's received bookings
+    let upcomingCount = 0;
+    let pendingCount = 0;
+    let confirmedCount = 0;
+    let cancelledCount = 0;
+    let completedCount = 0;
+
+    for (const b of hostBookings) {
+        if (b.status === "PENDING") pendingCount++;
+        else if (b.status === "CONFIRMED") confirmedCount++;
+        else if (b.status === "CANCELLED") cancelledCount++;
+        else if (b.status === "COMPLETED") completedCount++;
+
+        const checkInDT = toComparableDateTime(b.checkInDate, b.checkInTime) || new Date(b.checkInDate);
+        if (checkInDT > now && (b.status === "CONFIRMED" || b.status === "PENDING")) {
+            upcomingCount++;
+        }
+    }
+
+    const counts = {
+        totalListings: hostListings.length,
+        totalBookings: hostBookings.length,
+        pendingBookings: pendingCount,
+        confirmedBookings: confirmedCount,
+        upcomingBookings: upcomingCount,
+        completedBookings: completedCount,
+        cancelledBookings: cancelledCount
+    };
+
+    const recentBookings = hostBookings.slice(0, 5);
+    const previewListings = hostListings.slice(0, 6);
+
+    res.render("host/dashboard.ejs", {
+        user: req.user,
+        counts,
+        hostListings,
+        previewListings,
+        hostBookings,
+        recentBookings
+    });
+};
+
+module.exports.renderHostListings = async (req, res) => {
+    // SECURITY: Strictly target authenticated host ID
+    const hostId = req.user._id;
+
+    // Fetch ONLY listings owned by authenticated host using exact schema 'owner' field
+    const hostListings = await Listing.find({ owner: hostId })
+        .select("title description location country price image category")
+        .sort({ _id: -1 });
+
+    res.render("host/listings.ejs", {
+        user: req.user,
+        hostListings
+    });
+};
+
+module.exports.renderHostBookings = async (req, res) => {
+    // SECURITY: Strictly target authenticated host ID
+    const hostId = req.user._id;
+
+    // 1. Find all listings owned by authenticated host using exact schema 'owner' field
+    const hostListings = await Listing.find({ owner: hostId }).select("_id");
+    const hostListingIds = hostListings.map(l => l._id);
+
+    // 2. Determine filter status (PENDING, CONFIRMED, CANCELLED, COMPLETED, or ALL)
+    const { status } = req.query;
+    const validStatuses = ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"];
+    const currentStatus = (typeof status === "string" && validStatuses.includes(status.trim().toUpperCase()))
+        ? status.trim().toUpperCase()
+        : "ALL";
+
+    // 3. Construct query: strictly restrict to host's own listing IDs
+    const filterQuery = { listing: { $in: hostListingIds } };
+    if (currentStatus !== "ALL") {
+        filterQuery.status = currentStatus;
+    }
+
+    // 4. Fetch host-owned bookings, sorted newest first
+    // Only retrieve necessary guest info (username, email)
+    const hostBookings = await Booking.find(filterQuery)
+        .populate({
+            path: "listing",
+            select: "title image location country price"
+        })
+        .populate({
+            path: "user",
+            select: "username email"
+        })
+        .sort({ createdAt: -1 });
+
+    // 5. Calculate status counts for filter badges across all host's bookings
+    const allHostBookings = await Booking.find({ listing: { $in: hostListingIds } }).select("status");
+    const statusCounts = {
+        ALL: allHostBookings.length,
+        PENDING: allHostBookings.filter(b => b.status === "PENDING").length,
+        CONFIRMED: allHostBookings.filter(b => b.status === "CONFIRMED").length,
+        CANCELLED: allHostBookings.filter(b => b.status === "CANCELLED").length,
+        COMPLETED: allHostBookings.filter(b => b.status === "COMPLETED").length,
+    };
+
+    res.render("host/bookings.ejs", {
+        user: req.user,
+        hostBookings,
+        currentStatus,
+        statusCounts
+    });
+};
+
+module.exports.renderHostBookingDetails = async (req, res) => {
+    const { id } = req.params;
+
+    // 1. Validate booking ID format
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        req.flash("error", "Invalid booking ID.");
+        return res.redirect("/host/bookings");
+    }
+
+    // 2. Fetch booking and populate listing (including owner) and guest user details
+    const booking = await Booking.findById(id)
+        .populate({
+            path: "listing",
+            select: "title image location country price owner"
+        })
+        .populate({
+            path: "user",
+            select: "username email"
+        });
+
+    if (!booking) {
+        req.flash("error", "Booking you requested for does not exist!");
+        return res.redirect("/host/bookings");
+    }
+
+    // 3. STRICT HOST AUTHORIZATION:
+    // Verify that the booking belongs to a listing owned by the authenticated host (req.user._id)
+    // Do NOT authorize only by checking booking._id
+    // Disallow Host A from viewing Host B's booking by manipulating booking ID
+    if (!booking.listing || !booking.listing.owner || !booking.listing.owner.equals(req.user._id)) {
+        req.flash("error", "You do not have permission to view this booking.");
+        return res.redirect("/host/bookings");
+    }
+
+    // 4. Calculate nights for display
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    const checkInTimeVal = new Date(booking.checkInDate).getTime();
+    const checkOutTimeVal = new Date(booking.checkOutDate).getTime();
+    const nights = booking.numberOfNights || Math.max(1, Math.round((checkOutTimeVal - checkInTimeVal) / MS_PER_DAY));
+
+    res.render("host/bookingShow.ejs", {
+        user: req.user,
+        booking,
+        nights
+    });
+};
+
+module.exports.confirmHostBooking = async (req, res) => {
+    const { id } = req.params;
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        req.flash("error", "Invalid booking ID.");
+        return res.redirect("/host/bookings");
+    }
+
+    const booking = await Booking.findById(id).populate({
+        path: "listing",
+        select: "owner title"
+    });
+
+    if (!booking) {
+        req.flash("error", "Booking you requested for does not exist!");
+        return res.redirect("/host/bookings");
+    }
+
+    // STRICT CRITICAL AUTHORIZATION:
+    // Verify that the booking belongs to a listing owned by the authenticated host (req.user._id)
+    if (!booking.listing || !booking.listing.owner || !booking.listing.owner.equals(req.user._id)) {
+        req.flash("error", "You do not have permission to manage this booking.");
+        return res.redirect("/host/bookings");
+    }
+
+    // STRICT VALID STATUS TRANSITIONS:
+    // Only PENDING -> CONFIRMED is allowed for confirmation
+    if (booking.status === "CONFIRMED") {
+        req.flash("error", "This booking is already confirmed.");
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    if (booking.status === "CANCELLED") {
+        req.flash("error", "Cannot confirm a cancelled booking.");
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    if (booking.status === "COMPLETED") {
+        req.flash("error", "Cannot confirm a completed booking.");
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    if (booking.status !== "PENDING") {
+        req.flash("error", `Cannot confirm booking with status ${booking.status}.`);
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    booking.status = "CONFIRMED";
+    await booking.save();
+
+    req.flash("success", "Booking has been confirmed successfully!");
+
+    const referer = req.get("Referrer");
+    if (referer && referer.includes("/host/bookings") && !referer.includes(booking._id.toString())) {
+        return res.redirect(referer);
+    }
+    res.redirect(`/host/bookings/${booking._id}`);
+};
+
+module.exports.cancelHostBooking = async (req, res) => {
+    const { id } = req.params;
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        req.flash("error", "Invalid booking ID.");
+        return res.redirect("/host/bookings");
+    }
+
+    const booking = await Booking.findById(id).populate({
+        path: "listing",
+        select: "owner title"
+    });
+
+    if (!booking) {
+        req.flash("error", "Booking you requested for does not exist!");
+        return res.redirect("/host/bookings");
+    }
+
+    // STRICT CRITICAL AUTHORIZATION:
+    // Verify that the booking belongs to a listing owned by the authenticated host (req.user._id)
+    if (!booking.listing || !booking.listing.owner || !booking.listing.owner.equals(req.user._id)) {
+        req.flash("error", "You do not have permission to manage this booking.");
+        return res.redirect("/host/bookings");
+    }
+
+    // STRICT VALID STATUS TRANSITIONS:
+    // For this version, only PENDING -> CANCELLED is allowed for the host.
+    if (booking.status === "CANCELLED") {
+        req.flash("error", "This booking is already cancelled.");
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    if (booking.status === "CONFIRMED") {
+        req.flash("error", "Confirmed bookings cannot be cancelled directly by the host in this version.");
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    if (booking.status === "COMPLETED") {
+        req.flash("error", "Cannot cancel a completed booking.");
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    if (booking.status !== "PENDING") {
+        req.flash("error", `Cannot cancel booking with status ${booking.status}.`);
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    booking.status = "CANCELLED";
+    await booking.save();
+
+    req.flash("success", "Booking request has been cancelled.");
+
+    const referer = req.get("Referrer");
+    if (referer && referer.includes("/host/bookings") && !referer.includes(booking._id.toString())) {
+        return res.redirect(referer);
+    }
+    res.redirect(`/host/bookings/${booking._id}`);
+};

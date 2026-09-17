@@ -31,7 +31,7 @@
               <i class="fa-solid fa-house-chimney-user me-1"></i>Become a Host
             </a>
           <% } else if (user.role === "HOST") { %>
-            <a href="#my-listings" class="btn btn-outline-primary px-3 py-2 fw-semibold">
+            <a href="/host/dashboard" class="btn btn-outline-primary px-3 py-2 fw-semibold">
               <i class="fa-solid fa-hotel me-1"></i>Host Dashboard
             </a>
             <a href="/listings/new" class="btn btn-dark add-btn text-white px-3 py-2 fw-semibold shadow-sm">
@@ -169,7 +169,10 @@
               <i class="fa-solid fa-house-chimney-user me-1"></i>Become a Host
             </a>
           <% } else if (user.role === "HOST") { %>
-            <a href="#my-listings" class="btn btn-sm btn-outline-primary fw-medium shadow-sm">
+            <a href="#my-listings" class="btn btn-sm btn-white bg-white border fw-medium shadow-sm">
+              <i class="fa-solid fa-house-user text-danger me-1"></i>My Listings
+            </a>
+            <a href="/host/dashboard" class="btn btn-sm btn-outline-primary fw-medium shadow-sm">
               <i class="fa-solid fa-hotel me-1"></i>Host Dashboard
             </a>
             <a href="/listings/new" class="btn btn-sm btn-danger add-btn text-white fw-medium shadow-sm">
@@ -486,7 +489,7 @@
             <i class="fa-solid fa-house-chimney-user me-1"></i>Become a Host
           </a>
         <% } else if (user.role === "HOST") { %>
-          <a href="#my-listings" class="btn btn-outline-primary fw-semibold">
+          <a href="/host/dashboard" class="btn btn-outline-primary fw-semibold">
             <i class="fa-solid fa-hotel me-1"></i>Host Dashboard
           </a>
         <% } %>
