@@ -11,7 +11,12 @@ const userSchema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Listing"
         }
-    ]
+    ],
+    role: {
+        type: String,
+        enum: ["USER", "HOST", "ADMIN"],
+        default: "USER"
+    }
 });
 userSchema.plugin(passportLocalMongoose);
 module.exports = mongoose.model("User", userSchema);

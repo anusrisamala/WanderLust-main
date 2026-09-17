@@ -1,0 +1,76 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row mt-4 mb-5 justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+    <!-- Back to Dashboard -->
+    <div class="mb-3">
+      <a href="/dashboard" class="text-decoration-none text-muted small fw-medium">
+        <i class="fa-solid fa-arrow-left me-1"></i>Back to Dashboard
+      </a>
+    </div>
+
+    <div class="card border shadow-sm rounded-4 p-4 p-md-5">
+      <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+        <div class="stat-icon-wrapper bg-danger bg-opacity-10 text-danger p-3 rounded-circle" style="width: 54px; height: 54px; display: flex; align-items: center; justify-content: center;">
+          <i class="fa-solid fa-house-chimney-user fa-xl"></i>
+        </div>
+        <div>
+          <h3 class="fw-bold mb-0">Become a Host</h3>
+          <p class="text-muted small mb-0">Turn your space into your next opportunity</p>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h5 class="fw-bold text-dark mb-2">Welcome to Hosting on WanderLust!</h5>
+        <p class="text-secondary small">
+          As a Host, you can list your properties, welcome travelers from around the world, and manage your hosted stays.
+        </p>
+
+        <div class="bg-light rounded-4 p-3 mb-3 border">
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <div class="text-success mt-1">
+              <i class="fa-solid fa-circle-check fa-lg"></i>
+            </div>
+            <div>
+              <strong class="d-block text-dark small">Keep all Traveler capabilities</strong>
+              <span class="text-muted small" style="font-size: 0.8rem;">You retain your existing bookings, wishlist, and traveler profile. No need for a separate account.</span>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <div class="text-danger mt-1">
+              <i class="fa-solid fa-house fa-lg"></i>
+            </div>
+            <div>
+              <strong class="d-block text-dark small">Create & manage listings</strong>
+              <span class="text-muted small" style="font-size: 0.8rem;">Publish your places with photos, prices, categories, and custom details.</span>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3">
+            <div class="text-primary mt-1">
+              <i class="fa-solid fa-gauge-high fa-lg"></i>
+            </div>
+            <div>
+              <strong class="d-block text-dark small">Host Dashboard access</strong>
+              <span class="text-muted small" style="font-size: 0.8rem;">Access your hosted listings and quick hosting tools directly from your account.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirmation Form -->
+      <!-- SECURITY: No user ID or role is sent by client. Backend strictly uses req.user._id and sets role = "HOST" -->
+      <form action="/become-host" method="POST">
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm py-2">
+            <i class="fa-solid fa-check me-2"></i>Confirm & Become a Host
+          </button>
+          <a href="/dashboard" class="btn btn-outline-secondary fw-semibold py-2">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

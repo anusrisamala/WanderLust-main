@@ -39,6 +39,10 @@ router.post("/profile", isLoggedIn, wrapAsync(userController.updateProfile));
 
 router.get("/wishlist", isLoggedIn, wrapAsync(userController.renderWishlist));
 
+router.route("/become-host")
+    .get(isLoggedIn, wrapAsync(userController.renderBecomeHostForm))
+    .post(isLoggedIn, wrapAsync(userController.becomeHost));
+
 module.exports = router;
 
 

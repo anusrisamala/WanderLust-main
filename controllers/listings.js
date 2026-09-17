@@ -130,7 +130,8 @@ module.exports.createListing = async(req,res)=>{
 
     let url = req.file.path;
     let filename  = req.file.filename;
-    let listing = req.body.listing;
+    let listing = { ...req.body.listing };
+    delete listing.owner;
     const newListing = new Listing(listing);
     newListing.owner = req.user._id;
     newListing.image = {url, filename};
@@ -173,6 +174,7 @@ module.exports.updateListing = async(req,res)=>{
     }
 
     let updateData = { ...req.body.listing };
+    delete updateData.owner;
 
     // Check if location changed
     if (updateData.location && updateData.location !== existingListing.location) {

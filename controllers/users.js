@@ -6,10 +6,10 @@ module.exports.renderSignupForm = (req, res) => {
   res.render("users/signup.ejs");
 }
 
-module.exports.signup = async (req, res) => {
+module.exports.signup = async (req, res, next) => {
     try {
       let { username, email, password } = req.body;
-      const newUser = new User({ email, username });
+      const newUser = new User({ email, username, role: "USER" });
       const registeredUser = await User.register(newUser, password);
       console.log(registeredUser);
 
@@ -222,5 +222,49 @@ module.exports.updateProfile = async (req, res, next) => {
         req.flash("error", err.message || "Failed to update profile.");
         res.redirect("/profile/edit");
     }
+};
+
+module.exports.renderBecomeHostForm = async (req, res) => {
+    if (req.user.role === "HOST") {
+        req.flash("error", "You are already registered as a host!");
+        return res.redirect("/dashboard");
+    }
+    if (req.user.role === "ADMIN") {
+        req.flash("error", "Admin accounts cannot be converted to host accounts.");
+        return res.redirect("/dashboard");
+    }
+    res.render("users/becomeHost.ejs");
+};
+
+module.exports.becomeHost = async (req, res) => {
+    if (req.user.role === "HOST") {
+        req.flash("error", "You are already registered as a host!");
+        return res.redirect("/dashboard");
+    }
+    if (req.user.role === "ADMIN") {
+        req.flash("error", "Admin accounts cannot be converted to host accounts.");
+        return res.redirect("/dashboard");
+    }
+    if (req.user.role !== "USER") {
+        req.flash("error", "Invalid user role.");
+        return res.redirect("/dashboard");
+    }
+
+    // SECURITY: Always target the authenticated user's ID
+    const user = await User.findById(req.user._id);
+    if (!user) {
+        req.flash("error", "User not found.");
+        return res.redirect("/login");
+    }
+
+    // Explicitly set role = "HOST" on the backend
+    user.role = "HOST";
+    await user.save();
+
+    // Keep session user in sync
+    req.user.role = "HOST";
+
+    req.flash("success", "Congratulations! You are now a host on WanderLust.");
+    res.redirect("/dashboard");
 };
 

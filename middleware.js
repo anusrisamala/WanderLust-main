@@ -27,7 +27,8 @@ module.exports.isOwner = async(req,res,next)=>{
         req.flash("error", "Listing you requested for does not exist!");
         return res.redirect("/listings");
     }
-    if(!listing.owner || !listing.owner.equals(res.locals.currUser._id)){
+    const currentUserId = (res.locals.currUser && res.locals.currUser._id) || (req.user && req.user._id);
+    if(!listing.owner || !currentUserId || !listing.owner.equals(currentUserId)){
         req.flash("error","You are not the owner of this listing");
         return res.redirect(`/listings/${id}`);
     }
@@ -70,3 +71,16 @@ module.exports.isReviewAuthor = async(req,res,next)=>{
 
     next();
 }
+
+module.exports.isHost = (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        req.session.redirectUrl = req.originalUrl;
+        req.flash("error", "You must be logged in!");
+        return res.redirect("/login");
+    }
+    if (req.user.role !== "HOST") {
+        req.flash("error", "Access denied. Only hosts can access this resource.");
+        return res.redirect("/dashboard");
+    }
+    next();
+};
