@@ -303,3 +303,76 @@ body{
   border-radius: 0.75rem;
 }
 
+/* User Dashboard Styling */
+.dashboard-welcome-card {
+  background: linear-gradient(135deg, #ffffff 0%, #fbfbfc 100%);
+  border: 1px solid #f1f5f9 !important;
+}
+
+.dashboard-avatar-circle {
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-stat-card {
+  background: #ffffff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.dashboard-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07) !important;
+  border-color: #e2e8f0 !important;
+}
+
+.stat-icon-wrapper {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.dashboard-booking-snippet {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dashboard-booking-snippet:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+.btn-white {
+  background-color: #ffffff;
+  color: #333333;
+  border-color: #e2e8f0;
+}
+
+.btn-white:hover {
+  background-color: #f8fafc;
+  color: #111111;
+  border-color: #cbd5e1;
+}
+
+#bookingFilterTabs .nav-link.active {
+  background-color: #222222;
+  color: #ffffff !important;
+}
+
+#bookingFilterTabs .nav-link {
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+#bookingFilterTabs .nav-link:hover {
+  background-color: #f3f4f6;
+}
+
+
+

@@ -201,8 +201,11 @@ module.exports.destroyListing = async(req,res)=>{
     let deletedListing = await Listing.findByIdAndDelete(id);
     console.log(deletedListing);
     req.flash("success","Listing deleted!");
+    const referer = req.get("Referrer");
+    if (referer && referer.includes("/dashboard")) {
+        return res.redirect("/dashboard#my-listings");
+    }
     res.redirect("/listings");
-
 }
 
 module.exports.toggleWishlist = async (req, res) => {

@@ -27,6 +27,18 @@ router.route("/login")
 
 router.get("/logout", userController.logout);
 
+router.get("/dashboard", isLoggedIn, wrapAsync(userController.renderDashboard));
+
+router.get("/profile", isLoggedIn, (req, res) => {
+    res.redirect("/dashboard#profile-section");
+});
+
+router.get("/profile/edit", isLoggedIn, wrapAsync(userController.renderEditProfileForm));
+
+router.post("/profile", isLoggedIn, wrapAsync(userController.updateProfile));
+
 router.get("/wishlist", isLoggedIn, wrapAsync(userController.renderWishlist));
 
 module.exports = router;
+
+

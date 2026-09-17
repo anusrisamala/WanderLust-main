@@ -292,7 +292,7 @@ module.exports.cancelBooking = async (req, res) => {
     req.flash("success", "Booking has been cancelled successfully.");
 
     const referer = req.get("Referrer");
-    if (referer && referer.includes("/bookings")) {
+    if (referer && (referer.includes("/bookings") || referer.includes("/dashboard"))) {
         return res.redirect(referer);
     }
     res.redirect(`/bookings/${booking._id}`);
