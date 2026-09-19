@@ -2,8 +2,14 @@
   <div class="row mt-3">
     <div class="col-12 col-md-8 offset-md-2">
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h3 class="mb-0"><%= listing.title %></h3>
+        <div class="d-flex align-items-center gap-2">
+          <h3 class="mb-0"><%= listing.title %></h3>
+          <% if (listing.isActive === false) { %>
+            <span class="badge bg-secondary px-3 py-2 fs-6"><i class="fa-solid fa-box-archive me-1"></i>Archived</span>
+          <% } %>
+        </div>
         <form method="POST" action="/listings/<%= listing._id %>/wishlist" class="d-inline">
+          <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
           <button type="submit" class="wishlist-btn-show" title="<%= (typeof isWishlisted !== 'undefined' && isWishlisted) ? 'Remove from Wishlist' : 'Add to Wishlist' %>">
             <% if (typeof isWishlisted !== 'undefined' && isWishlisted) { %>
               <i class="fa-solid fa-heart wishlist-heart-filled"></i>
@@ -36,8 +42,9 @@
       <% if(currUser && listing.owner && currUser._id.equals(listing.owner._id)){ %>
         <div class="d-flex gap-3 my-3">
           <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark edit-btn">Edit</a>
-          <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
-            <button class="btn btn-dark">Delete</button>
+          <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" data-confirm="Archive this listing? It will be hidden from search, but all bookings, receipts, and reviews will be preserved.">
+            <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+            <button class="btn btn-outline-danger"><i class="fa-solid fa-box-archive me-1"></i><%= listing.isActive === false ? 'Archived' : 'Archive Listing' %></button>
           </form>
         </div>
       <% } %>
@@ -46,6 +53,15 @@
 
       <!-- Booking Card Section -->
       <div class="card booking-card shadow-sm p-4 my-4">
+        <% if (listing.isActive === false) { %>
+          <div class="text-center py-4">
+            <i class="fa-solid fa-box-archive fa-3x text-secondary mb-3 opacity-75"></i>
+            <h4 class="fw-bold mb-2">Listing Archived</h4>
+            <p class="text-muted small mb-0" style="max-width: 440px; margin: 0 auto;">
+              This property has been archived by the host and is no longer accepting new reservations. Existing bookings and trip history remain safely preserved.
+            </p>
+          </div>
+        <% } else { %>
         <div class="d-flex justify-content-between align-items-center mb-3">
           <div>
             <span class="fs-4 fw-bold">&#8377;<%= listing.price ? listing.price.toLocaleString("en-IN") : "0" %></span>
@@ -57,6 +73,7 @@
         </div>
 
         <form action="/listings/<%= listing._id %>/bookings" method="POST" id="bookingForm" data-listing-id="<%= listing._id %>" data-price="<%= listing.price || 0 %>" data-tax-rate="<%= (typeof taxConfig !== 'undefined' && taxConfig.GST_PERCENT) ? taxConfig.GST_PERCENT : 5 %>" class="needs-validation" novalidate>
+          <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
           <div class="booking-inputs-box border rounded-3 p-3 mb-3 bg-light">
             <div class="row g-3">
               <!-- CHECK-IN -->
@@ -187,6 +204,7 @@
             <p class="text-muted small text-center mt-2 mb-0">You must be logged in to make a reservation.</p>
           <% } %>
         </form>
+        <% } %>
       </div>
 
       <hr>
@@ -195,9 +213,12 @@
           <div class="mt-4">
             <h4>Where you'll be staying</h4>
             <p class="text-muted mb-2">
-              <%= listing.location %>, <%= listing.country %>
+              <i class="fa-solid fa-location-dot text-danger me-1"></i><%= listing.location %>, <%= listing.country %>
             </p>
-            <div id="map"></div>
+            <div id="map" style="height: 400px; border-radius: 1rem;" class="shadow-sm border"></div>
+            <small class="text-muted d-block mt-2">
+              <i class="fa-solid fa-map-location-dot me-1"></i>Map data &copy; Esri &amp; contributors, delivered via high-availability ArcGIS CDN.
+            </small>
           </div>
 
           <hr>
@@ -207,9 +228,10 @@
             <% if(currUser){ %>
               <h4>Leave a Review</h4>
               <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate class="needs-validation">
+                <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
                 <div class="mb-3 mt-3">
-                  <label for="rating" class="form-label">Rating</label>
-                  <fieldset class="starability-slot">
+                  <span class="form-label d-block fw-semibold mb-2">Rating</span>
+                  <fieldset class="starability-slot" aria-label="Rating">
                     <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked
                       aria-label="No rating." />
                     <input type="radio" id="first-rate1" name="review[rating]" value="1" />
@@ -270,6 +292,7 @@
                               <form method="POST"
                                 action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE"
                                 class="mt-auto">
+                                <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
                                 <button class="btn btn-sm btn-dark">Delete</button>
                               </form>
                               <% } %>
@@ -295,10 +318,14 @@
       const listingTitle = "<%= listing.title %>";
       const listingLocation = "<%= listing.location %>";
 
-      const map = L.map("map").setView([latitude, longitude], 13);
+      const map = L.map("map", {
+        scrollWheelZoom: false
+      }).setView([latitude, longitude], 13);
 
-      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; OpenStreetMap contributors"
+      // World Street Map tile provider (100% free, high-availability CDN, no API keys, no watermarks, no usage blocks)
+      L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom: 18,
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom'
       }).addTo(map);
 
       L.marker([latitude, longitude])

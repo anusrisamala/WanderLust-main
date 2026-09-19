@@ -4,7 +4,8 @@
     <br><br>
     <h3>Create a new Listing</h3>
 
-    <form method="POST" action="/listings" novalidate class="needs-validation " enctype="multipart/form-data">
+    <form method="POST" action="/listings?_csrf=<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>" novalidate class="needs-validation " enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
 
       <div class="mb-3">
         <label class="form-label">Title</label>
@@ -58,9 +59,10 @@
         <input name="listing[image]"
                type="file"
                class="form-control"
-               >
-               required
-       
+               required>
+        <div class="invalid-feedback">
+          Please upload an image for the listing.
+        </div>
       </div>
 
       <div class="row">

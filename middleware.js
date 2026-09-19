@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Listing = require("./models/listing");
 const Review = require("./models/review");
 const {listingSchema, reviewSchema} = require("./schema.js");
@@ -22,6 +23,10 @@ module.exports.savedRedirectUrl = (req,res,next)=>{
 
 module.exports.isOwner = async(req,res,next)=>{
     let {id} = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        req.flash("error", "Listing you requested for does not exist!");
+        return res.redirect("/listings");
+    }
     let listing = await Listing.findById(id);
     if (!listing) {
         req.flash("error", "Listing you requested for does not exist!");
@@ -57,16 +62,20 @@ module.exports.validateReview = (req,res,next)=>{
 
 module.exports.isReviewAuthor = async(req,res,next)=>{
     let {id, reviewId} = req.params;
+    if (!reviewId || !mongoose.Types.ObjectId.isValid(reviewId)) {
+        req.flash("error", "Review you requested for does not exist");
+        return res.redirect(id && mongoose.Types.ObjectId.isValid(id) ? `/listings/${id}` : "/listings");
+    }
 
     let review = await Review.findById(reviewId);
     if(!review){
         req.flash("error", "Review you requested for does not exist");
-        return res.redirect(`/listings/${id}`);
+        return res.redirect(id && mongoose.Types.ObjectId.isValid(id) ? `/listings/${id}` : "/listings");
     }
 
     if(!review.author || !review.author.equals(res.locals.currUser._id)){
         req.flash("error","You are not the author of this review");
-        return res.redirect(`/listings/${id}`);
+        return res.redirect(id && mongoose.Types.ObjectId.isValid(id) ? `/listings/${id}` : "/listings");
     }
 
     next();

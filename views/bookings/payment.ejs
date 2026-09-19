@@ -1,0 +1,505 @@
+<% layout("/layouts/boilerplate") %>
+<%
+  const toRupees = (amt) => (booking && booking.isPaise ? (amt || 0) / 100 : (amt || 0));
+  const displayPricePerNight = booking.pricePerNight != null ? toRupees(booking.pricePerNight) : (booking.listing ? booking.listing.price : 0);
+  const displayBasePrice = booking.basePrice != null ? toRupees(booking.basePrice) : toRupees(booking.totalPrice);
+  const displayTaxAmount = toRupees(booking.taxAmount);
+  const displayTotalPrice = toRupees(booking.totalPrice);
+  const displayRefundAmount = toRupees(booking.refundAmount || booking.totalPrice);
+%>
+
+<div class="row mt-4 mb-5">
+  <div class="col-12 col-lg-8 offset-lg-2">
+    <!-- Breadcrumb / Back Link -->
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+      <a href="/bookings/<%= booking._id %>" class="text-decoration-none text-muted small fw-semibold">
+        <i class="fa-solid fa-arrow-left me-1"></i>Back to Booking Confirmation
+      </a>
+      <span class="badge bg-light text-secondary border small">
+        <i class="fa-solid fa-shield-halved me-1 text-success"></i>100% Secure Payment
+      </span>
+    </div>
+
+    <!-- Alert placeholder for AJAX error feedback -->
+    <div id="paymentAlert" class="alert d-none rounded-3 mb-3 shadow-sm" role="alert"></div>
+
+    <div class="card border shadow-sm rounded-4 p-4 p-md-5 bg-white">
+      <!-- Checkout Header -->
+      <div class="text-center mb-4 pb-3 border-bottom">
+        <div class="mb-2">
+          <i class="fa-solid fa-credit-card text-danger fs-1"></i>
+        </div>
+        <h2 class="fw-bold mb-1">Checkout &amp; Payment</h2>
+        <p class="text-muted mb-2">Review your reservation details and complete payment securely</p>
+
+        <!-- Payment Status Badge -->
+        <% if (booking.status === "CANCELLED") { %>
+          <span class="badge bg-danger px-3 py-2 fs-6">
+            <i class="fa-solid fa-ban me-1"></i>Booking Cancelled
+          </span>
+        <% } else if (booking.paymentStatus === "PAID") { %>
+          <span class="badge bg-success px-3 py-2 fs-6">
+            <i class="fa-solid fa-circle-check me-1"></i>Payment Completed
+          </span>
+        <% } else if (booking.paymentStatus === "FAILED") { %>
+          <span class="badge bg-danger px-3 py-2 fs-6">
+            <i class="fa-solid fa-circle-xmark me-1"></i>Payment Failed
+          </span>
+        <% } else if (booking.paymentStatus === "REFUNDED") { %>
+          <span class="badge bg-secondary px-3 py-2 fs-6">
+            <i class="fa-solid fa-rotate-left me-1"></i>Payment Refunded
+          </span>
+        <% } else { %>
+          <span class="badge bg-warning text-dark px-3 py-2 fs-6">
+            <i class="fa-solid fa-hourglass-half me-1"></i>Payment Pending
+          </span>
+        <% } %>
+      </div>
+
+      <!-- Cancelled Booking Notice (if cancelled) -->
+      <% if (booking.status === "CANCELLED") { %>
+        <div class="alert alert-danger border-danger border-opacity-50 rounded-3 p-3 mb-4">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation fs-5"></i>
+            <div>
+              <h6 class="fw-bold mb-0">This booking has been cancelled</h6>
+              <small>Cancelled reservations cannot be paid for. If you wish to stay, please make a new booking.</small>
+            </div>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Already Paid Notice (if PAID) -->
+      <% if (booking.paymentStatus === "PAID") { %>
+        <div class="alert alert-success border-success border-opacity-50 rounded-3 p-3 mb-4">
+          <div class="d-flex align-items-start gap-2">
+            <i class="fa-solid fa-circle-check fs-4 text-success mt-1"></i>
+            <div>
+              <h6 class="fw-bold mb-1">Payment Completed</h6>
+              <p class="small mb-1 text-muted">Your payment has been verified and your booking is confirmed.</p>
+              <div class="small">
+                <% if (booking.paymentId) { %>
+                  <span class="d-inline-block me-3"><strong>Payment ID:</strong> <code><%= booking.paymentId %></code></span>
+                <% } %>
+                <% if (booking.paymentMethod) { %>
+                  <span class="d-inline-block me-3"><strong>Method:</strong> <%= booking.paymentMethod %></span>
+                <% } %>
+                <% if (booking.paidAt) { %>
+                  <span class="d-inline-block"><strong>Paid On:</strong> <%= new Date(booking.paidAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) %></span>
+                <% } %>
+              </div>
+              <form method="POST" action="/bookings/<%= booking._id %>/refund" class="mt-2" data-confirm="Are you sure you want to request a full refund of ₹<%= displayTotalPrice.toLocaleString() %>?">
+                <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+                <button type="submit" class="btn btn-sm btn-outline-warning text-dark fw-semibold">
+                  <i class="fa-solid fa-rotate-left me-1"></i>Request Full Refund
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Payment Failed Notice (if FAILED) -->
+      <% if (booking.paymentStatus === "FAILED" && booking.status !== "CANCELLED") { %>
+        <div class="alert alert-danger border-danger border-opacity-50 rounded-3 p-3 mb-4">
+          <div class="d-flex align-items-start gap-2">
+            <i class="fa-solid fa-circle-xmark fs-4 text-danger mt-1"></i>
+            <div class="w-100">
+              <h6 class="fw-bold mb-1">Payment Failed</h6>
+              <p class="small mb-2 text-muted">Your previous payment attempt could not be verified or was declined. You can retry payment below.</p>
+              <button
+                type="button"
+                id="retryPaymentBtn"
+                class="btn btn-sm btn-danger fw-semibold px-3 py-2"
+              >
+                <i class="fa-solid fa-rotate-right me-1"></i>Retry Payment
+              </button>
+            </div>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Payment Refunded Notice (if REFUNDED) -->
+      <% if (booking.paymentStatus === "REFUNDED") { %>
+        <div class="alert alert-secondary border-secondary border-opacity-50 rounded-3 p-3 mb-4">
+          <div class="d-flex align-items-start gap-2">
+            <i class="fa-solid fa-rotate-left fs-4 text-secondary mt-1"></i>
+            <div>
+              <h6 class="fw-bold mb-1">Payment Refunded</h6>
+              <p class="small mb-1 text-muted">The payment for this reservation has been refunded.</p>
+              <div class="small">
+                <% if (displayRefundAmount > 0) { %>
+                  <span class="d-inline-block me-3"><strong>Refund Amount:</strong> &#8377;<%= displayRefundAmount.toLocaleString("en-IN") %></span>
+                <% } %>
+                <% if (booking.refundId) { %>
+                  <span class="d-inline-block me-3"><strong>Refund ID:</strong> <code><%= booking.refundId %></code></span>
+                <% } %>
+                <% if (booking.refundedAt) { %>
+                  <span class="d-inline-block"><strong>Refunded On:</strong> <%= new Date(booking.refundedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) %></span>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Listing Information Card -->
+      <div class="card mb-4 border-0 bg-light rounded-3 p-3">
+        <div class="row g-3 align-items-center">
+          <% if (booking.listing && booking.listing.image && booking.listing.image.url) { %>
+            <div class="col-12 col-sm-4">
+              <img
+                src="<%= booking.listing.image.url %>"
+                class="img-fluid rounded-3 w-100 object-fit-cover"
+                style="height: 140px;"
+                alt="<%= booking.listing.title %>"
+              />
+            </div>
+          <% } %>
+          <div class="col-12 <%= (booking.listing && booking.listing.image && booking.listing.image.url) ? 'col-sm-8' : 'col-12' %>">
+            <small class="text-muted text-uppercase fw-semibold">Listing</small>
+            <h4 class="fw-bold mb-1"><%= booking.listing ? booking.listing.title : "Listing Unavailable" %></h4>
+            <p class="text-muted mb-2">
+              <i class="fa-solid fa-location-dot me-1 text-danger"></i>
+              <strong>Location:</strong> <%= booking.listing ? booking.listing.location : "N/A" %><% if (booking.listing && booking.listing.country) { %>, <%= booking.listing.country %><% } %>
+            </p>
+            <p class="mb-0 fw-semibold">
+              <strong>Price per night:</strong> &#8377;<%= displayPricePerNight.toLocaleString("en-IN") %>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reservation Details Table/Grid -->
+      <h5 class="fw-bold mb-3">Reservation Details</h5>
+      <div class="row g-3 mb-4 bg-light rounded-3 p-3 mx-0">
+        <div class="col-6 col-md-3">
+          <small class="text-muted d-block">Check-in</small>
+          <span class="fw-bold fs-6"><%= new Date(booking.checkInDate || booking.checkIn).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) %></span>
+          <% if (booking.checkInTime) { %>
+            <small class="text-muted d-block"><i class="fa-regular fa-clock me-1"></i><%= booking.checkInTime %></small>
+          <% } %>
+        </div>
+        <div class="col-6 col-md-3">
+          <small class="text-muted d-block">Check-out</small>
+          <span class="fw-bold fs-6"><%= new Date(booking.checkOutDate || booking.checkOut).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) %></span>
+          <% if (booking.checkOutTime) { %>
+            <small class="text-muted d-block"><i class="fa-regular fa-clock me-1"></i><%= booking.checkOutTime %></small>
+          <% } %>
+        </div>
+        <div class="col-6 col-md-3">
+          <small class="text-muted d-block">Guests</small>
+          <span class="fw-bold fs-6"><%= booking.guests %> <%= booking.guests === 1 ? 'guest' : 'guests' %></span>
+        </div>
+        <div class="col-6 col-md-3">
+          <small class="text-muted d-block">Number of nights</small>
+          <span class="fw-bold fs-6"><%= booking.numberOfNights || nights %> <%= (booking.numberOfNights || nights) === 1 ? 'night' : 'nights' %></span>
+        </div>
+      </div>
+
+      <!-- Price Breakdown -->
+      <div class="border-top pt-3 mb-4">
+        <h5 class="fw-bold mb-3">Price Breakdown</h5>
+        <div class="d-flex justify-content-between text-muted mb-2">
+          <span>Price per night:</span>
+          <span>&#8377;<%= displayPricePerNight.toLocaleString("en-IN") %></span>
+        </div>
+        <div class="d-flex justify-content-between text-muted mb-2">
+          <span>Base price (<%= displayPricePerNight.toLocaleString("en-IN") %> &times; <%= booking.numberOfNights || nights %> <%= (booking.numberOfNights || nights) === 1 ? 'night' : 'nights' %>):</span>
+          <span>&#8377;<%= displayBasePrice.toLocaleString("en-IN") %></span>
+        </div>
+        <div class="d-flex justify-content-between text-muted mb-2">
+          <span>GST / Tax (<%= booking.taxRate != null ? booking.taxRate : 5 %>%):</span>
+          <span>&#8377;<%= displayTaxAmount.toLocaleString("en-IN") %></span>
+        </div>
+        <hr class="my-2 text-muted">
+        <div class="d-flex justify-content-between fw-bold fs-5 align-items-center">
+          <span>Total Amount:</span>
+          <span class="text-danger fs-4">&#8377;<%= displayTotalPrice.toLocaleString("en-IN") %></span>
+        </div>
+      </div>
+
+      <!-- Payment Action / Button Section -->
+      <% if (booking.status !== "CANCELLED" && (booking.paymentStatus === "PENDING" || !booking.paymentStatus)) { %>
+        <div class="card border-0 bg-light rounded-4 p-4 text-center mb-4">
+          <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+            <i class="fa-solid fa-shield-halved text-success"></i>
+            <% if (typeof isSimulator !== 'undefined' && isSimulator) { %>
+              <span class="fw-semibold small text-muted">Local Payment Simulator Mode</span>
+            <% } else { %>
+              <span class="fw-semibold small text-muted">Secure Payment Checkout</span>
+            <% } %>
+          </div>
+          <p class="text-muted small mb-3">
+            Click below to proceed to payment for <strong>&#8377;<%= displayTotalPrice.toLocaleString("en-IN") %></strong>.
+          </p>
+
+          <button
+            type="button"
+            id="payNowBtn"
+            class="btn btn-danger add-btn btn-lg py-3 px-5 fw-bold shadow-sm"
+          >
+            <i class="fa-solid fa-lock me-2"></i>Pay Now &#8377;<%= displayTotalPrice.toLocaleString("en-IN") %>
+          </button>
+          <% if (typeof isSimulator !== 'undefined' && isSimulator) { %>
+            <small class="text-muted mt-2 d-block"><i class="fa-solid fa-flask text-danger me-1"></i>Running with offline Local Payment Simulator (no external gateway calls)</small>
+          <% } else { %>
+            <small class="text-muted mt-2 d-block">Powered by Razorpay Payments (UPI, Cards, Netbanking, Wallets)</small>
+          <% } %>
+        </div>
+      <% } %>
+
+      <!-- Navigation & Auxiliary Action Buttons -->
+      <div class="d-flex gap-3 mt-2 flex-wrap align-items-center border-top pt-3">
+        <a href="/bookings/<%= booking._id %>" class="btn btn-outline-dark px-4 py-2">
+          <i class="fa-regular fa-file-lines me-1"></i>View Booking Details
+        </a>
+        <a href="/bookings" class="btn btn-outline-secondary px-4 py-2">
+          <i class="fa-solid fa-calendar-days me-1"></i>My Bookings
+        </a>
+        <a href="/dashboard" class="btn btn-outline-secondary px-4 py-2">
+          <i class="fa-solid fa-user me-1"></i>User Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Razorpay Test Mode Simulator Modal -->
+<div class="modal fade" id="simulatedPaymentModal" tabindex="-1" aria-labelledby="simModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header border-bottom-0 pb-0">
+        <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="simModalTitle">
+          <i class="fa-solid fa-flask-vial text-danger"></i>
+          Local Payment Simulator
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body py-3">
+        <div class="alert alert-warning border-0 rounded-3 mb-3 small">
+          <i class="fa-solid fa-circle-info me-1"></i>
+          <strong>Local Simulator Active:</strong> <code>ALLOW_PAYMENT_SIMULATOR=true</code> is enabled for local offline testing. In production, payments require official Razorpay Checkout and strict server-side cryptographic signature verification.
+        </div>
+        <div class="p-3 bg-light rounded-3 mb-3">
+          <div class="d-flex justify-content-between mb-1 small">
+            <span class="text-muted">Order ID:</span>
+            <code id="simOrderId"></code>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Total Payable:</span>
+            <strong class="text-danger fs-5">&#8377;<%= displayTotalPrice.toLocaleString() %></strong>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-top-0 pt-0 d-flex flex-column gap-2">
+        <button type="button" id="simSuccessBtn" class="btn btn-success w-100 py-2 fw-semibold">
+          <i class="fa-solid fa-circle-check me-2"></i>Simulate Successful Payment
+        </button>
+        <button type="button" id="simFailBtn" class="btn btn-outline-danger w-100 py-2 fw-semibold">
+          <i class="fa-solid fa-circle-xmark me-2"></i>Simulate Failed Payment
+        </button>
+        <button type="button" class="btn btn-link text-muted text-decoration-none w-100 py-1 small" data-bs-dismiss="modal">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Integration Script -->
+<% if (typeof isSimulator === 'undefined' || !isSimulator) { %>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<% } %>
+<script>
+  const BOOKING_ID = "<%= booking._id %>";
+  let activeMockOrderId = null;
+
+  function showAlert(message, type = "danger") {
+    const alertBox = document.getElementById("paymentAlert");
+    if (!alertBox) return;
+    alertBox.className = `alert alert-${type} alert-dismissible fade show rounded-3 mb-3 shadow-sm`;
+    alertBox.innerHTML = `
+      <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-triangle-exclamation'} me-2"></i>
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    alertBox.classList.remove("d-none");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function initiateRazorpayPayment() {
+    const payBtn = document.getElementById("payNowBtn") || document.getElementById("retryPaymentBtn");
+    const originalHtml = payBtn ? payBtn.innerHTML : "";
+
+    try {
+      if (payBtn) {
+        payBtn.disabled = true;
+        payBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Initializing payment...`;
+      }
+
+      // 1. Request backend to create Razorpay Order
+      const CSRF_TOKEN = "<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>";
+      const orderRes = await fetch(`/bookings/${BOOKING_ID}/create-payment-order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": CSRF_TOKEN
+        }
+      });
+
+      const orderData = await orderRes.json();
+
+      if (!orderRes.ok || !orderData.success) {
+        if (orderData.alreadyPaid) {
+          showAlert("This booking has already been paid.", "info");
+          setTimeout(() => { window.location.href = `/bookings/${BOOKING_ID}`; }, 1500);
+          return;
+        }
+        throw new Error(orderData.error || "Failed to initialize payment gateway order.");
+      }
+
+      // 2. Handle Simulator Mode if active
+      if (orderData.isMockMode) {
+        activeMockOrderId = orderData.orderId;
+        const orderIdSpan = document.getElementById("simOrderId");
+        if (orderIdSpan) orderIdSpan.innerText = orderData.orderId;
+        if (payBtn) {
+          payBtn.disabled = false;
+          payBtn.innerHTML = originalHtml;
+        }
+        const simModalEl = document.getElementById("simulatedPaymentModal");
+        if (simModalEl && typeof bootstrap !== "undefined") {
+          const simModal = new bootstrap.Modal(simModalEl);
+          simModal.show();
+        } else {
+          // Fallback if bootstrap modal unavailable
+          const confirmed = confirm("Simulate Successful Test Payment for ₹" + (orderData.amount / 100) + "?");
+          handleSimulatedPayment(confirmed);
+        }
+        return;
+      }
+
+      // 3. Configure Official Razorpay Checkout options
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency || "INR",
+        name: "WanderLust",
+        description: "Payment for " + (orderData.booking ? orderData.booking.title : "Reservation"),
+        order_id: orderData.orderId,
+        prefill: {
+          name: orderData.booking ? orderData.booking.userName : "",
+          email: orderData.booking ? orderData.booking.userEmail : ""
+        },
+        theme: {
+          color: "#fe424d"
+        },
+        handler: async function (response) {
+          await verifyPaymentOnServer(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature, payBtn, originalHtml);
+        },
+        modal: {
+          ondismiss: function () {
+            if (payBtn) {
+              payBtn.disabled = false;
+              payBtn.innerHTML = originalHtml;
+            }
+          }
+        }
+      };
+
+      // 4. Open Razorpay Checkout Window
+      const rzp = new Razorpay(options);
+      rzp.on("payment.failed", function (response) {
+        console.error("Payment failed response:", response);
+        const reason = response.error ? (response.error.description || response.error.reason) : "Transaction failed.";
+        showAlert("Payment was unsuccessful: " + reason, "danger");
+        if (payBtn) {
+          payBtn.disabled = false;
+          payBtn.innerHTML = originalHtml;
+        }
+      });
+      rzp.open();
+
+    } catch (err) {
+      console.error("Payment initiation error:", err);
+      showAlert(err.message || "An unexpected error occurred while starting payment.", "danger");
+      if (payBtn) {
+        payBtn.disabled = false;
+        payBtn.innerHTML = originalHtml;
+      }
+    }
+  }
+
+  async function handleSimulatedPayment(isSuccess) {
+    const simModalEl = document.getElementById("simulatedPaymentModal");
+    if (simModalEl && typeof bootstrap !== "undefined") {
+      const modalInstance = bootstrap.Modal.getInstance(simModalEl);
+      if (modalInstance) modalInstance.hide();
+    }
+
+    const payBtn = document.getElementById("payNowBtn") || document.getElementById("retryPaymentBtn");
+    const originalHtml = payBtn ? payBtn.innerHTML : "";
+
+    if (!isSuccess) {
+      showAlert("Simulated payment was cancelled or declined.", "danger");
+      return;
+    }
+
+    const mockPaymentId = "pay_test_mock_" + Date.now();
+    await verifyPaymentOnServer(mockPaymentId, activeMockOrderId, "simulated_test_signature", payBtn, originalHtml);
+  }
+
+  async function verifyPaymentOnServer(paymentId, orderId, signature, payBtn, originalHtml) {
+    if (payBtn) {
+      payBtn.disabled = true;
+      payBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Verifying payment signature...`;
+    }
+
+    try {
+      const CSRF_TOKEN = "<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>";
+      const verifyRes = await fetch(`/bookings/${BOOKING_ID}/verify-payment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": CSRF_TOKEN
+        },
+        body: JSON.stringify({
+          razorpay_payment_id: paymentId,
+          razorpay_order_id: orderId,
+          razorpay_signature: signature
+        })
+      });
+
+      const verifyData = await verifyRes.json();
+
+      if (verifyRes.ok && verifyData.success) {
+        showAlert("Payment successful! Redirecting to booking confirmation...", "success");
+        setTimeout(() => {
+          window.location.href = `/bookings/${BOOKING_ID}`;
+        }, 1200);
+      } else {
+        showAlert(verifyData.error || "Payment verification failed. Please try again or contact support.", "danger");
+        if (payBtn) {
+          payBtn.disabled = false;
+          payBtn.innerHTML = originalHtml;
+        }
+        setTimeout(() => { window.location.reload(); }, 2500);
+      }
+    } catch (verifyErr) {
+      console.error("Verification error:", verifyErr);
+      showAlert("Error connecting to server for payment verification. Please check your bookings page.", "danger");
+      if (payBtn) {
+        payBtn.disabled = false;
+        payBtn.innerHTML = originalHtml;
+      }
+    }
+  }
+
+  // Use listeners instead of inline onclick handlers: Helmet's script-src-attr
+  // correctly blocks inline event handlers even when inline scripts are allowed.
+  document.getElementById("payNowBtn")?.addEventListener("click", initiateRazorpayPayment);
+  document.getElementById("retryPaymentBtn")?.addEventListener("click", initiateRazorpayPayment);
+  document.getElementById("simSuccessBtn")?.addEventListener("click", () => handleSimulatedPayment(true));
+  document.getElementById("simFailBtn")?.addEventListener("click", () => handleSimulatedPayment(false));
+</script>

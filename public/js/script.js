@@ -17,4 +17,16 @@ console.log("script working");
       form.classList.add('was-validated')
     }, false)
   })
+
+  // Confirmation dialogs using addEventListener to strictly comply with CSP
+  document.addEventListener('submit', event => {
+    const form = event.target;
+    if (form && typeof form.matches === 'function' && form.matches('[data-confirm]')) {
+      const message = form.getAttribute('data-confirm');
+      if (message && !window.confirm(message)) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }
+  });
 })()

@@ -1,8 +1,10 @@
+const mongoose = require("mongoose");
 const Listing  = require("../models/listing");
 const User = require("../models/user");
+const { deleteCloudinaryImage } = require("../cloudConfig.js");
 
 function buildQuery(q, category) {
-    const conditions = [];
+    const conditions = [{ isActive: { $ne: false } }];
 
     if (q && q.trim()) {
         const safeQuery = q.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -20,9 +22,7 @@ function buildQuery(q, category) {
         conditions.push({ category: category.trim() });
     }
 
-    if (conditions.length === 0) {
-        return {};
-    } else if (conditions.length === 1) {
+    if (conditions.length === 1) {
         return conditions[0];
     } else {
         return { $and: conditions };
@@ -73,6 +73,10 @@ module.exports.renderNewForm = (req,res)=>{
 
 module.exports.showListing = async(req,res)=>{
     let {id} = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        req.flash("error", "listing you requested for does not exist");
+        return res.redirect("/listings");
+    }
     const listing = await Listing.findById(id).populate({path: "reviews" , populate:{path: "author"}}).populate("owner");
     if(!listing){
         req.flash("error", "listing you requested for does not exist");
@@ -115,18 +119,10 @@ async function geocodeLocation(location) {
 }
 
 module.exports.createListing = async(req,res)=>{
-    // if(!req.body||!req.body.listing){
-    //     throw new ExpressError(400,"Send valid data for listing"); 
-    // }
-    // let result = listingSchema.validate(req.body);
-    // console.log(result);
-    // if(result.error){
-    //     throw new ExpressError(400,result.error);
-    // }
-
-    //one way is..
-    //let {title,description,image,price,country,location}=req.body;
-    //(or)
+    if (!req.file) {
+        req.flash("error", "Please upload an image for your listing.");
+        return res.redirect("/listings/new");
+    }
 
     let url = req.file.path;
     let filename  = req.file.filename;
@@ -152,6 +148,10 @@ module.exports.createListing = async(req,res)=>{
 
 module.exports.renderEditForm = async (req,res)=>{
     let {id} = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        req.flash("error", "listing you requested for does not exist");
+        return res.redirect("/listings");
+    }
     const listing = await Listing.findById(id);
     if(!listing){
         req.flash("error", "listing you requested for does not exist");
@@ -167,6 +167,10 @@ module.exports.updateListing = async(req,res)=>{
     //     throw new ExpressError(400,"Send valid data for listing"); 
     // }
     let {id} = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        req.flash("error", "listing you requested for does not exist");
+        return res.redirect("/listings");
+    }
     const existingListing = await Listing.findById(id);
     if (!existingListing) {
         req.flash("error", "listing you requested for does not exist");
@@ -188,10 +192,16 @@ module.exports.updateListing = async(req,res)=>{
     let listing = await Listing.findByIdAndUpdate(id, updateData, { new: true });
 
     if(typeof req.file!== "undefined"){
+        const oldImage = existingListing.image;
         let url = req.file.path;
         let filename = req.file.filename;
         listing.image = {url,filename};
         await listing.save();
+
+        // Safely delete old Cloudinary image (only if filename changed and not shared)
+        if (oldImage && oldImage.filename && oldImage.filename !== filename) {
+            await deleteCloudinaryImage(oldImage, listing._id);
+        }
     }
     req.flash("success","Listing updated!");
     res.redirect(`/listings/${id}`);
@@ -200,9 +210,30 @@ module.exports.updateListing = async(req,res)=>{
 
 module.exports.destroyListing = async(req,res)=>{
     let {id} = req.params;
-    let deletedListing = await Listing.findByIdAndDelete(id);
-    console.log(deletedListing);
-    req.flash("success","Listing deleted!");
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        req.flash("error", "Listing you requested to delete does not exist!");
+        return res.redirect("/listings");
+    }
+
+    const listing = await Listing.findById(id);
+    if (!listing) {
+        req.flash("error", "Listing you requested to delete does not exist!");
+        return res.redirect("/listings");
+    }
+
+    // SOFT DELETE / ARCHIVE:
+    // Mark listing as inactive so it is hidden from search and blocks new bookings,
+    // while keeping all existing bookings, payments, refunds, reviews, and history intact!
+    listing.isActive = false;
+    listing.archivedAt = new Date();
+    await listing.save();
+
+    // Delete associated Cloudinary image where appropriate (if not shared)
+    if (listing.image) {
+        await deleteCloudinaryImage(listing.image, listing._id);
+    }
+
+    req.flash("success", "Listing has been archived. Existing bookings and history have been preserved.");
     const referer = req.get("Referrer");
     if (referer && referer.includes("/host/listings")) {
         return res.redirect("/host/listings");
@@ -218,6 +249,10 @@ module.exports.destroyListing = async(req,res)=>{
 
 module.exports.toggleWishlist = async (req, res) => {
     let { id } = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        req.flash("error", "Listing you requested for does not exist!");
+        return res.redirect("/listings");
+    }
     const listing = await Listing.findById(id);
     if (!listing) {
         req.flash("error", "Listing you requested for does not exist!");

@@ -45,12 +45,51 @@ const listingSchema = new Schema({
     ],
     required: true,
   },
+  reservationLockVersion: {
+    type: Number,
+    default: 0,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+    index: true,
+  },
+  archivedAt: {
+    type: Date,
+    default: null,
+  },
 });
 
-listingSchema.post("findOneAndDelete",async(listing)=>{
-  if(listing != null){
-    await review.deleteMany({_id:{$in: listing.reviews}});
+listingSchema.post("findOneAndDelete", async (listing) => {
+  if (listing != null) {
+    const Review = require("./review");
+    const Booking = require("./booking");
+    const User = require("./user");
+
+    // 1. Delete associated reviews
+    if (listing.reviews && listing.reviews.length > 0) {
+      await Review.deleteMany({ _id: { $in: listing.reviews } });
+    }
+
+    // 2. Cascade delete all related bookings so none are left pointing to an unavailable listing
+    await Booking.deleteMany({ listing: listing._id });
+
+    // 3. Remove deleted listing from all user wishlists
+    await User.updateMany(
+      { wishlist: listing._id },
+      { $pull: { wishlist: listing._id } }
+    );
+
+    // 4. Safely delete associated Cloudinary image if not shared with another listing
+    if (listing.image) {
+      try {
+        const { deleteCloudinaryImage } = require("../cloudConfig.js");
+        await deleteCloudinaryImage(listing.image, listing._id);
+      } catch (err) {
+        console.error("Error deleting listing image from Cloudinary:", err?.message || err);
+      }
+    }
   }
-})
+});
 const Listing = mongoose.model("Listing", listingSchema);
 module.exports = Listing;

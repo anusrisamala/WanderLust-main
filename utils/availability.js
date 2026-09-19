@@ -1,4 +1,5 @@
 const Booking = require("../models/booking.js");
+const { PAYMENT_HOLD_CONFIG } = require("./constants.js");
 
 /**
  * Parses time string (24h format like "14:00" or 12h format like "02:00 PM")
@@ -134,6 +135,8 @@ async function checkListingAvailability(arg1, arg2, arg3, arg4, arg5, arg6) {
         }
     }
 
+    let session = (typeof arg1 === "object" && arg1 !== null && arg1.session) ? arg1.session : null;
+
     if (!listingId || !reqCheckIn || !reqCheckOut || isNaN(reqCheckIn.getTime()) || isNaN(reqCheckOut.getTime())) {
         return {
             available: false,
@@ -141,11 +144,49 @@ async function checkListingAvailability(arg1, arg2, arg3, arg4, arg5, arg6) {
         };
     }
 
-    // Query MongoDB for existing bookings belonging to this listing
-    // Only consider PENDING and CONFIRMED; ignore CANCELLED and COMPLETED
+    // Automatic Payment-Hold Expiry (15-minute checkout window):
+    // Abandoned unpaid PENDING bookings older than 15 minutes are automatically released and marked CANCELLED
+    const holdMs = PAYMENT_HOLD_CONFIG?.HOLD_MS || (15 * 60 * 1000);
+    const holdCutoff = new Date(Date.now() - holdMs);
+
+    // 1. Cancel expired unpaid pending bookings to permanently free the dates in the database
+    const expiredCleanupQuery = {
+        listing: listingId,
+        status: { $in: ["PENDING_PAYMENT", "PENDING"] },
+        paymentStatus: { $nin: ["PAID", "REFUND_PENDING"] },
+        $or: [
+            { createdAt: { $lt: holdCutoff } },
+            { createdAt: { $exists: false } },
+        ],
+    };
+
+    try {
+        if (session) {
+            await Booking.updateMany(expiredCleanupQuery, { $set: { status: "CANCELLED" } }, { session });
+        } else {
+            await Booking.updateMany(expiredCleanupQuery, { $set: { status: "CANCELLED" } });
+        }
+    } catch (cleanupErr) {
+        console.warn("[Availability] Automatic expiry cleanup notice:", cleanupErr.message);
+    }
+
+    // 2. Query active bookings blocking this listing:
+    // CONFIRMED bookings, bookings awaiting host approval, bookings with refund pending,
+    // and active pending payment bookings within the 15-minute payment hold window
     const query = {
         listing: listingId,
-        status: { $in: ["PENDING", "CONFIRMED"] },
+        $or: [
+            { status: "CONFIRMED" },
+            { status: "AWAITING_HOST_APPROVAL" },
+            { paymentStatus: "REFUND_PENDING" },
+            {
+                status: { $in: ["PENDING_PAYMENT", "PENDING"] },
+                $or: [
+                    { paymentStatus: "PAID" },
+                    { createdAt: { $gte: holdCutoff } },
+                ],
+            },
+        ],
     };
 
     // Optionally exclude the current booking (for future booking updates/edits)
@@ -153,7 +194,11 @@ async function checkListingAvailability(arg1, arg2, arg3, arg4, arg5, arg6) {
         query._id = { $ne: excludeBookingId };
     }
 
-    const existingBookings = await Booking.find(query);
+    const existingBookingsQuery = Booking.find(query);
+    if (session) {
+        existingBookingsQuery.session(session);
+    }
+    const existingBookings = await existingBookingsQuery;
 
     for (const booking of existingBookings) {
         const existingCheckIn = toComparableDateTime(booking.checkInDate || booking.checkIn, booking.checkInTime);
@@ -180,9 +225,46 @@ async function checkListingAvailability(arg1, arg2, arg3, arg4, arg5, arg6) {
     };
 }
 
+/**
+ * Synchronizes past confirmed bookings to persisted COMPLETED status in MongoDB.
+ * Any booking with status === 'CONFIRMED' whose checkout date/time is in the past
+ * is automatically transitioned to status === 'COMPLETED'.
+ */
+async function syncCompletedBookings(filter = {}) {
+    try {
+        const now = new Date();
+        const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+
+        // Candidates are confirmed bookings whose checkOutDate is today or earlier
+        const candidates = await Booking.find({
+            ...filter,
+            status: "CONFIRMED",
+            checkOutDate: { $lte: todayUTC }
+        });
+
+        const completedIds = [];
+        for (const b of candidates) {
+            const checkOutDT = toComparableDateTime(b.checkOutDate || b.checkOut, b.checkOutTime) || new Date(b.checkOutDate || b.checkOut);
+            if (checkOutDT && checkOutDT <= now) {
+                completedIds.push(b._id);
+            }
+        }
+
+        if (completedIds.length > 0) {
+            await Booking.updateMany(
+                { _id: { $in: completedIds } },
+                { $set: { status: "COMPLETED" } }
+            );
+        }
+    } catch (err) {
+        console.warn("[syncCompletedBookings] Notice:", err.message);
+    }
+}
+
 module.exports = {
     checkListingAvailability,
     toComparableDateTime,
     checkIntervalOverlap,
     parseTimeComponents,
+    syncCompletedBookings,
 };

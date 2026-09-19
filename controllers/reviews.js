@@ -1,8 +1,14 @@
+const mongoose = require("mongoose");
 const Listing  = require("../models/listing");
 const Review  = require("../models/review");
 
 module.exports.createReview = async(req,res)=>{
-    let listing = await Listing.findById(req.params.id);
+    let { id } = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        req.flash("error", "Listing not found");
+        return res.redirect("/listings");
+    }
+    let listing = await Listing.findById(id);
     if (!listing) {
         req.flash("error", "Listing not found");
         return res.redirect("/listings");
@@ -18,7 +24,11 @@ module.exports.createReview = async(req,res)=>{
 }
 
 module.exports.destroyReview = async(req,res)=>{
-    let {id,reviewId}=req.params;
+    let {id, reviewId} = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id) || !reviewId || !mongoose.Types.ObjectId.isValid(reviewId)) {
+        req.flash("error", "Invalid listing or review ID");
+        return res.redirect(id && mongoose.Types.ObjectId.isValid(id) ? `/listings/${id}` : "/listings");
+    }
     await Listing.findByIdAndUpdate(id,{$pull:{reviews:reviewId}});
     await Review.findByIdAndDelete(reviewId);
     req.flash("success","Review deleted!");

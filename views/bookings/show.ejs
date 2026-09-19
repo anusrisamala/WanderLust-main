@@ -1,20 +1,84 @@
 <% layout("/layouts/boilerplate") %>
+<%
+  const toRupees = (amt) => (booking && booking.isPaise ? (amt || 0) / 100 : (amt || 0));
+  const displayPricePerNight = booking.pricePerNight != null ? toRupees(booking.pricePerNight) : (booking.listing ? booking.listing.price : 0);
+  const displayBasePrice = booking.basePrice != null ? toRupees(booking.basePrice) : toRupees(booking.totalPrice);
+  const displayTaxAmount = toRupees(booking.taxAmount);
+  const displayTotalPrice = toRupees(booking.totalPrice);
+%>
 
 <div class="row mt-4 mb-5">
   <div class="col-12 col-md-8 offset-md-2">
     <div class="card border shadow-sm rounded-4 p-4 p-md-5">
-      <!-- Confirmation Header -->
+      <!-- Status Header -->
       <div class="text-center mb-4 pb-3 border-bottom">
-        <div class="mb-2">
-          <i class="fa-solid fa-circle-check text-success fs-1"></i>
+        <% if (booking.status === 'CONFIRMED') { %>
+          <div class="mb-2">
+            <i class="fa-solid fa-circle-check text-success fs-1"></i>
+          </div>
+          <h2 class="fw-bold mb-1 text-dark">Booking Confirmed</h2>
+          <p class="text-success fw-semibold mb-2">
+            <i class="fa-solid fa-check me-1"></i>Your reservation is confirmed!
+          </p>
+        <% } else if (booking.status === 'AWAITING_HOST_APPROVAL' || (booking.status === 'PENDING' && booking.paymentStatus === 'PAID')) { %>
+          <div class="mb-2">
+            <i class="fa-solid fa-hourglass-half text-primary fs-1"></i>
+          </div>
+          <h2 class="fw-bold mb-1 text-dark">Payment Received — Awaiting Host Approval</h2>
+          <p class="text-primary fw-semibold mb-2">
+            <i class="fa-solid fa-clock me-1"></i>Your payment has been captured. The host is reviewing your reservation request.
+          </p>
+        <% } else if (booking.status === 'PENDING_PAYMENT' || (booking.status === 'PENDING' && booking.paymentStatus !== 'PAID')) { %>
+          <div class="mb-2">
+            <i class="fa-solid fa-clock text-warning fs-1"></i>
+          </div>
+          <h2 class="fw-bold mb-1 text-dark">Booking Pending (Awaiting Payment)</h2>
+          <p class="text-secondary fw-semibold mb-2">
+            <i class="fa-regular fa-clock me-1 text-warning"></i>Please complete payment within 15 minutes to secure your dates.
+          </p>
+        <% } else if (booking.status === 'COMPLETED') { %>
+          <div class="mb-2">
+            <i class="fa-solid fa-flag-checkered text-secondary fs-1"></i>
+          </div>
+          <h2 class="fw-bold mb-1 text-dark">Trip Completed</h2>
+          <p class="text-secondary fw-semibold mb-2">
+            <i class="fa-solid fa-circle-check me-1"></i>We hope you had a wonderful stay!
+          </p>
+        <% } else if (booking.status === 'CANCELLED') { %>
+          <div class="mb-2">
+            <i class="fa-solid fa-circle-xmark text-danger fs-1"></i>
+          </div>
+          <h2 class="fw-bold mb-1 text-dark">Booking Cancelled</h2>
+          <p class="text-danger fw-semibold mb-2">
+            <i class="fa-solid fa-ban me-1"></i>This reservation has been cancelled.
+          </p>
+        <% } %>
+        <div class="d-flex justify-content-center gap-2 flex-wrap">
+          <span class="badge <%= booking.status === 'CONFIRMED' ? 'bg-success' : (booking.status === 'CANCELLED' ? 'bg-danger' : (booking.status === 'COMPLETED' ? 'bg-secondary' : (booking.status === 'AWAITING_HOST_APPROVAL' ? 'bg-primary text-white' : 'bg-warning text-dark'))) %> px-3 py-2 fs-6">
+            Status: <%= (booking.status === 'AWAITING_HOST_APPROVAL') ? 'Awaiting Host Approval' : ((booking.status === 'PENDING_PAYMENT') ? 'Awaiting Payment' : booking.status) %>
+          </span>
+          <% if (booking.paymentStatus === "PAID") { %>
+            <span class="badge bg-success px-3 py-2 fs-6">
+              <i class="fa-solid fa-circle-check me-1"></i>Payment: PAID
+            </span>
+          <% } else if (booking.paymentStatus === "REFUND_PENDING") { %>
+            <span class="badge bg-warning text-dark px-3 py-2 fs-6">
+              <i class="fa-solid fa-spinner fa-spin me-1"></i>Payment: REFUND PENDING
+            </span>
+          <% } else if (booking.paymentStatus === "FAILED") { %>
+            <span class="badge bg-danger px-3 py-2 fs-6">
+              <i class="fa-solid fa-circle-xmark me-1"></i>Payment: FAILED
+            </span>
+          <% } else if (booking.paymentStatus === "REFUNDED") { %>
+            <span class="badge bg-secondary px-3 py-2 fs-6">
+              <i class="fa-solid fa-rotate-left me-1"></i>Payment: REFUNDED
+            </span>
+          <% } else { %>
+            <span class="badge bg-warning text-dark px-3 py-2 fs-6">
+              <i class="fa-solid fa-hourglass-half me-1"></i>Payment: PENDING
+            </span>
+          <% } %>
         </div>
-        <h2 class="fw-bold mb-1">Booking Confirmed</h2>
-        <p class="text-success fw-semibold mb-2">
-          <i class="fa-solid fa-check me-1"></i>Your reservation details
-        </p>
-        <span class="badge <%= booking.status === 'CONFIRMED' ? 'bg-success' : (booking.status === 'CANCELLED' ? 'bg-danger' : (booking.status === 'COMPLETED' ? 'bg-secondary' : 'bg-warning text-dark')) %> px-3 py-2 fs-6">
-          Status: <%= booking.status %>
-        </span>
       </div>
 
       <!-- Listing Information -->
@@ -38,7 +102,7 @@
               <strong>Location:</strong> <%= booking.listing ? booking.listing.location : "N/A" %><% if (booking.listing && booking.listing.country) { %>, <%= booking.listing.country %><% } %>
             </p>
             <p class="mb-0 fw-semibold">
-              <strong>Price per night:</strong> &#8377;<%= (booking.pricePerNight != null ? booking.pricePerNight : (booking.listing ? booking.listing.price : 0)).toLocaleString("en-IN") %>
+              <strong>Price per night:</strong> &#8377;<%= displayPricePerNight.toLocaleString("en-IN") %>
             </p>
           </div>
         </div>
@@ -76,20 +140,20 @@
         <h5 class="fw-bold mb-3">Price Summary</h5>
         <div class="d-flex justify-content-between text-muted mb-2">
           <span>Price per night:</span>
-          <span>&#8377;<%= (booking.pricePerNight != null ? booking.pricePerNight : (booking.listing ? booking.listing.price : 0)).toLocaleString("en-IN") %></span>
+          <span>&#8377;<%= displayPricePerNight.toLocaleString("en-IN") %></span>
         </div>
         <div class="d-flex justify-content-between text-muted mb-2">
-          <span>Base price (<%= (booking.pricePerNight != null ? booking.pricePerNight : (booking.listing ? booking.listing.price : 0)).toLocaleString("en-IN") %> &times; <%= booking.numberOfNights || nights %> <%= (booking.numberOfNights || nights) === 1 ? 'night' : 'nights' %>):</span>
-          <span>&#8377;<%= (booking.basePrice != null ? booking.basePrice : (booking.totalPrice || 0)).toLocaleString("en-IN") %></span>
+          <span>Base price (<%= displayPricePerNight.toLocaleString("en-IN") %> &times; <%= booking.numberOfNights || nights %> <%= (booking.numberOfNights || nights) === 1 ? 'night' : 'nights' %>):</span>
+          <span>&#8377;<%= displayBasePrice.toLocaleString("en-IN") %></span>
         </div>
         <div class="d-flex justify-content-between text-muted mb-2">
           <span>GST (<%= booking.taxRate != null ? booking.taxRate : 5 %>%):</span>
-          <span>&#8377;<%= (booking.taxAmount != null ? booking.taxAmount : 0).toLocaleString("en-IN") %></span>
+          <span>&#8377;<%= displayTaxAmount.toLocaleString("en-IN") %></span>
         </div>
         <hr class="my-2 text-muted">
         <div class="d-flex justify-content-between fw-bold fs-5">
           <span>Total:</span>
-          <span class="text-danger">&#8377;<%= booking.totalPrice ? booking.totalPrice.toLocaleString("en-IN") : 0 %></span>
+          <span class="text-danger">&#8377;<%= displayTotalPrice.toLocaleString("en-IN") %></span>
         </div>
       </div>
 
@@ -104,8 +168,25 @@
           My Bookings
         </a>
 
-        <% if (booking.status === "PENDING" || booking.status === "CONFIRMED") { %>
-          <form method="POST" action="/bookings/<%= booking._id %>/cancel" class="ms-auto m-0" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+        <% if (booking.status !== "CANCELLED" && (booking.paymentStatus === "PENDING" || !booking.paymentStatus)) { %>
+          <a href="/bookings/<%= booking._id %>/payment" class="btn btn-danger add-btn px-4 py-2 fw-semibold">
+            <i class="fa-solid fa-credit-card me-1"></i>Proceed to Payment
+          </a>
+        <% } else if (booking.paymentStatus === "PAID") { %>
+          <a href="/bookings/<%= booking._id %>/payment" class="btn btn-outline-success px-4 py-2 fw-semibold">
+            <i class="fa-solid fa-receipt me-1"></i>View Payment Receipt
+          </a>
+          <form method="POST" action="/bookings/<%= booking._id %>/refund" class="m-0" data-confirm="Are you sure you want to request a full refund of ₹<%= displayTotalPrice.toLocaleString() %> for this reservation?">
+            <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+            <button type="submit" class="btn btn-outline-warning text-dark px-4 py-2 fw-semibold">
+              <i class="fa-solid fa-rotate-left me-1"></i>Request Refund
+            </button>
+          </form>
+        <% } %>
+
+        <% if (booking.status === "PENDING_PAYMENT" || booking.status === "PENDING" || booking.status === "AWAITING_HOST_APPROVAL" || booking.status === "CONFIRMED") { %>
+          <form method="POST" action="/bookings/<%= booking._id %>/cancel" class="ms-auto m-0" data-confirm="Are you sure you want to cancel this booking?">
+            <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
             <button type="submit" class="btn btn-outline-danger px-4 py-2">
               <i class="fa-solid fa-ban me-1"></i>Cancel Booking
             </button>

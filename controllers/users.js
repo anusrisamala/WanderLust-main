@@ -10,19 +10,65 @@ module.exports.renderSignupForm = (req, res) => {
 module.exports.signup = async (req, res, next) => {
     try {
       let { username, email, password } = req.body;
-      const newUser = new User({ email, username, role: "USER" });
+
+      // 1. Validate required fields
+      if (!username || typeof username !== "string" || !username.trim()) {
+        req.flash("error", "Username is required.");
+        return res.redirect("/signup");
+      }
+      if (!email || typeof email !== "string" || !email.trim()) {
+        req.flash("error", "Email is required.");
+        return res.redirect("/signup");
+      }
+      if (!password || typeof password !== "string" || !password.trim()) {
+        req.flash("error", "Password is required.");
+        return res.redirect("/signup");
+      }
+
+      // 2. Normalize email and username
+      const cleanUsername = username.trim();
+      const normalizedEmail = email.trim().toLowerCase();
+
+      // 3. Strict email validation
+      // Rejects: 'abc', 'abc@', '@domain.com', 'abc@domain', 'user@.com.my', etc.
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(normalizedEmail)) {
+        req.flash("error", "Please provide a valid email address.");
+        return res.redirect("/signup");
+      }
+
+      // 4. Pre-check for duplicate email to provide immediate feedback
+      const existingUserByEmail = await User.findOne({ email: normalizedEmail });
+      if (existingUserByEmail) {
+        req.flash("error", "An account with this email address already exists.");
+        return res.redirect("/signup");
+      }
+
+      const newUser = new User({ email: normalizedEmail, username: cleanUsername, role: "USER" });
       const registeredUser = await User.register(newUser, password);
-      console.log(registeredUser);
 
       req.login(registeredUser,(err)=>{
         if(err){
           return next(err);
         }
         req.flash("success", "welcome to wanderlust");
-      res.redirect("/listings");
-      })
+        res.redirect("/listings");
+      });
       
     } catch (e) {
+      // 5. Handle duplicate-key race conditions and passport errors gracefully
+      if (e.code === 11000) {
+        if (e.keyPattern && e.keyPattern.email) {
+          req.flash("error", "An account with this email address already exists.");
+          return res.redirect("/signup");
+        }
+        if (e.keyPattern && e.keyPattern.username) {
+          req.flash("error", "A user with the given username is already registered.");
+          return res.redirect("/signup");
+        }
+        req.flash("error", "An account with these details already exists.");
+        return res.redirect("/signup");
+      }
       req.flash("error", e.message);
       res.redirect("/signup");
     }
@@ -54,11 +100,14 @@ module.exports.renderWishlist = async (req, res) => {
     res.render("users/wishlist.ejs", { wishlist });
 };
 
-const { toComparableDateTime } = require("../utils/availability.js");
+const { toComparableDateTime, syncCompletedBookings } = require("../utils/availability.js");
 
 module.exports.renderDashboard = async (req, res) => {
     // Strictly retrieve data using authenticated user ID
     const userId = req.user._id;
+
+    // Automatically synchronize past confirmed stays to persisted COMPLETED status
+    await syncCompletedBookings({ user: userId });
 
     const now = new Date();
 
@@ -164,7 +213,7 @@ module.exports.updateProfile = async (req, res, next) => {
     const cleanEmail = email.trim().toLowerCase();
 
     // 3. Validation: validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(cleanEmail)) {
         req.flash("error", "Please provide a valid email address.");
         return res.redirect("/profile/edit");
@@ -282,6 +331,9 @@ module.exports.renderHostDashboard = async (req, res) => {
     // 2. Extract listing IDs
     const hostListingIds = hostListings.map(listing => listing._id);
 
+    // Automatically synchronize past confirmed stays to persisted COMPLETED status in MongoDB
+    await syncCompletedBookings({ listing: { $in: hostListingIds } });
+
     // 3. Find bookings where booking.listing belongs to those listing IDs
     const hostBookings = await Booking.find({ listing: { $in: hostListingIds } })
         .populate({
@@ -302,13 +354,13 @@ module.exports.renderHostDashboard = async (req, res) => {
     let completedCount = 0;
 
     for (const b of hostBookings) {
-        if (b.status === "PENDING") pendingCount++;
+        if (b.status === "AWAITING_HOST_APPROVAL" || b.status === "PENDING_PAYMENT" || b.status === "PENDING") pendingCount++;
         else if (b.status === "CONFIRMED") confirmedCount++;
         else if (b.status === "CANCELLED") cancelledCount++;
         else if (b.status === "COMPLETED") completedCount++;
 
         const checkInDT = toComparableDateTime(b.checkInDate, b.checkInTime) || new Date(b.checkInDate);
-        if (checkInDT > now && (b.status === "CONFIRMED" || b.status === "PENDING")) {
+        if (checkInDT > now && (b.status === "CONFIRMED" || b.status === "AWAITING_HOST_APPROVAL" || b.status === "PENDING_PAYMENT" || b.status === "PENDING")) {
             upcomingCount++;
         }
     }
@@ -340,9 +392,9 @@ module.exports.renderHostListings = async (req, res) => {
     // SECURITY: Strictly target authenticated host ID
     const hostId = req.user._id;
 
-    // Fetch ONLY listings owned by authenticated host using exact schema 'owner' field
+    // Fetch listings owned by authenticated host (including active/archived state)
     const hostListings = await Listing.find({ owner: hostId })
-        .select("title description location country price image category")
+        .select("title description location country price image category isActive")
         .sort({ _id: -1 });
 
     res.render("host/listings.ejs", {
@@ -359,16 +411,31 @@ module.exports.renderHostBookings = async (req, res) => {
     const hostListings = await Listing.find({ owner: hostId }).select("_id");
     const hostListingIds = hostListings.map(l => l._id);
 
-    // 2. Determine filter status (PENDING, CONFIRMED, CANCELLED, COMPLETED, or ALL)
+    // Automatically synchronize past confirmed stays to persisted COMPLETED status in MongoDB
+    await syncCompletedBookings({ listing: { $in: hostListingIds } });
+
+    // 2. Determine filter status (AWAITING_HOST_APPROVAL, CONFIRMED, PENDING_PAYMENT, CANCELLED, COMPLETED, or ALL)
     const { status } = req.query;
-    const validStatuses = ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"];
+    const validStatuses = ["AWAITING_HOST_APPROVAL", "CONFIRMED", "PENDING_PAYMENT", "CANCELLED", "COMPLETED", "PENDING"];
     const currentStatus = (typeof status === "string" && validStatuses.includes(status.trim().toUpperCase()))
         ? status.trim().toUpperCase()
         : "ALL";
 
     // 3. Construct query: strictly restrict to host's own listing IDs
     const filterQuery = { listing: { $in: hostListingIds } };
-    if (currentStatus !== "ALL") {
+    if (currentStatus === "AWAITING_HOST_APPROVAL") {
+        filterQuery.$or = [
+            { status: "AWAITING_HOST_APPROVAL" },
+            { status: "PENDING", paymentStatus: "PAID" }
+        ];
+    } else if (currentStatus === "PENDING_PAYMENT") {
+        filterQuery.$or = [
+            { status: "PENDING_PAYMENT" },
+            { status: "PENDING", paymentStatus: { $ne: "PAID" } }
+        ];
+    } else if (currentStatus === "PENDING") {
+        filterQuery.status = { $in: ["AWAITING_HOST_APPROVAL", "PENDING_PAYMENT", "PENDING"] };
+    } else if (currentStatus !== "ALL") {
         filterQuery.status = currentStatus;
     }
 
@@ -386,13 +453,15 @@ module.exports.renderHostBookings = async (req, res) => {
         .sort({ createdAt: -1 });
 
     // 5. Calculate status counts for filter badges across all host's bookings
-    const allHostBookings = await Booking.find({ listing: { $in: hostListingIds } }).select("status");
+    const allHostBookings = await Booking.find({ listing: { $in: hostListingIds } }).select("status paymentStatus");
     const statusCounts = {
         ALL: allHostBookings.length,
-        PENDING: allHostBookings.filter(b => b.status === "PENDING").length,
+        AWAITING_HOST_APPROVAL: allHostBookings.filter(b => b.status === "AWAITING_HOST_APPROVAL" || (b.status === "PENDING" && b.paymentStatus === "PAID")).length,
         CONFIRMED: allHostBookings.filter(b => b.status === "CONFIRMED").length,
+        PENDING_PAYMENT: allHostBookings.filter(b => b.status === "PENDING_PAYMENT" || (b.status === "PENDING" && b.paymentStatus !== "PAID")).length,
         CANCELLED: allHostBookings.filter(b => b.status === "CANCELLED").length,
         COMPLETED: allHostBookings.filter(b => b.status === "COMPLETED").length,
+        PENDING: allHostBookings.filter(b => b.status === "AWAITING_HOST_APPROVAL" || b.status === "PENDING_PAYMENT" || b.status === "PENDING").length,
     };
 
     res.render("host/bookings.ejs", {
@@ -435,6 +504,15 @@ module.exports.renderHostBookingDetails = async (req, res) => {
     if (!booking.listing || !booking.listing.owner || !booking.listing.owner.equals(req.user._id)) {
         req.flash("error", "You do not have permission to view this booking.");
         return res.redirect("/host/bookings");
+    }
+
+    // Automatically sync to COMPLETED if checkout date/time has passed
+    if (booking.status === "CONFIRMED") {
+        const checkOutDT = toComparableDateTime(booking.checkOutDate, booking.checkOutTime) || new Date(booking.checkOutDate);
+        if (checkOutDT && checkOutDT <= new Date()) {
+            booking.status = "COMPLETED";
+            await booking.save();
+        }
     }
 
     // 4. Calculate nights for display
@@ -492,8 +570,15 @@ module.exports.confirmHostBooking = async (req, res) => {
         return res.redirect(`/host/bookings/${booking._id}`);
     }
 
-    if (booking.status !== "PENDING") {
-        req.flash("error", `Cannot confirm booking with status ${booking.status}.`);
+    if (booking.status !== "AWAITING_HOST_APPROVAL" && booking.status !== "PENDING") {
+        req.flash("error", `Cannot confirm booking with status ${booking.status}. Only bookings awaiting host approval can be confirmed.`);
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    // STRICT PAYMENT REQUIREMENT:
+    // A booking must be PAID before the host can confirm it. This prevents bypassing the 15-minute payment hold on unpaid reservations.
+    if (booking.paymentStatus !== "PAID") {
+        req.flash("error", "Cannot confirm an unpaid booking. The guest must complete payment before host confirmation.");
         return res.redirect(`/host/bookings/${booking._id}`);
     }
 
@@ -551,15 +636,166 @@ module.exports.cancelHostBooking = async (req, res) => {
         return res.redirect(`/host/bookings/${booking._id}`);
     }
 
-    if (booking.status !== "PENDING") {
-        req.flash("error", `Cannot cancel booking with status ${booking.status}.`);
+    const cancellableByHost = ["AWAITING_HOST_APPROVAL", "PENDING_PAYMENT", "PENDING"];
+    if (!cancellableByHost.includes(booking.status)) {
+        req.flash("error", `Cannot cancel/decline booking with status ${booking.status}.`);
         return res.redirect(`/host/bookings/${booking._id}`);
     }
 
-    booking.status = "CANCELLED";
+    // If refund is already in progress, reject concurrent duplicate request
+    if (booking.paymentStatus === "REFUND_PENDING") {
+        req.flash("error", "A cancellation/refund is already in progress for this reservation. Please wait.");
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    // CASE 1: UNPAID BOOKING (no payment captured, safe to immediately mark CANCELLED)
+    if (booking.paymentStatus !== "PAID") {
+        booking.status = "CANCELLED";
+        await booking.save();
+        req.flash("success", "Booking request has been cancelled.");
+        const referer = req.get("Referrer");
+        if (referer && referer.includes("/host/bookings") && !referer.includes(booking._id.toString())) {
+            return res.redirect(referer);
+        }
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    // CASE 2: PAID BOOKING
+    // ATOMIC CONCURRENCY CLAIM:
+    const claimedBooking = await Booking.findOneAndUpdate(
+        { _id: booking._id, paymentStatus: "PAID" },
+        { $set: { paymentStatus: "REFUND_PENDING" } },
+        { new: true }
+    );
+
+    if (!claimedBooking) {
+        req.flash("error", "A cancellation/refund is already in progress or has already been completed for this booking.");
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    let refundProcessed = false;
+    let refundError = null;
+
+    if (claimedBooking.paymentId) {
+        try {
+            const { getRazorpayInstance, isPaymentSimulatorAllowed, isPaymentSimulatorForced } = require("../utils/razorpay.js");
+            const razorpay = getRazorpayInstance();
+            const refundAmountInPaise = claimedBooking.isPaise ? Math.round(claimedBooking.totalPrice) : Math.round(claimedBooking.totalPrice * 100);
+
+            const allowSimulator = isPaymentSimulatorAllowed();
+            let refund;
+            const isMockPayment = allowSimulator && claimedBooking.paymentId && claimedBooking.paymentId.startsWith("pay_test_mock_");
+
+            if (isMockPayment) {
+                refund = {
+                    id: `rfnd_test_${Date.now()}`,
+                    amount: refundAmountInPaise,
+                    currency: "INR",
+                    status: "processed"
+                };
+            } else {
+                if (!allowSimulator && claimedBooking.paymentId && claimedBooking.paymentId.startsWith("pay_test_mock_")) {
+                    throw new Error("Mock payment refunds are strictly prohibited without ALLOW_PAYMENT_SIMULATOR=true in local development.");
+                }
+                try {
+                    refund = await razorpay.payments.refund(claimedBooking.paymentId, {
+                        amount: refundAmountInPaise,
+                        notes: {
+                            bookingId: claimedBooking._id.toString(),
+                            refundedBy: `host:${req.user?.username || req.user?._id?.toString() || "host"}`,
+                            reason: "Automatic refund upon host cancellation",
+                        }
+                    });
+                } catch (apiErr) {
+                    if (allowSimulator && (apiErr?.statusCode === 401 || apiErr?.error?.description === "Authentication failed")) {
+                        console.warn("[Razorpay] 401 Authentication error during host cancellation refund. Falling back to simulated test refund (LOCAL DEV ONLY with ALLOW_PAYMENT_SIMULATOR=true).");
+                        refund = {
+                            id: `rfnd_test_${Date.now()}`,
+                            amount: refundAmountInPaise,
+                            currency: "INR",
+                            status: "processed"
+                        };
+                    } else {
+                        throw apiErr;
+                    }
+                }
+            }
+
+            // CRITICAL: Finalize cancellation and free dates ONLY after a confirmed successful refund!
+            claimedBooking.status = "CANCELLED";
+            claimedBooking.paymentStatus = "REFUNDED";
+            claimedBooking.refundId = refund.id;
+            claimedBooking.refundedAt = new Date();
+            claimedBooking.refundAmount = claimedBooking.totalPrice;
+            await claimedBooking.save();
+            refundProcessed = true;
+        } catch (err) {
+            console.error("Auto-refund error upon host cancellation:", err?.error?.description || err?.message || err);
+            refundError = err?.error?.description || err?.message || "Gateway processing error";
+
+            // CRITICAL: On refund failure, DO NOT mark CANCELLED! Revert to PAID and keep reservation intact.
+            claimedBooking.paymentStatus = "PAID";
+            await claimedBooking.save();
+        }
+    } else {
+        claimedBooking.status = "CANCELLED";
+        await claimedBooking.save();
+        refundProcessed = true;
+    }
+
+    if (refundProcessed) {
+        const refundAmountRupees = claimedBooking.isPaise ? claimedBooking.totalPrice / 100 : claimedBooking.totalPrice;
+        req.flash("success", `Booking request has been cancelled and a full refund of ₹${refundAmountRupees.toLocaleString("en-IN")} was initiated for the guest.`);
+    } else {
+        req.flash("error", `Could not cancel booking because the automatic refund failed (${refundError}). Dates remain reserved.`);
+    }
+
+    const referer = req.get("Referrer");
+    if (referer && referer.includes("/host/bookings") && !referer.includes(booking._id.toString())) {
+        return res.redirect(referer);
+    }
+    res.redirect(`/host/bookings/${booking._id}`);
+};
+
+module.exports.completeHostBooking = async (req, res) => {
+    const { id } = req.params;
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        req.flash("error", "Invalid booking ID.");
+        return res.redirect("/host/bookings");
+    }
+
+    const booking = await Booking.findById(id).populate({
+        path: "listing",
+        select: "owner title"
+    });
+
+    if (!booking) {
+        req.flash("error", "Booking you requested for does not exist!");
+        return res.redirect("/host/bookings");
+    }
+
+    // STRICT CRITICAL AUTHORIZATION:
+    // Verify that the booking belongs to a listing owned by the authenticated host (req.user._id)
+    if (!booking.listing || !booking.listing.owner || !booking.listing.owner.equals(req.user._id)) {
+        req.flash("error", "You do not have permission to manage this booking.");
+        return res.redirect("/host/bookings");
+    }
+
+    if (booking.status === "COMPLETED") {
+        req.flash("error", "This booking is already marked as completed.");
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    if (booking.status !== "CONFIRMED") {
+        req.flash("error", `Only confirmed bookings can be marked as completed (current status: ${booking.status}).`);
+        return res.redirect(`/host/bookings/${booking._id}`);
+    }
+
+    booking.status = "COMPLETED";
     await booking.save();
 
-    req.flash("success", "Booking request has been cancelled.");
+    req.flash("success", "Booking has been marked as completed successfully!");
 
     const referer = req.get("Referrer");
     if (referer && referer.includes("/host/bookings") && !referer.includes(booking._id.toString())) {

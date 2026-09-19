@@ -4,19 +4,21 @@ const router = express.Router();
 const User = require("../models/user.js");
 const passport = require("passport");
 const { savedRedirectUrl, isLoggedIn, isHost } = require("../middleware.js");
+const { authLimiter } = require("../utils/security.js");
 
 const userController = require("../controllers/users.js");
 
 router.route("/signup")
   .get( userController.renderSignupForm )
-
   .post(
+    authLimiter,
     wrapAsync(userController.signup),
   );
 
 router.route("/login")
   .get( userController.renderLoginForm)
   .post(
+  authLimiter,
   savedRedirectUrl,
   passport.authenticate("local", {
     failureRedirect: "/login",
@@ -38,6 +40,8 @@ router.get("/host/bookings", isHost, wrapAsync(userController.renderHostBookings
 router.get("/host/bookings/:id", isHost, wrapAsync(userController.renderHostBookingDetails));
 
 router.post("/host/bookings/:id/confirm", isHost, wrapAsync(userController.confirmHostBooking));
+
+router.post("/host/bookings/:id/complete", isHost, wrapAsync(userController.completeHostBooking));
 
 router.post("/host/bookings/:id/cancel", isHost, wrapAsync(userController.cancelHostBooking));
 

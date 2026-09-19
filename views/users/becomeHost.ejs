@@ -62,6 +62,7 @@
       <!-- Confirmation Form -->
       <!-- SECURITY: No user ID or role is sent by client. Backend strictly uses req.user._id and sets role = "HOST" -->
       <form action="/become-host" method="POST">
+        <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
         <div class="d-grid gap-2">
           <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm py-2">
             <i class="fa-solid fa-check me-2"></i>Confirm & Become a Host

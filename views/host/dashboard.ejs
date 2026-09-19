@@ -300,16 +300,20 @@
                     <span class="text-muted small"><%= (booking.guests === 1) ? 'guest' : 'guests' %></span>
                   </td>
                   <td>
-                    <strong class="text-dark">&#8377;<%= (booking.totalPrice || 0).toLocaleString("en-IN") %></strong>
+                    <strong class="text-dark">&#8377;<%= (booking.isPaise ? (booking.totalPrice || 0) / 100 : (booking.totalPrice || 0)).toLocaleString("en-IN") %></strong>
                   </td>
                   <td>
-                    <% if (booking.status === "CONFIRMED") { %>
+                    <% if (booking.status === "AWAITING_HOST_APPROVAL" || (booking.status === "PENDING" && booking.paymentStatus === "PAID")) { %>
+                      <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1 small">
+                        <i class="fa-solid fa-clock-rotate-left me-1"></i>Awaiting Approval
+                      </span>
+                    <% } else if (booking.status === "PENDING_PAYMENT" || (booking.status === "PENDING" && booking.paymentStatus !== "PAID")) { %>
+                      <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-2 py-1 small">
+                        <i class="fa-regular fa-clock me-1"></i>Awaiting Payment
+                      </span>
+                    <% } else if (booking.status === "CONFIRMED") { %>
                       <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 small">
                         <i class="fa-solid fa-circle-check me-1"></i>Confirmed
-                      </span>
-                    <% } else if (booking.status === "PENDING") { %>
-                      <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-2 py-1 small">
-                        <i class="fa-solid fa-hourglass-half me-1"></i>Pending
                       </span>
                     <% } else if (booking.status === "CANCELLED") { %>
                       <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 small">
@@ -324,6 +328,17 @@
                         <%= booking.status %>
                       </span>
                     <% } %>
+                    <div class="mt-1">
+                      <% if (booking.paymentStatus === "PAID") { %>
+                        <span class="badge bg-success text-white px-2 py-1" style="font-size: 0.7rem;"><i class="fa-solid fa-check me-1"></i>Paid</span>
+                      <% } else if (booking.paymentStatus === "REFUNDED") { %>
+                        <span class="badge bg-info text-dark px-2 py-1" style="font-size: 0.7rem;"><i class="fa-solid fa-rotate-left me-1"></i>Refunded</span>
+                      <% } else if (booking.paymentStatus === "FAILED") { %>
+                        <span class="badge bg-danger text-white px-2 py-1" style="font-size: 0.7rem;"><i class="fa-solid fa-xmark me-1"></i>Failed</span>
+                      <% } else { %>
+                        <span class="badge bg-warning text-dark px-2 py-1" style="font-size: 0.7rem;"><i class="fa-solid fa-hourglass-half me-1"></i>Pending</span>
+                      <% } %>
+                    </div>
                   </td>
                   <td class="text-end pe-4">
                     <a href="/host/bookings/<%= booking._id %>" class="btn btn-sm btn-outline-dark px-3 py-1 fw-semibold" title="View Booking Details">

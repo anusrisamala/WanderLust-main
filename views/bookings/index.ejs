@@ -30,10 +30,25 @@
               style="height: 200px; border-radius: 1rem 1rem 0 0 !important;"
               alt="<%= booking.listing ? booking.listing.title : 'Listing' %>"
             />
-            <!-- Status Badge -->
-            <span class="position-absolute top-0 end-0 m-3 badge <%= booking.status === 'CONFIRMED' ? 'bg-success' : (booking.status === 'CANCELLED' ? 'bg-danger' : 'bg-warning text-dark') %> px-3 py-2 shadow-sm">
-              <%= booking.status %>
-            </span>
+            <!-- Status Badges -->
+            <div class="position-absolute top-0 end-0 m-3 d-flex flex-column align-items-end gap-1">
+              <span class="badge <%= booking.status === 'CONFIRMED' ? 'bg-success' : (booking.status === 'CANCELLED' ? 'bg-danger' : (booking.status === 'COMPLETED' ? 'bg-secondary' : (booking.status === 'AWAITING_HOST_APPROVAL' ? 'bg-primary text-white' : 'bg-warning text-dark'))) %> px-3 py-2 shadow-sm">
+                <%= (booking.status === 'AWAITING_HOST_APPROVAL') ? 'Awaiting Host Approval' : ((booking.status === 'PENDING_PAYMENT') ? 'Awaiting Payment' : booking.status) %>
+              </span>
+              <% if (booking.paymentStatus === "PAID") { %>
+                <span class="badge bg-success text-white px-2 py-1 shadow-sm small">
+                  <i class="fa-solid fa-receipt me-1"></i>PAID
+                </span>
+              <% } else if (booking.paymentStatus === "REFUNDED") { %>
+                <span class="badge bg-secondary text-white px-2 py-1 shadow-sm small">
+                  <i class="fa-solid fa-rotate-left me-1"></i>REFUNDED
+                </span>
+              <% } else if (booking.paymentStatus === "FAILED") { %>
+                <span class="badge bg-danger text-white px-2 py-1 shadow-sm small">
+                  <i class="fa-solid fa-circle-xmark me-1"></i>FAILED
+                </span>
+              <% } %>
+            </div>
           </div>
 
           <div class="card-body p-4 d-flex flex-column justify-content-between">
@@ -63,13 +78,19 @@
                   <span class="text-muted">Nights:</span>
                   <span class="fw-semibold"><%= booking.numberOfNights || 1 %> <%= (booking.numberOfNights || 1) === 1 ? 'night' : 'nights' %></span>
                 </div>
+                <%
+                  const toRupees = (amt) => (booking && booking.isPaise ? (amt || 0) / 100 : (amt || 0));
+                  const displayBasePrice = booking.basePrice != null ? toRupees(booking.basePrice) : toRupees(booking.totalPrice);
+                  const displayTaxAmount = toRupees(booking.taxAmount);
+                  const displayTotalPrice = toRupees(booking.totalPrice);
+                %>
                 <div class="d-flex justify-content-between mb-1">
                   <span class="text-muted">Base Price:</span>
-                  <span class="fw-semibold">&#8377;<%= (booking.basePrice != null ? booking.basePrice : (booking.totalPrice || 0)).toLocaleString("en-IN") %></span>
+                  <span class="fw-semibold">&#8377;<%= displayBasePrice.toLocaleString("en-IN") %></span>
                 </div>
                 <div class="d-flex justify-content-between mb-1">
                   <span class="text-muted">GST (<%= booking.taxRate != null ? booking.taxRate : 5 %>%):</span>
-                  <span class="fw-semibold">&#8377;<%= (booking.taxAmount != null ? booking.taxAmount : 0).toLocaleString("en-IN") %></span>
+                  <span class="fw-semibold">&#8377;<%= displayTaxAmount.toLocaleString("en-IN") %></span>
                 </div>
                 <div class="d-flex justify-content-between border-top pt-1 mt-1">
                   <span class="text-muted">Booked on:</span>
@@ -79,16 +100,40 @@
 
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <span class="text-muted small">Total Price:</span>
-                <span class="fs-5 fw-bold text-danger">&#8377;<%= booking.totalPrice ? booking.totalPrice.toLocaleString("en-IN") : "0" %></span>
+                <span class="fs-5 fw-bold text-danger">&#8377;<%= displayTotalPrice.toLocaleString("en-IN") %></span>
               </div>
             </div>
 
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 flex-wrap">
               <a href="/bookings/<%= booking._id %>" class="btn btn-outline-dark flex-grow-1 py-2 fw-semibold">
                 View Booking
               </a>
-              <% if (booking.status === "PENDING" || booking.status === "CONFIRMED") { %>
-                <form method="POST" action="/bookings/<%= booking._id %>/cancel" class="m-0" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+              <% if (booking.status !== "CANCELLED" && (booking.paymentStatus === "PENDING" || !booking.paymentStatus)) { %>
+                <a href="/bookings/<%= booking._id %>/payment" class="btn btn-danger add-btn px-3 py-2 fw-semibold">
+                  <i class="fa-solid fa-credit-card me-1"></i>Pay Now
+                </a>
+              <% } else if (booking.paymentStatus === "PAID") { %>
+                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-2 d-flex align-items-center">
+                  <i class="fa-solid fa-circle-check me-1"></i>Paid
+                </span>
+                <form method="POST" action="/bookings/<%= booking._id %>/refund" class="m-0" data-confirm="Are you sure you want to request a full refund for this booking?">
+                  <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+                  <button type="submit" class="btn btn-sm btn-outline-warning text-dark px-2 py-1 fw-medium" title="Request Refund">
+                    <i class="fa-solid fa-rotate-left me-1"></i>Refund
+                  </button>
+                </form>
+              <% } else if (booking.paymentStatus === "REFUNDED") { %>
+                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2 py-2 d-flex align-items-center">
+                  <i class="fa-solid fa-rotate-left me-1"></i>Refunded
+                </span>
+              <% } else if (booking.paymentStatus === "FAILED" && booking.status !== "CANCELLED") { %>
+                <a href="/bookings/<%= booking._id %>/payment" class="btn btn-outline-danger px-2 py-2 fw-semibold small">
+                  <i class="fa-solid fa-rotate-right me-1"></i>Retry Payment
+                </a>
+              <% } %>
+              <% if (booking.status === "PENDING_PAYMENT" || booking.status === "PENDING" || booking.status === "AWAITING_HOST_APPROVAL" || booking.status === "CONFIRMED") { %>
+                <form method="POST" action="/bookings/<%= booking._id %>/cancel" class="m-0" data-confirm="Are you sure you want to cancel this booking?">
+                  <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
                   <button type="submit" class="btn btn-outline-danger py-2 px-3 fw-semibold" title="Cancel Booking">
                     Cancel
                   </button>
