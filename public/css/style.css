@@ -374,5 +374,47 @@ body{
   background-color: #f3f4f6;
 }
 
+/* Bootstrap 5.0.2 compatibility for bg-opacity and soft status badges */
+.bg-success.bg-opacity-10 {
+  background-color: #d1e7dd !important;
+  color: #0f5132 !important;
+}
+.bg-danger.bg-opacity-10 {
+  background-color: #f8d7da !important;
+  color: #842029 !important;
+}
+.bg-warning.bg-opacity-10,
+.bg-warning.bg-opacity-25 {
+  background-color: #fff3cd !important;
+  color: #664d03 !important;
+}
+.bg-primary.bg-opacity-10 {
+  background-color: #cfe2ff !important;
+  color: #084298 !important;
+}
+.bg-secondary.bg-opacity-10 {
+  background-color: #e2e3e5 !important;
+  color: #41464b !important;
+}
+.bg-info.bg-opacity-10 {
+  background-color: #cff4fc !important;
+  color: #055160 !important;
+}
+.bg-dark.bg-opacity-75 {
+  background-color: rgba(33, 37, 41, 0.75) !important;
+  color: #ffffff !important;
+}
+.bg-dark.bg-opacity-10 {
+  background-color: #d3d3d4 !important;
+  color: #141619 !important;
+}
+.bg-light.bg-opacity-50 {
+  background-color: rgba(248, 249, 250, 0.6) !important;
+}
+.bg-light.bg-opacity-25 {
+  background-color: rgba(248, 249, 250, 0.35) !important;
+}
+
+
 
 

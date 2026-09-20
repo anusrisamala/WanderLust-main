@@ -15,7 +15,7 @@ const { checkListingAvailability, syncCompletedBookings } = require(path.join(pr
 
 async function runTestSuite() {
     console.log('====================================================');
-    console.log('  WANDERLUST PAYMENT & BOOKING TEST SUITE (43 TESTS)');
+    console.log('  WANDERLUST PAYMENT & BOOKING TEST SUITE (44 TESTS)');
     console.log('====================================================\n');
 
     const dbUrl = process.env.ATLASDB_URL || 'mongodb://127.0.0.1:27017/wanderlust';
@@ -1944,6 +1944,143 @@ async function runTestSuite() {
             }
 
             console.log('✓ Test 43: Production security verified: Helmet CSP, trust proxy, secure httpOnly sameSite cookies');
+            passedTests++;
+        }
+
+        // TEST 44: simulatePaymentFailure transitions booking to FAILED and enforces security guards
+        {
+            // Create a pending booking for testing failure simulation
+            const simBooking = new Booking({
+                user: guestUser._id,
+                listing: listing._id,
+                checkInDate: new Date(Date.now() + 10 * 86400000),
+                checkInTime: "14:00",
+                checkOutDate: new Date(Date.now() + 12 * 86400000),
+                checkOutTime: "11:00",
+                guests: 1,
+                numberOfNights: 2,
+                pricePerNight: 200000,
+                basePrice: 400000,
+                taxRate: 5,
+                taxAmount: 20000,
+                totalPrice: 420000,
+                status: "PENDING_PAYMENT",
+                paymentStatus: "PENDING",
+                isPaise: true,
+            });
+            await simBooking.save();
+
+            // 44a. Stranger user cannot simulate payment failure (403)
+            const reqStranger = createMockReq({ id: simBooking._id.toString() }, {}, strangerUser);
+            const resStranger = createMockRes();
+            await bookingController.simulatePaymentFailure(reqStranger, resStranger);
+            if (resStranger.statusCode !== 403) {
+                throw new Error(`Test 44a Failed: Expected 403 for unauthorized stranger, got ${resStranger.statusCode}`);
+            }
+
+            // 44b. Owner guest successfully simulates payment failure -> status becomes FAILED
+            const reqOwner = createMockReq({ id: simBooking._id.toString() }, {}, guestUser);
+            const resOwner = createMockRes();
+            await bookingController.simulatePaymentFailure(reqOwner, resOwner);
+            if (resOwner.statusCode !== 200 || !resOwner.jsonPayload?.success) {
+                throw new Error(`Test 44b Failed: Expected 200 success, got ${resOwner.statusCode}`);
+            }
+            const updatedSim = await Booking.findById(simBooking._id);
+            if (updatedSim.paymentStatus !== "FAILED") {
+                throw new Error(`Test 44b Failed: Expected paymentStatus FAILED, got ${updatedSim.paymentStatus}`);
+            }
+
+            // 44c. Already paid booking cannot be failed (400)
+            updatedSim.paymentStatus = "PAID";
+            await updatedSim.save();
+            const reqPaid = createMockReq({ id: simBooking._id.toString() }, {}, guestUser);
+            const resPaid = createMockRes();
+            await bookingController.simulatePaymentFailure(reqPaid, resPaid);
+            if (resPaid.statusCode !== 400) {
+                throw new Error(`Test 44c Failed: Expected 400 for already-paid booking, got ${resPaid.statusCode}`);
+            }
+
+            // 44d. In production mode, simulatePaymentFailure is strictly rejected (403)
+            const origEnv = process.env.NODE_ENV;
+            try {
+                process.env.NODE_ENV = "production";
+                const reqProd = createMockReq({ id: simBooking._id.toString() }, {}, guestUser);
+                const resProd = createMockRes();
+                await bookingController.simulatePaymentFailure(reqProd, resProd);
+                if (resProd.statusCode !== 403) {
+                    throw new Error(`Test 44d Failed: Expected 403 in production, got ${resProd.statusCode}`);
+                }
+            } finally {
+                process.env.NODE_ENV = origEnv;
+                await Booking.deleteOne({ _id: simBooking._id });
+            }
+
+            console.log('✓ Test 44: simulatePaymentFailure transitions booking to FAILED and enforces security guards');
+            passedTests++;
+        }
+
+        // TEST 45: Completed trip strictly rejects refund and cancellation attempts
+        {
+            // Case A: Explicitly COMPLETED booking
+            const completedBooking = new Booking({
+                user: guestUser._id,
+                listing: listing._id,
+                checkInDate: new Date(Date.UTC(2025, 0, 10)),
+                checkInTime: '14:00',
+                checkOutDate: new Date(Date.UTC(2025, 0, 15)),
+                checkOutTime: '11:00',
+                guests: 2,
+                numberOfNights: 5,
+                pricePerNight: 2000,
+                basePrice: 10000,
+                taxRate: 5,
+                taxAmount: 500,
+                totalPrice: 10500,
+                status: 'COMPLETED',
+                paymentStatus: 'PAID',
+                paymentId: 'pay_test_completed_refund_45',
+            });
+            await completedBooking.save();
+
+            // Guest attempts refund on completed trip -> MUST BE REJECTED (400)
+            const reqRefund = createMockReq({ id: completedBooking._id.toString() }, {}, guestUser);
+            const resRefund = createMockRes();
+            await bookingController.refundPayment(reqRefund, resRefund);
+            if (resRefund.statusCode !== 400 || !resRefund.jsonPayload?.error?.includes('already been completed')) {
+                throw new Error(`Test 45 Failed: Expected 400 rejection for completed trip refund, got ${resRefund.statusCode}`);
+            }
+
+            // Guest attempts cancellation on completed trip -> MUST BE REJECTED with flash error
+            const reqCancel = createMockReq({ id: completedBooking._id.toString() }, {}, guestUser);
+            let flashCancelMsg = null;
+            reqCancel.flash = (type, msg) => { flashCancelMsg = msg; };
+            let redirectedTo = null;
+            const resCancel = {
+                redirect: (url) => { redirectedTo = url; }
+            };
+            await bookingController.cancelBooking(reqCancel, resCancel);
+            if (!flashCancelMsg || !flashCancelMsg.includes('already been completed')) {
+                throw new Error(`Test 45 Failed: Expected completed trip cancellation to be rejected, got: ${flashCancelMsg}`);
+            }
+
+            // Case B: CONFIRMED booking whose checkout date is in the past -> auto-syncs to COMPLETED and rejects refund
+            completedBooking.status = 'CONFIRMED';
+            await completedBooking.save();
+
+            const reqPast = createMockReq({ id: completedBooking._id.toString() }, {}, guestUser);
+            const resPast = createMockRes();
+            await bookingController.refundPayment(reqPast, resPast);
+            if (resPast.statusCode !== 400 || !resPast.jsonPayload?.error?.includes('already been completed')) {
+                throw new Error(`Test 45 Failed: Past confirmed trip refund was not rejected with 400`);
+            }
+            const syncedCheck = await Booking.findById(completedBooking._id);
+            if (syncedCheck.status !== 'COMPLETED') {
+                throw new Error(`Test 45 Failed: Past trip was not transitioned to COMPLETED upon refund attempt`);
+            }
+
+            await Booking.deleteOne({ _id: completedBooking._id });
+
+            console.log('✓ Test 45: Completed trip strictly rejects refund and cancellation attempts (400)');
             passedTests++;
         }
 

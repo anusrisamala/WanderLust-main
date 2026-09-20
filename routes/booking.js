@@ -22,6 +22,9 @@ router.post("/:id/create-payment-order", paymentLimiter, isLoggedIn, wrapAsync(b
 // Verify Razorpay payment signature & update booking
 router.post("/:id/verify-payment", paymentLimiter, isLoggedIn, wrapAsync(bookingController.verifyPayment));
 
+// Simulate failed payment (local development only)
+router.post("/:id/simulate-payment-failure", paymentLimiter, isLoggedIn, wrapAsync(bookingController.simulatePaymentFailure));
+
 // Process refund for a paid booking
 router.post("/:id/refund", isLoggedIn, wrapAsync(bookingController.refundPayment));
 

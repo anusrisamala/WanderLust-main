@@ -291,16 +291,23 @@
             <strong class="text-danger fs-5">&#8377;<%= displayTotalPrice.toLocaleString() %></strong>
           </div>
         </div>
+        <div class="small text-muted mb-1">
+          <ul class="ps-3 mb-0">
+            <li><strong>Success:</strong> Captures payment and updates booking to <code>AWAITING_HOST_APPROVAL</code> (PAID).</li>
+            <li><strong>Failed Payment:</strong> Simulates a gateway decline and updates <code>paymentStatus</code> to <code>FAILED</code> in database to test the retry flow.</li>
+            <li><strong>Cancel:</strong> Closes the dialog leaving the booking <code>PENDING</code> (simulates closing the payment modal without paying).</li>
+          </ul>
+        </div>
       </div>
       <div class="modal-footer border-top-0 pt-0 d-flex flex-column gap-2">
         <button type="button" id="simSuccessBtn" class="btn btn-success w-100 py-2 fw-semibold">
           <i class="fa-solid fa-circle-check me-2"></i>Simulate Successful Payment
         </button>
         <button type="button" id="simFailBtn" class="btn btn-outline-danger w-100 py-2 fw-semibold">
-          <i class="fa-solid fa-circle-xmark me-2"></i>Simulate Failed Payment
+          <i class="fa-solid fa-circle-xmark me-2"></i>Simulate Failed Payment (Transitions to FAILED)
         </button>
         <button type="button" class="btn btn-link text-muted text-decoration-none w-100 py-1 small" data-bs-dismiss="modal">
-          Cancel
+          Cancel (Dismiss without Payment)
         </button>
       </div>
     </div>
@@ -442,7 +449,39 @@
     const originalHtml = payBtn ? payBtn.innerHTML : "";
 
     if (!isSuccess) {
-      showAlert("Simulated payment was cancelled or declined.", "danger");
+      // Record simulated payment failure on the server to transition paymentStatus to FAILED
+      if (payBtn) {
+        payBtn.disabled = true;
+        payBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Simulating payment failure...`;
+      }
+      try {
+        const CSRF_TOKEN = "<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>";
+        const failRes = await fetch(`/bookings/${BOOKING_ID}/simulate-payment-failure`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": CSRF_TOKEN
+          }
+        });
+        const failData = await failRes.json();
+        if (failRes.ok && failData.success) {
+          showAlert("Simulated payment failure recorded. Booking payment status updated to FAILED in database. Reloading retry view...", "danger");
+          setTimeout(() => { window.location.reload(); }, 1200);
+        } else {
+          showAlert(failData.error || "Simulated payment failure occurred.", "danger");
+          if (payBtn) {
+            payBtn.disabled = false;
+            payBtn.innerHTML = originalHtml;
+          }
+        }
+      } catch (err) {
+        console.error("Error simulating payment failure:", err);
+        showAlert("Simulated payment was cancelled or declined.", "danger");
+        if (payBtn) {
+          payBtn.disabled = false;
+          payBtn.innerHTML = originalHtml;
+        }
+      }
       return;
     }
 

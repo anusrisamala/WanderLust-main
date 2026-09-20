@@ -774,19 +774,24 @@ module.exports.verifyPayment = async (req, res) => {
         }
         booking.paymentStatus = "FAILED";
         await booking.save();
+        const errorMessage = (allowSimulator && isMockOrder && razorpay_signature === "simulated_failed_signature")
+            ? "Simulated payment failure: Transaction declined by test simulator. Payment status marked as FAILED."
+            : "Payment verification failed. Invalid payment signature.";
         return res.status(400).json({
             success: false,
-            error: "Payment verification failed. Invalid payment signature."
+            error: errorMessage
         });
     }
 
     // Signature is cryptographically valid: Customer's funds were captured on Razorpay!
     // Check if the booking hold had expired (15-minute checkout window) or was cancelled
     const { PAYMENT_HOLD_CONFIG } = require("../utils/constants.js");
-    const holdMs = PAYMENT_HOLD_CONFIG?.HOLD_MS || (15 * 60 * 1000);
-    const bookingCreatedTime = booking.createdAt ? new Date(booking.createdAt).getTime() : (booking._id.getTimestamp ? booking._id.getTimestamp().getTime() : 0);
-    const isHoldExpired = (booking.status === "PENDING_PAYMENT" || booking.status === "PENDING") &&
-                          bookingCreatedTime &&
+    const holdMs = (PAYMENT_HOLD_CONFIG && PAYMENT_HOLD_CONFIG.HOLD_DURATION_MINUTES)
+        ? PAYMENT_HOLD_CONFIG.HOLD_DURATION_MINUTES * 60 * 1000
+        : 15 * 60 * 1000;
+
+    const bookingCreatedTime = new Date(booking.createdAt).getTime();
+    const isHoldExpired = !isNaN(bookingCreatedTime) &&
                           (Date.now() - bookingCreatedTime > holdMs);
 
     if (booking.status === "CANCELLED" || isHoldExpired) {
@@ -833,25 +838,31 @@ module.exports.verifyPayment = async (req, res) => {
                         amount: refundAmountPaise,
                         notes: {
                             bookingId: booking._id.toString(),
-                            reason: "Automatic refund: payment received after 15-minute hold expired and dates were taken."
+                            reason: "Dates unavailable upon late payment confirmation"
                         }
                     });
                 } catch (refundErr) {
                     if (allowSimulator && (refundErr?.statusCode === 401 || refundErr?.error?.description === "Authentication failed")) {
                         refund = { id: `rfnd_test_${Date.now()}`, amount: refundAmountPaise, status: "processed" };
                     } else {
-                        console.error("Auto-refund error for expired booking:", refundErr);
-                        throw refundErr;
+                        console.error("[Late Payment Auto-Refund Error]", refundErr);
+                        // Leave booking cancelled, paymentStatus FAILED for manual host/admin reconciliation
+                        booking.paymentStatus = "FAILED";
+                        await booking.save();
+                        return res.status(500).json({
+                            success: false,
+                            error: "Dates are no longer available and automated refund failed. Please contact support immediately."
+                        });
                     }
                 }
             }
 
-            booking.status = "CANCELLED";
             booking.paymentStatus = "REFUNDED";
             booking.paymentId = cleanPaymentId;
             booking.refundId = refund.id;
             booking.refundedAt = new Date();
-            booking.refundAmount = booking.totalPrice;
+            booking.refundAmount = refundAmountPaise;
+            booking.status = "CANCELLED";
             await booking.save();
 
             const refundAmountRupees = booking.isPaise ? booking.totalPrice / 100 : booking.totalPrice;
@@ -866,7 +877,7 @@ module.exports.verifyPayment = async (req, res) => {
         }
     }
 
-    // 6. Normal on-time booking: update to PAID and AWAITING_HOST_APPROVAL
+    // Normal happy path: hold active, signature verified -> Transition to AWAITING_HOST_APPROVAL
     booking.paymentStatus = "PAID";
     booking.paymentId = cleanPaymentId;
     booking.paymentMethod = "Razorpay";
@@ -883,6 +894,53 @@ module.exports.verifyPayment = async (req, res) => {
     });
 };
 
+module.exports.simulatePaymentFailure = async (req, res) => {
+    const { id } = req.params;
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ success: false, error: "Invalid booking ID." });
+    }
+
+    const { isPaymentSimulatorAllowed, isPaymentSimulatorForced } = require("../utils/razorpay.js");
+    const allowSimulator = isPaymentSimulatorAllowed();
+    const forceSimulator = isPaymentSimulatorForced();
+
+    if (!allowSimulator && !forceSimulator) {
+        return res.status(403).json({
+            success: false,
+            error: "Payment simulator is strictly disabled in this environment."
+        });
+    }
+
+    const booking = await Booking.findById(id);
+    if (!booking) {
+        return res.status(404).json({ success: false, error: "Booking not found." });
+    }
+
+    // Authorization: only the guest who created the booking (or admin) can simulate failure
+    const bookingUserId = (booking.user && booking.user._id) ? booking.user._id : booking.user;
+    if (!bookingUserId || (!bookingUserId.equals(req.user._id) && req.user.role !== "ADMIN")) {
+        return res.status(403).json({ success: false, error: "Unauthorized access to this booking." });
+    }
+
+    if (booking.status === "CANCELLED") {
+        return res.status(400).json({ success: false, error: "Cannot record payment failure for a cancelled booking." });
+    }
+
+    if (booking.paymentStatus === "PAID") {
+        return res.status(400).json({ success: false, error: "Cannot fail an already paid booking." });
+    }
+
+    booking.paymentStatus = "FAILED";
+    await booking.save();
+
+    return res.status(200).json({
+        success: true,
+        paymentStatus: "FAILED",
+        message: "Simulated payment failure recorded. Booking payment status transitioned to FAILED."
+    });
+};
+
 module.exports.refundPayment = async (req, res) => {
     const { id } = req.params;
 
@@ -894,6 +952,9 @@ module.exports.refundPayment = async (req, res) => {
         return res.redirect("/bookings");
     }
 
+    const { syncCompletedBookings, toComparableDateTime } = require("../utils/availability.js");
+    await syncCompletedBookings({ _id: id });
+
     const booking = await Booking.findById(id).populate("listing").populate("user");
     if (!booking) {
         if (req.xhr || req.headers.accept?.includes("json") || req.is("json")) {
@@ -901,6 +962,24 @@ module.exports.refundPayment = async (req, res) => {
         }
         req.flash("error", "Booking not found.");
         return res.redirect("/bookings");
+    }
+
+    // Check if trip is already completed (status COMPLETED or checkout date in past)
+    const now = new Date();
+    const checkOutDT = toComparableDateTime(booking.checkOutDate || booking.checkOut, booking.checkOutTime) || new Date(booking.checkOutDate || booking.checkOut);
+    const isCompletedStay = booking.status === "COMPLETED" || (checkOutDT && checkOutDT <= now);
+
+    if (isCompletedStay) {
+        if (booking.status !== "COMPLETED") {
+            booking.status = "COMPLETED";
+            await booking.save();
+        }
+        const errMsg = "This trip has already been completed. Refunds cannot be requested for completed stays.";
+        if (req.xhr || req.headers.accept?.includes("json") || req.is("json")) {
+            return res.status(400).json({ success: false, error: errMsg });
+        }
+        req.flash("error", errMsg);
+        return res.redirect(`/bookings/${booking._id}`);
     }
 
     // Authorization: only the booking owner OR listing host can refund
@@ -1118,12 +1197,40 @@ module.exports.index = async (req, res) => {
     const { syncCompletedBookings } = require("../utils/availability.js");
     await syncCompletedBookings({ user: req.user._id });
 
-    // Strictly retrieve only the authenticated user's bookings, sorted newest first
-    const bookings = await Booking.find({ user: req.user._id })
+    // Strictly retrieve all authenticated user's bookings, sorted newest first
+    const allBookings = await Booking.find({ user: req.user._id })
         .populate("listing")
         .sort({ createdAt: -1 });
 
-    res.render("bookings/index.ejs", { bookings });
+    const statusCounts = {
+        ALL: allBookings.length,
+        CONFIRMED: allBookings.filter(b => b.status === "CONFIRMED").length,
+        PENDING: allBookings.filter(b => b.status === "PENDING_PAYMENT" || b.status === "PENDING" || b.status === "AWAITING_HOST_APPROVAL").length,
+        COMPLETED: allBookings.filter(b => b.status === "COMPLETED").length,
+        REFUNDED: allBookings.filter(b => b.paymentStatus === "REFUNDED").length,
+        CANCELLED: allBookings.filter(b => b.status === "CANCELLED").length,
+    };
+
+    const currentStatus = (req.query.status || "ALL").toUpperCase();
+    let filteredBookings = allBookings;
+
+    if (currentStatus === "CONFIRMED") {
+        filteredBookings = allBookings.filter(b => b.status === "CONFIRMED");
+    } else if (currentStatus === "PENDING" || currentStatus === "PENDING_PAYMENT") {
+        filteredBookings = allBookings.filter(b => b.status === "PENDING_PAYMENT" || b.status === "PENDING" || b.status === "AWAITING_HOST_APPROVAL");
+    } else if (currentStatus === "COMPLETED") {
+        filteredBookings = allBookings.filter(b => b.status === "COMPLETED");
+    } else if (currentStatus === "REFUNDED") {
+        filteredBookings = allBookings.filter(b => b.paymentStatus === "REFUNDED");
+    } else if (currentStatus === "CANCELLED") {
+        filteredBookings = allBookings.filter(b => b.status === "CANCELLED");
+    }
+
+    res.render("bookings/index.ejs", {
+        bookings: filteredBookings,
+        currentStatus,
+        statusCounts
+    });
 };
 
 module.exports.cancelBooking = async (req, res) => {
@@ -1146,6 +1253,18 @@ module.exports.cancelBooking = async (req, res) => {
     if (!booking.user.equals(req.user._id)) {
         req.flash("error", "You do not have permission to cancel this booking.");
         return res.redirect("/bookings");
+    }
+
+    // Check if trip is already completed (status COMPLETED or checkout date in past)
+    const { toComparableDateTime } = require("../utils/availability.js");
+    const checkOutDT = toComparableDateTime(booking.checkOutDate || booking.checkOut, booking.checkOutTime) || new Date(booking.checkOutDate || booking.checkOut);
+    if (booking.status === "COMPLETED" || (checkOutDT && checkOutDT <= new Date())) {
+        if (booking.status !== "COMPLETED") {
+            booking.status = "COMPLETED";
+            await booking.save();
+        }
+        req.flash("error", "This trip has already been completed. Completed reservations cannot be cancelled or refunded.");
+        return res.redirect(`/bookings/${booking._id}`);
     }
 
     // Only allow cancellation when status is PENDING_PAYMENT, PENDING, AWAITING_HOST_APPROVAL, or CONFIRMED

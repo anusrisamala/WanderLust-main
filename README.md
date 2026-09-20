@@ -57,6 +57,10 @@ To eliminate this vulnerability:
 For developer convenience during local offline coding and student demos:
 - **Strictly Local-Only**: Mock payment simulation is permitted **ONLY** when `NODE_ENV !== "production"` **AND** `NODE_ENV !== "staging"` **AND** `ALLOW_PAYMENT_SIMULATOR=true` is explicitly configured in `.env`.
 - **Demo Override**: Set `FORCE_PAYMENT_SIMULATOR=true` alongside `ALLOW_PAYMENT_SIMULATOR=true` to open the local simulator directly and exercise the full booking flow without relying on a third-party test payment method. This override remains unavailable in staging and production.
+- **Realistic Payment State Transitions**:
+  - **Simulate Successful Payment**: Exercises server-side signature validation, records payment, and transitions booking status to `AWAITING_HOST_APPROVAL` (`paymentStatus: PAID`).
+  - **Simulate Failed Payment**: Sends a server-side failure signal (`POST /bookings/:id/simulate-payment-failure`) that transitions `paymentStatus: FAILED` in MongoDB. This activates the real-world **Payment Failed** UI and allows testing the full **Retry Payment** lifecycle.
+  - **Modal Dismissal / Cancel**: Closing or dismissing the checkout modal without paying keeps the booking in `PENDING_PAYMENT` / `paymentStatus: PENDING` (faithfully reflecting a customer who opened the checkout window but hasn't yet completed or failed a transaction).
 - **Production & Staging Safe Failure**:
   In production or staging, `isPaymentSimulatorAllowed()` unconditionally returns `false`. Any simulated signature or mock refund is strictly rejected. If Razorpay credentials or gateway API calls fail, the platform **never silently fakes a success**; it fails safely with structured error feedback and preserves database integrity.
 

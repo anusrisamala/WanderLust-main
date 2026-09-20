@@ -180,21 +180,23 @@
             <i class="fa-solid fa-credit-card me-1"></i>Proceed to Payment
           </a>
         <% } else if (booking.paymentStatus === "PAID") { %>
-          <a href="/bookings/<%= booking._id %>/payment" class="btn btn-outline-success px-4 py-2 fw-semibold">
+          <a href="/bookings/<%= booking._id %>/payment" class="btn btn-outline-success px-4 py-2 fw-semibold rounded-pill">
             <i class="fa-solid fa-receipt me-1"></i>View Payment Receipt
           </a>
-          <form method="POST" action="/bookings/<%= booking._id %>/refund" class="m-0" data-confirm="Are you sure you want to request a full refund of ₹<%= displayTotalPrice.toLocaleString() %> for this reservation?">
-            <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
-            <button type="submit" class="btn btn-outline-warning text-dark px-4 py-2 fw-semibold">
-              <i class="fa-solid fa-rotate-left me-1"></i>Request Refund
-            </button>
-          </form>
+          <% if (booking.status !== "COMPLETED" && booking.status !== "CANCELLED") { %>
+            <form method="POST" action="/bookings/<%= booking._id %>/refund" class="m-0" data-confirm="Are you sure you want to request a full refund of ₹<%= displayTotalPrice.toLocaleString('en-IN') %> for this reservation?">
+              <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+              <button type="submit" class="btn btn-outline-danger px-4 py-2 fw-semibold rounded-pill" title="Request Refund">
+                <i class="fa-solid fa-rotate-left me-1"></i>Request Refund
+              </button>
+            </form>
+          <% } %>
         <% } %>
 
         <% if (booking.status === "PENDING_PAYMENT" || booking.status === "PENDING" || booking.status === "AWAITING_HOST_APPROVAL" || booking.status === "CONFIRMED") { %>
           <form method="POST" action="/bookings/<%= booking._id %>/cancel" class="ms-auto m-0" data-confirm="Are you sure you want to cancel this booking?">
             <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
-            <button type="submit" class="btn btn-outline-danger px-4 py-2">
+            <button type="submit" class="btn btn-outline-danger px-4 py-2 fw-semibold rounded-pill">
               <i class="fa-solid fa-ban me-1"></i>Cancel Booking
             </button>
           </form>
