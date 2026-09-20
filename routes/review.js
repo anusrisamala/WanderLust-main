@@ -6,12 +6,12 @@ const {listingSchema,reviewSchema} = require("../schema.js");
 const Review = require("../models/review.js");
 const Listing = require("../models/listing.js");
 const {validateReview} = require("../middleware.js");
-const {isLoggedIn, isOwner, validateListing , isReviewAuthor} = require("../middleware.js");
+const {isLoggedIn, isOwner, validateListing , isReviewAuthor, isVerifiedGuest} = require("../middleware.js");
 
 const reviewController = require("../controllers/reviews.js");
 
 //REVIEWS
-router.post("/",isLoggedIn, validateReview,wrapAsync(reviewController.createReview))
+router.post("/", isLoggedIn, validateReview, isVerifiedGuest, wrapAsync(reviewController.createReview));
 
 
 //Delete review Route

@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const Listing  = require("../models/listing");
 const User = require("../models/user");
+const Booking = require("../models/booking");
+const { syncCompletedBookings } = require("../utils/availability");
 const { deleteCloudinaryImage } = require("../cloudConfig.js");
 
 function buildQuery(q, category) {
@@ -88,7 +90,48 @@ module.exports.showListing = async(req,res)=>{
         isWishlisted = req.user.wishlist.some((wishlistId) => wishlistId && wishlistId.equals(listing._id));
     }
 
-    res.render("listings/show.ejs", { listing, isWishlisted });
+    // Determine review eligibility for verified guests
+    let canReview = false;
+    let hasReviewed = false;
+    let hasUpcomingStay = false;
+    let isListingOwner = false;
+
+    if (req.user) {
+        const currentUserId = req.user._id;
+        isListingOwner = !!(listing.owner && listing.owner.equals(currentUserId));
+
+        if (!isListingOwner) {
+            await syncCompletedBookings({ listing: id, user: currentUserId });
+            const completedBookings = await Booking.find({
+                listing: id,
+                user: currentUserId,
+                status: "COMPLETED",
+            });
+
+            const userReviews = (listing.reviews || []).filter(
+                (r) => r.author && r.author._id && r.author._id.equals(currentUserId)
+            );
+            hasReviewed = userReviews.length > 0;
+            canReview = completedBookings.length > userReviews.length;
+
+            if (!canReview && !hasReviewed) {
+                hasUpcomingStay = !!(await Booking.exists({
+                    listing: id,
+                    user: currentUserId,
+                    status: { $in: ["CONFIRMED", "AWAITING_HOST_APPROVAL", "PENDING_PAYMENT", "PENDING"] },
+                }));
+            }
+        }
+    }
+
+    res.render("listings/show.ejs", {
+        listing,
+        isWishlisted,
+        canReview,
+        hasReviewed,
+        hasUpcomingStay,
+        isListingOwner,
+    });
 }
 
 

@@ -10,11 +10,13 @@ module.exports.listingSchema=Joi.object({
         image: Joi.string().allow("",null),
         category: Joi.string().required(),
     }).required(),
-})
+    _csrf: Joi.string().allow("", null),
+}).unknown(true);
 
 module.exports.reviewSchema = Joi.object({
     review:Joi.object({
         rating:Joi.number().required().min(1).max(5),
         comment:Joi.string().required(),
     }).required(),
-})
+    _csrf: Joi.string().allow("", null),
+}).unknown(true);

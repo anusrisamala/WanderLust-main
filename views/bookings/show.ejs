@@ -44,6 +44,13 @@
           <p class="text-secondary fw-semibold mb-2">
             <i class="fa-solid fa-circle-check me-1"></i>We hope you had a wonderful stay!
           </p>
+          <% if (booking.listing) { %>
+            <div class="mt-2 mb-3">
+              <a href="/listings/<%= booking.listing._id || booking.listing %>#reviews" class="btn btn-outline-success px-4 py-2 rounded-pill fw-semibold shadow-sm">
+                <i class="fa-solid fa-star text-warning me-2"></i>Review Your Stay
+              </a>
+            </div>
+          <% } %>
         <% } else if (booking.status === 'CANCELLED') { %>
           <div class="mb-2">
             <i class="fa-solid fa-circle-xmark text-danger fs-1"></i>

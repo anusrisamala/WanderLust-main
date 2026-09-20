@@ -16,8 +16,17 @@ const reviewSchema = new Schema({
     author:{
         type: Schema.Types.ObjectId,
         ref:"User",
-    }
-})
+    },
+    booking: {
+        type: Schema.Types.ObjectId,
+        ref: "Booking",
+        default: null,
+    },
+    isVerifiedGuest: {
+        type: Boolean,
+        default: false,
+    },
+});
 
 module.exports = mongoose.model("Review",reviewSchema);
 
