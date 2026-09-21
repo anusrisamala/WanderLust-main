@@ -266,20 +266,126 @@ h1, h2, h3, h4, h5, h6,
 
 .wl-user-pill:hover {
   box-shadow: var(--wl-shadow-md);
-  border-color: #cbd5e1;
+  border-color: #cd8032;
+  transform: translateY(-1px);
 }
 
 .wl-avatar-circle {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--wl-dark);
+  background: linear-gradient(135deg, #241612 0%, #4A2417 100%);
   color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 0.82rem;
   font-weight: 700;
+  box-shadow: 0 2px 6px rgba(36, 22, 18, 0.2);
+}
+
+/* Luxury User Profile Dropdown & Animations */
+@keyframes wlDropdownSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.wl-user-dropdown-menu {
+  background: #ffffff !important;
+  border: 1px solid var(--wl-border) !important;
+  border-radius: 20px !important;
+  padding: 0.75rem !important;
+  min-width: 260px !important;
+  box-shadow: 0 16px 38px -4px rgba(36, 22, 18, 0.16), 0 6px 16px -2px rgba(36, 22, 18, 0.08) !important;
+  margin-top: 0.5rem !important;
+  transform-origin: top right;
+  overflow: hidden;
+}
+
+.dropdown-menu.show.wl-user-dropdown-menu {
+  animation: wlDropdownSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.wl-dropdown-header-card {
+  background: linear-gradient(135deg, #FAF6F0 0%, #F5EFE6 100%);
+  border: 1px solid var(--wl-border);
+  border-radius: 14px;
+  padding: 0.85rem 0.95rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.wl-dropdown-header-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #241612 0%, #4A2417 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(36, 22, 18, 0.2);
+  flex-shrink: 0;
+}
+
+.wl-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 0.55rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--wl-dark) !important;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-bottom: 2px;
+}
+
+.wl-dropdown-item:hover {
+  background-color: var(--wl-bg);
+  color: var(--wl-dark) !important;
+  transform: translateX(4px);
+}
+
+.wl-dropdown-item-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  margin-right: 0.65rem;
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wl-dropdown-item:hover .wl-dropdown-item-icon {
+  transform: scale(1.14);
+}
+
+.wl-dropdown-item-logout {
+  color: #B33927 !important;
+}
+
+.wl-dropdown-item-logout:hover {
+  background-color: #FDF2F0;
+  color: #854D00 !important;
+}
+
+.wl-dropdown-item-logout:hover .wl-dropdown-item-icon i {
+  transform: translateX(2px);
+  transition: transform 0.2s ease;
 }
 
 /* ==========================================================================
@@ -1461,6 +1567,134 @@ h1, h2, h3, h4, h5, h6,
   padding: 0.4rem 0.85rem;
   border-radius: 30px;
   font-weight: 600;
+}
+
+/* ==========================================================================
+   Luxury Wishlist Save Button & Flying Heart Animation
+   ========================================================================== */
+
+.wishlist-btn-show {
+  background: #ffffff;
+  border: 1.5px solid var(--wl-border);
+  border-radius: var(--wl-radius-full);
+  padding: 0.45rem 1.15rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--wl-dark);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--wl-shadow-xs);
+  position: relative;
+  user-select: none;
+}
+
+.wishlist-btn-show:hover {
+  border-color: #cd8032;
+  color: var(--wl-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(205, 128, 50, 0.22);
+}
+
+.wishlist-btn-show:active {
+  transform: scale(0.94);
+}
+
+.wishlist-btn-show.is-saved {
+  background: #FDF8EE;
+  border-color: #B78727;
+  color: #854D00;
+  box-shadow: 0 2px 8px rgba(183, 135, 39, 0.18);
+}
+
+.wishlist-heart-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.wishlist-btn-show:hover .wishlist-heart-box {
+  transform: scale(1.18);
+}
+
+.wishlist-heart-icon {
+  font-size: 1.05rem;
+}
+
+.wishlist-btn-show.is-saved .wishlist-heart-icon {
+  color: #cd8032 !important;
+  filter: drop-shadow(0 2px 5px rgba(205, 128, 50, 0.45));
+}
+
+.wishlist-btn-show:not(.is-saved) .wishlist-heart-icon {
+  color: #785949;
+  transition: color 0.2s ease;
+}
+
+.wishlist-btn-show:not(.is-saved):hover .wishlist-heart-icon {
+  color: #cd8032;
+}
+
+/* Flying Heart Element */
+.wl-flying-heart {
+  position: fixed;
+  z-index: 999999;
+  pointer-events: none;
+  color: #cd8032;
+  font-size: 1.6rem;
+  filter: drop-shadow(0 0 14px rgba(205, 128, 50, 0.85));
+  will-change: transform, opacity;
+}
+
+/* Pop burst for Navbar Wishlist icon upon heart arrival */
+@keyframes wlHeartPop {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.55) rotate(-15deg);
+    color: #B78727;
+    filter: drop-shadow(0 0 10px rgba(183, 135, 39, 0.8));
+  }
+  60% {
+    transform: scale(1.3) rotate(12deg);
+    color: #CD8032;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.wl-heart-pulse {
+  animation: wlHeartPop 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+
+/* Golden Ripple/Sparkle on Navbar Arrival */
+@keyframes wlSparkleRipple {
+  0% {
+    transform: scale(0.6);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.wl-sparkle-ripple {
+  position: fixed;
+  z-index: 999998;
+  pointer-events: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #D7B137;
+  background: radial-gradient(circle, rgba(215, 177, 55, 0.4) 0%, transparent 70%);
+  animation: wlSparkleRipple 0.55s ease-out forwards;
 }
 
 

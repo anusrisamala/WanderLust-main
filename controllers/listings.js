@@ -325,6 +325,15 @@ module.exports.toggleWishlist = async (req, res) => {
 
     await user.save();
 
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+        return res.json({
+            success: true,
+            isWishlisted: existsIndex === -1,
+            wishlistCount: user.wishlist.length,
+            message: existsIndex === -1 ? "Listing added to wishlist!" : "Listing removed from wishlist!"
+        });
+    }
+
     const referer = req.get("Referrer");
     if (referer && referer.includes("/wishlist")) {
         return res.redirect("/wishlist");

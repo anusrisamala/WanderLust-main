@@ -41,16 +41,17 @@
           </form>
         <% } %>
 
-        <form method="POST" action="/listings/<%= listing._id %>/wishlist" class="m-0">
+        <form method="POST" action="/listings/<%= listing._id %>/wishlist" class="m-0" id="showWishlistForm" data-listing-id="<%= listing._id %>">
           <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
-          <button type="submit" class="wishlist-btn-show" title="<%= (typeof isWishlisted !== 'undefined' && isWishlisted) ? 'Remove from Wishlist' : 'Save to Wishlist' %>">
-            <% if (typeof isWishlisted !== 'undefined' && isWishlisted) { %>
-              <i class="fa-solid fa-heart wishlist-heart-filled"></i>
-              <span>Saved</span>
-            <% } else { %>
-              <i class="fa-regular fa-heart wishlist-heart-empty"></i>
-              <span>Save</span>
-            <% } %>
+          <button type="submit" class="wishlist-btn-show <%= (typeof isWishlisted !== 'undefined' && isWishlisted) ? 'is-saved' : '' %>" id="showWishlistBtn" title="<%= (typeof isWishlisted !== 'undefined' && isWishlisted) ? 'Remove from Wishlist' : 'Save to Wishlist' %>">
+            <span class="wishlist-heart-box">
+              <% if (typeof isWishlisted !== 'undefined' && isWishlisted) { %>
+                <i class="fa-solid fa-heart wishlist-heart-icon wishlist-heart-filled"></i>
+              <% } else { %>
+                <i class="fa-regular fa-heart wishlist-heart-icon wishlist-heart-empty"></i>
+              <% } %>
+            </span>
+            <span class="wishlist-btn-text"><%= (typeof isWishlisted !== 'undefined' && isWishlisted) ? 'Saved' : 'Save' %></span>
           </button>
         </form>
       </div>
@@ -914,5 +915,152 @@
     if (checkInDate && checkInDate.value && checkOutDate && checkOutDate.value) {
       handleInputChange();
     }
+  })();
+
+  // Wishlist Flying Heart Controller & AJAX Toggle
+  (() => {
+    const wishlistForm = document.getElementById("showWishlistForm");
+    const wishlistBtn = document.getElementById("showWishlistBtn");
+    if (!wishlistForm || !wishlistBtn) return;
+
+    let isBusy = false;
+
+    wishlistForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (isBusy) return;
+      isBusy = true;
+
+      const heartBox = wishlistBtn.querySelector(".wishlist-heart-box");
+      const btnText = wishlistBtn.querySelector(".wishlist-btn-text");
+      const isCurrentlySaved = wishlistBtn.classList.contains("is-saved");
+      const listingId = wishlistForm.dataset.listingId;
+      const csrfInput = wishlistForm.querySelector('input[name="_csrf"]');
+      const csrfToken = csrfInput ? csrfInput.value : "";
+
+      // Target: Navbar Wishlist Icon
+      const navTarget = document.getElementById("navbarWishlistIcon") || document.getElementById("navbarWishlistLink");
+
+      // If adding to wishlist, animate flying heart across screen to navbar!
+      if (!isCurrentlySaved && navTarget) {
+        const startRect = heartBox ? heartBox.getBoundingClientRect() : wishlistBtn.getBoundingClientRect();
+        const targetRect = navTarget.getBoundingClientRect();
+
+        const startX = startRect.left + startRect.width / 2;
+        const startY = startRect.top + startRect.height / 2;
+        const endX = targetRect.left + targetRect.width / 2;
+        const endY = targetRect.top + targetRect.height / 2;
+
+        const deltaX = endX - startX;
+        const deltaY = endY - startY;
+
+        // Create flying heart element
+        const flyingHeart = document.createElement("div");
+        flyingHeart.className = "wl-flying-heart";
+        flyingHeart.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        flyingHeart.style.left = `${startX - 12}px`;
+        flyingHeart.style.top = `${startY - 12}px`;
+        document.body.appendChild(flyingHeart);
+
+        // Animate flying heart with dynamic parabolic curve
+        const duration = 750;
+        const startTime = performance.now();
+
+        const animateFlight = (currentTime) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          // Easing progress (smooth cubic out)
+          const easeProgress = 1 - Math.pow(1 - progress, 3);
+          const currentX = deltaX * easeProgress;
+          // Arc upward curve (fly upward like an arc)
+          const arcPeak = -80 * Math.sin(progress * Math.PI);
+          const currentY = deltaY * easeProgress + arcPeak;
+
+          // Dynamic scale and rotation during flight
+          const scale = progress < 0.3 ? 1 + progress * 1.5 : 1.45 - (progress - 0.3) * 1.3;
+          const rotate = Math.sin(progress * Math.PI * 2) * 20;
+          const opacity = progress > 0.85 ? (1 - progress) / 0.15 : 1;
+
+          flyingHeart.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) scale(${scale}) rotate(${rotate}deg)`;
+          flyingHeart.style.opacity = opacity;
+
+          if (progress < 1) {
+            requestAnimationFrame(animateFlight);
+          } else {
+            flyingHeart.remove();
+
+            // Navbar heart celebration pulse
+            navTarget.classList.remove("wl-heart-pulse");
+            void navTarget.offsetWidth; // Trigger DOM reflow
+            navTarget.classList.add("wl-heart-pulse");
+
+            // Golden ripple particle effect
+            const ripple = document.createElement("div");
+            ripple.className = "wl-sparkle-ripple";
+            ripple.style.left = `${endX - 16}px`;
+            ripple.style.top = `${endY - 16}px`;
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+          }
+        };
+
+        requestAnimationFrame(animateFlight);
+      }
+
+      // Immediate visual update on button
+      if (!isCurrentlySaved) {
+        wishlistBtn.classList.add("is-saved");
+        wishlistBtn.title = "Remove from Wishlist";
+        if (heartBox) heartBox.innerHTML = '<i class="fa-solid fa-heart wishlist-heart-icon wishlist-heart-filled"></i>';
+        if (btnText) btnText.textContent = "Saved";
+      } else {
+        wishlistBtn.classList.remove("is-saved");
+        wishlistBtn.title = "Save to Wishlist";
+        if (heartBox) heartBox.innerHTML = '<i class="fa-regular fa-heart wishlist-heart-icon wishlist-heart-empty"></i>';
+        if (btnText) btnText.textContent = "Save";
+      }
+
+      // Send AJAX request
+      try {
+        const response = await fetch(`/listings/${listingId}/wishlist`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json"
+          },
+          body: new URLSearchParams({ _csrf: csrfToken })
+        });
+
+        if (response.redirected) {
+          window.location.href = response.url;
+          return;
+        }
+
+        if (response.status === 401 || response.status === 403) {
+          window.location.href = "/login";
+          return;
+        }
+
+        const data = await response.json();
+        if (data && data.success) {
+          if (data.isWishlisted) {
+            wishlistBtn.classList.add("is-saved");
+            wishlistBtn.title = "Remove from Wishlist";
+            if (heartBox) heartBox.innerHTML = '<i class="fa-solid fa-heart wishlist-heart-icon wishlist-heart-filled"></i>';
+            if (btnText) btnText.textContent = "Saved";
+          } else {
+            wishlistBtn.classList.remove("is-saved");
+            wishlistBtn.title = "Save to Wishlist";
+            if (heartBox) heartBox.innerHTML = '<i class="fa-regular fa-heart wishlist-heart-icon wishlist-heart-empty"></i>';
+            if (btnText) btnText.textContent = "Save";
+          }
+        }
+      } catch (err) {
+        console.error("Wishlist AJAX error:", err);
+        wishlistForm.submit();
+      } finally {
+        setTimeout(() => { isBusy = false; }, 350);
+      }
+    });
   })();
 </script>

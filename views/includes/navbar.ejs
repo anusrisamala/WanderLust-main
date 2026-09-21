@@ -66,8 +66,8 @@
             </a>
           <% } %>
 
-          <a class="wl-nav-link" href="/wishlist" title="Wishlist">
-            <i class="fa-regular fa-heart me-1" style="color: #cd8032;"></i>Wishlist
+          <a class="wl-nav-link" href="/wishlist" title="Wishlist" id="navbarWishlistLink">
+            <i class="fa-regular fa-heart me-1" id="navbarWishlistIcon" style="color: #cd8032; display: inline-block;"></i>Wishlist
           </a>
           <a class="wl-nav-link" href="/bookings" title="My Bookings">
             <i class="fa-regular fa-calendar-check me-1" style="color: #b78727;"></i>Trips
@@ -81,43 +81,81 @@
               </div>
               <span class="d-none d-xl-inline fw-semibold small"><%= currentUser.username %></span>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-2" aria-labelledby="navbarUserDropdown" style="min-width: 220px;">
-              <li class="px-3 py-2 border-bottom mb-1">
-                <span class="d-block fw-bold text-dark"><%= currentUser.username %></span>
-                <span class="d-block text-muted small text-truncate"><%= currentUser.email || '' %></span>
-                <span class="badge bg-light text-dark border mt-1 font-monospace" style="font-size: 0.68rem;">Role: <%= currentUser.role || 'USER' %></span>
+            <ul class="dropdown-menu dropdown-menu-end wl-user-dropdown-menu border-0 mt-2" aria-labelledby="navbarUserDropdown">
+              <!-- User Header Card -->
+              <li class="wl-dropdown-header-card">
+                <div class="wl-dropdown-header-avatar">
+                  <%= currentUser.username ? currentUser.username.charAt(0).toUpperCase() : 'U' %>
+                </div>
+                <div class="overflow-hidden">
+                  <span class="d-block fw-bold text-dark text-truncate" style="font-size: 0.95rem;"><%= currentUser.username %></span>
+                  <span class="d-block text-muted small text-truncate" style="font-size: 0.76rem;"><%= currentUser.email || '' %></span>
+                  <% if (currentUser.role === 'HOST') { %>
+                    <span class="badge rounded-pill mt-1" style="background-color: #FAF3E0; color: #CD8032; border: 1px solid #E8DDD1; font-size: 0.68rem; font-weight: 700;">
+                      <i class="fa-solid fa-crown me-1" style="color: #D7B137;"></i>Host Account
+                    </span>
+                  <% } else { %>
+                    <span class="badge rounded-pill mt-1" style="background-color: #FAF5DC; color: #B78727; border: 1px solid #E8DDD1; font-size: 0.68rem; font-weight: 700;">
+                      <i class="fa-solid fa-compass me-1"></i>Traveler Account
+                    </span>
+                  <% } %>
+                </div>
               </li>
+
+              <!-- Menu Items with Micro-Interactions -->
               <li>
-                <a class="dropdown-item rounded-3 py-2 small fw-semibold" href="/dashboard">
-                  <i class="fa-solid fa-gauge-high me-2 text-secondary"></i>Traveler Dashboard
+                <a class="wl-dropdown-item" href="/dashboard">
+                  <span class="wl-dropdown-item-icon" style="background-color: #FAF3E0; color: #CD8032;">
+                    <i class="fa-solid fa-gauge-high"></i>
+                  </span>
+                  <span>Traveler Dashboard</span>
                 </a>
               </li>
+
               <% if (currentUser.role === "HOST") { %>
                 <li>
-                  <a class="dropdown-item rounded-3 py-2 small fw-semibold" href="/host/dashboard">
-                    <i class="fa-solid fa-hotel me-2 text-primary"></i>Host Hub
+                  <a class="wl-dropdown-item" href="/host/dashboard">
+                    <span class="wl-dropdown-item-icon" style="background-color: #FAF5DC; color: #B78727;">
+                      <i class="fa-solid fa-hotel"></i>
+                    </span>
+                    <span>Host Hub</span>
                   </a>
                 </li>
                 <li>
-                  <a class="dropdown-item rounded-3 py-2 small fw-semibold" href="/host/listings">
-                    <i class="fa-solid fa-house-user me-2 text-primary"></i>My Listings
+                  <a class="wl-dropdown-item" href="/host/listings">
+                    <span class="wl-dropdown-item-icon" style="background-color: #F2EAE4; color: #4A2417;">
+                      <i class="fa-solid fa-house-chimney"></i>
+                    </span>
+                    <span>My Listings</span>
                   </a>
                 </li>
                 <li>
-                  <a class="dropdown-item rounded-3 py-2 small fw-semibold" href="/host/bookings">
-                    <i class="fa-solid fa-calendar-check me-2 text-primary"></i>Bookings Received
+                  <a class="wl-dropdown-item" href="/host/bookings">
+                    <span class="wl-dropdown-item-icon" style="background-color: #FEF9E7; color: #D7B137;">
+                      <i class="fa-solid fa-calendar-check"></i>
+                    </span>
+                    <span>Bookings Received</span>
                   </a>
                 </li>
               <% } %>
+
               <li>
-                <a class="dropdown-item rounded-3 py-2 small fw-semibold" href="/profile/edit">
-                  <i class="fa-solid fa-user-pen me-2 text-secondary"></i>Edit Profile
+                <a class="wl-dropdown-item" href="/profile/edit">
+                  <span class="wl-dropdown-item-icon" style="background-color: #F5EFE6; color: #785949;">
+                    <i class="fa-solid fa-user-pen"></i>
+                  </span>
+                  <span>Edit Profile</span>
                 </a>
               </li>
-              <li><hr class="dropdown-divider my-1"></li>
+
+              <li><hr class="my-2" style="border-color: var(--wl-border); opacity: 0.8;"></li>
+
               <li>
-                <a class="dropdown-item rounded-3 py-2 small fw-semibold text-danger" href="/logout">
-                  <i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Log Out
+                <a class="wl-dropdown-item wl-dropdown-item-logout" href="/logout">
+                  <span class="wl-dropdown-item-icon" style="background-color: #FDF2F0; color: #B33927;">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                  </span>
+                  <span>Log Out</span>
                 </a>
               </li>
             </ul>
