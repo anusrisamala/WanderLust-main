@@ -33,14 +33,14 @@
           <i class="fa-solid fa-user-pen me-1"></i>Edit Profile
         </a>
         <% if (user.role === "USER") { %>
-          <a href="/become-host" class="btn btn-sm text-white rounded-pill px-3 py-2 fw-semibold" style="background-color: #FF385C;">
+          <a href="/become-host" class="btn btn-sm text-white rounded-pill px-3 py-2 fw-semibold shadow-sm" style="background: linear-gradient(135deg, #b78727 0%, #cd8032 100%); border: none;">
             <i class="fa-solid fa-house-chimney-user me-1"></i>Become a Host
           </a>
         <% } else if (user.role === "HOST") { %>
-          <a href="/host/dashboard" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-2 fw-semibold">
+          <a href="/host/dashboard" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-2 fw-semibold">
             <i class="fa-solid fa-gauge-high me-1"></i>Host Hub
           </a>
-          <a href="/listings/new" class="btn btn-sm text-white rounded-pill px-3 py-2 fw-semibold" style="background-color: #FF385C;">
+          <a href="/listings/new" class="btn btn-sm text-white rounded-pill px-3 py-2 fw-semibold shadow-sm" style="background: linear-gradient(135deg, #b78727 0%, #cd8032 100%); border: none;">
             <i class="fa-solid fa-plus me-1"></i>Add Listing
           </a>
         <% } %>
@@ -49,7 +49,7 @@
   </div>
 </div>
 
-<!-- 2. Animated KPI Cards (6 Well-Proportioned Metric Blocks) -->
+<!-- 2. Animated KPI Cards (6 Well-Proportioned Metric Blocks - Bronze & Gold Palette) -->
 <div class="dashboard-animated-section mb-4">
   <div class="row row-cols-2 row-cols-md-3 row-cols-xl-6 g-3">
     <!-- 1. Total Bookings -->
@@ -57,7 +57,7 @@
       <a href="#my-bookings" class="wl-kpi-card">
         <div class="wl-kpi-top">
           <span class="wl-kpi-label">Total Bookings</span>
-          <div class="wl-kpi-icon-pill" style="background-color: #EFF6FF; color: #2563EB;">
+          <div class="wl-kpi-icon-pill" style="background-color: #FAF3E0; color: #CD8032;">
             <i class="fa-solid fa-calendar-check"></i>
           </div>
         </div>
@@ -65,7 +65,7 @@
         <div class="wl-kpi-sub">
           <span>All reservations</span>
         </div>
-        <div class="wl-kpi-accent-bar" style="background-color: #3B82F6;"></div>
+        <div class="wl-kpi-accent-bar" style="background-color: #CD8032;"></div>
       </a>
     </div>
 
@@ -74,7 +74,7 @@
       <a href="#upcoming-bookings" class="wl-kpi-card">
         <div class="wl-kpi-top">
           <span class="wl-kpi-label">Upcoming</span>
-          <div class="wl-kpi-icon-pill" style="background-color: #ECFDF5; color: #059669;">
+          <div class="wl-kpi-icon-pill" style="background-color: #FAF5DC; color: #B78727;">
             <i class="fa-solid fa-plane-departure"></i>
           </div>
         </div>
@@ -82,7 +82,7 @@
         <div class="wl-kpi-sub">
           <span>Future trips</span>
         </div>
-        <div class="wl-kpi-accent-bar" style="background-color: #10B981;"></div>
+        <div class="wl-kpi-accent-bar" style="background-color: #B78727;"></div>
       </a>
     </div>
 
@@ -91,7 +91,7 @@
       <a href="#my-bookings" class="wl-kpi-card">
         <div class="wl-kpi-top">
           <span class="wl-kpi-label">Completed</span>
-          <div class="wl-kpi-icon-pill" style="background-color: #F0FDFA; color: #0D9488;">
+          <div class="wl-kpi-icon-pill" style="background-color: #FFF9E6; color: #B49900;">
             <i class="fa-solid fa-circle-check"></i>
           </div>
         </div>
@@ -99,7 +99,7 @@
         <div class="wl-kpi-sub">
           <span>Past journeys</span>
         </div>
-        <div class="wl-kpi-accent-bar" style="background-color: #14B8A6;"></div>
+        <div class="wl-kpi-accent-bar" style="background-color: #B49900;"></div>
       </a>
     </div>
 
@@ -108,7 +108,7 @@
       <a href="#my-bookings" class="wl-kpi-card">
         <div class="wl-kpi-top">
           <span class="wl-kpi-label">Cancelled</span>
-          <div class="wl-kpi-icon-pill" style="background-color: #FFF1F2; color: #E11D48;">
+          <div class="wl-kpi-icon-pill" style="background-color: #F7EBE4; color: #854D00;">
             <i class="fa-solid fa-ban"></i>
           </div>
         </div>
@@ -116,7 +116,7 @@
         <div class="wl-kpi-sub">
           <span>Cancelled</span>
         </div>
-        <div class="wl-kpi-accent-bar" style="background-color: #F43F5E;"></div>
+        <div class="wl-kpi-accent-bar" style="background-color: #854D00;"></div>
       </a>
     </div>
 
@@ -125,7 +125,7 @@
       <a href="#my-listings" class="wl-kpi-card">
         <div class="wl-kpi-top">
           <span class="wl-kpi-label">Listings</span>
-          <div class="wl-kpi-icon-pill" style="background-color: #F5F3FF; color: #7C3AED;">
+          <div class="wl-kpi-icon-pill" style="background-color: #F2EAE4; color: #4A2417;">
             <i class="fa-solid fa-house-chimney"></i>
           </div>
         </div>
@@ -133,7 +133,7 @@
         <div class="wl-kpi-sub">
           <span>Hosted places</span>
         </div>
-        <div class="wl-kpi-accent-bar" style="background-color: #8B5CF6;"></div>
+        <div class="wl-kpi-accent-bar" style="background-color: #4A2417;"></div>
       </a>
     </div>
 
@@ -142,7 +142,7 @@
       <a href="#wishlist-section" class="wl-kpi-card">
         <div class="wl-kpi-top">
           <span class="wl-kpi-label">Wishlist</span>
-          <div class="wl-kpi-icon-pill" style="background-color: #FFFBEB; color: #D97706;">
+          <div class="wl-kpi-icon-pill" style="background-color: #FFF8E1; color: #D7B137;">
             <i class="fa-solid fa-heart"></i>
           </div>
         </div>
@@ -150,7 +150,7 @@
         <div class="wl-kpi-sub">
           <span>Saved stays</span>
         </div>
-        <div class="wl-kpi-accent-bar" style="background-color: #F59E0B;"></div>
+        <div class="wl-kpi-accent-bar" style="background-color: #D7B137;"></div>
       </a>
     </div>
   </div>
@@ -160,7 +160,7 @@
 <div class="dashboard-animated-section mb-4">
   <div class="wl-quick-actions-bar">
     <div class="d-flex align-items-center gap-2">
-      <i class="fa-solid fa-compass text-danger"></i>
+      <i class="fa-solid fa-compass" style="color: #cd8032;"></i>
       <span class="small fw-bold text-uppercase text-secondary" style="font-size: 0.72rem; letter-spacing: 0.05em;">Quick Navigation:</span>
     </div>
     <div class="d-flex align-items-center gap-2 flex-wrap">

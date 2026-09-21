@@ -39,7 +39,7 @@
       <!-- Action Navigation -->
       <div class="navbar-nav ms-auto align-items-lg-center gap-1 gap-lg-2">
         <a class="wl-nav-link" href="/listings">
-          <i class="fa-regular fa-compass me-1 text-danger"></i>Explore
+          <i class="fa-regular fa-compass me-1" style="color: #cd8032;"></i>Explore
         </a>
 
         <% const currentUser = (typeof currUser !== "undefined") ? currUser : null; %>
@@ -58,7 +58,7 @@
         <% } else { %>
           <% if (currentUser.role === "USER") { %>
             <a class="wl-nav-link" href="/become-host">
-              <i class="fa-solid fa-house-chimney-user me-1 text-danger"></i>Become a Host
+              <i class="fa-solid fa-house-chimney-user me-1" style="color: #cd8032;"></i>Become a Host
             </a>
           <% } else if (currentUser.role === "HOST") { %>
             <a class="wl-btn wl-btn-primary wl-btn-sm wl-btn-pill me-lg-1" href="/listings/new">
@@ -67,10 +67,10 @@
           <% } %>
 
           <a class="wl-nav-link" href="/wishlist" title="Wishlist">
-            <i class="fa-regular fa-heart me-1 text-danger"></i>Wishlist
+            <i class="fa-regular fa-heart me-1" style="color: #cd8032;"></i>Wishlist
           </a>
           <a class="wl-nav-link" href="/bookings" title="My Bookings">
-            <i class="fa-regular fa-calendar-check me-1 text-success"></i>Trips
+            <i class="fa-regular fa-calendar-check me-1" style="color: #b78727;"></i>Trips
           </a>
 
           <!-- User Profile Dropdown -->
