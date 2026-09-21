@@ -1,420 +1,1025 @@
-body{
-    font-family: "Plus Jakarta Sans",sans-serif !important;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+/* ==========================================================================
+   WANDERLUST DESIGN SYSTEM
+   Professional, bespoke travel-booking platform design tokens & primitives.
+   ========================================================================== */
+
+:root {
+  /* Brand Palette */
+  --wl-brand: #e14640;
+  --wl-brand-hover: #c93833;
+  --wl-brand-active: #b32e29;
+  --wl-brand-light: #fef2f2;
+  --wl-brand-subtle: rgba(225, 70, 64, 0.08);
+  --wl-brand-ring: rgba(225, 70, 64, 0.2);
+
+  /* Secondary & Neutral Palette */
+  --wl-dark: #0f172a;
+  --wl-dark-hover: #1e293b;
+  --wl-dark-subtle: #334155;
+  --wl-secondary: #475569;
+  --wl-muted: #94a3b8;
+  --wl-light-gray: #f1f5f9;
+  --wl-border: #e2e8f0;
+  --wl-border-subtle: #edf2f7;
+
+  /* Surfaces & Canvas */
+  --wl-bg: #f8fafc;
+  --wl-surface: #ffffff;
+  --wl-surface-subtle: #f8fafc;
+  --wl-surface-elevated: #ffffff;
+
+  /* Accent & Status Colors */
+  --wl-accent: #f59e0b;
+  --wl-accent-light: #fef3c7;
+  --wl-success: #059669;
+  --wl-success-light: #ecfdf5;
+  --wl-success-border: #a7f3d0;
+  --wl-warning: #d97706;
+  --wl-warning-light: #fffbeb;
+  --wl-warning-border: #fde68a;
+  --wl-danger: #dc2626;
+  --wl-danger-light: #fef2f2;
+  --wl-danger-border: #fecaca;
+  --wl-info: #0284c7;
+  --wl-info-light: #f0f9ff;
+  --wl-info-border: #bae6fd;
+
+  /* Typography */
+  --wl-font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --wl-font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Radii */
+  --wl-radius-xs: 4px;
+  --wl-radius-sm: 8px;
+  --wl-radius-md: 12px;
+  --wl-radius-lg: 16px;
+  --wl-radius-xl: 22px;
+  --wl-radius-2xl: 28px;
+  --wl-radius-full: 9999px;
+
+  /* Shadows */
+  --wl-shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --wl-shadow-sm: 0 2px 5px -1px rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+  --wl-shadow-md: 0 6px 14px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --wl-shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.1), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+  --wl-shadow-xl: 0 20px 38px -6px rgba(15, 23, 42, 0.14), 0 8px 16px -3px rgba(15, 23, 42, 0.06);
+  --wl-shadow-brand: 0 6px 20px -3px rgba(225, 70, 64, 0.35);
+
+  /* Transitions */
+  --wl-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --wl-transition-base: 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  --wl-transition-bounce: 350ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.container{
-    flex:1;
+/* ==========================================================================
+   Base & Reset
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-/* navbar */
-
-.navbar{
-    height:5rem;
-    background-color: white;
-}
-.fa-compass{
-    color: #fe424d;
-    font-size: 2rem;
-}
-.nav-link{
-    color:black !important;
+html {
+  scroll-behavior: smooth;
 }
 
-/*Footer*/
-.f-info-links a{
-    text-decoration: none;
-    color: #222222;
-}
-.f-info-links a:hover{
-    text-decoration: underline;
-}
-
-.f-info-links,.f-info-socials,.f-info-brand{
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+body.wl-body {
+  font-family: var(--wl-font-sans) !important;
+  color: var(--wl-dark);
+  background-color: var(--wl-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.f-info-socials i{
-    margin-right: 1rem;
-    font-size: 1.2rem;
+.wl-main-container {
+  flex: 1 0 auto;
 }
 
-.f-info{
-    text-align: center;
-    height: 8rem;
-    background-color: #ebebeb;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: space-evenly;
+/* Headings */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: var(--wl-font-sans);
+  color: var(--wl-dark);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-/*card*/
-.listing-card{
-    border: none !important;
-    margin-bottom: 2rem;
-}
-.card-img-top{
-    border-radius: 1rem !important;
-    width:100% !important;
-    object-fit: cover !important;
+/* ==========================================================================
+   Navigation (Navbar)
+   ========================================================================== */
+
+.wl-navbar {
+  background: rgba(255, 255, 255, 0.94) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--wl-border);
+  height: 4.75rem;
+  padding: 0 1.25rem;
+  z-index: 1030;
+  transition: all var(--wl-transition-base);
 }
 
-.card-body{
-    padding: 0 !important;
+.wl-brand-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none !important;
 }
 
-.card-text p{
-    font-weight: 400 !important;
-}
-
-.listing-link{
-    text-decoration: none;
-}
-
-/*card effect*/
-.card-img-overlay{
-    opacity:0;
-}
-
-.card-img-overlay:hover{
-    opacity: 0.2;
-    background-color: white;
-}
-
-/* make the whole card link text black */
-.listing-link {
-    text-decoration: none !important;
-    color: black !important;
-    display: block;   /* ensures the link covers the whole card */
-}
-
-/* explicitly set inner text color */
-.listing-link p,
-.listing-link b {
-    color: black !important;
-}
-
-/*new page*/
-.add-btn{
-    background-color: #fe424d !important;
-    border: none !important;
-}
-
-/*edit page*/
-.edit-btn{
-    background-color: #fe424d !important;
-    border: none !important;
-}
-/*show page*/
-.show-img{
-    height: 30vh;
-}
-
-.btns{
-    display: flex;
-}
-
-.show-card{
-    padding-left: 0;
-    padding-right: 0;
-}
-
-#map {
-  height: 400px;
-  width: 100%;
+.wl-brand-mark {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, var(--wl-brand) 0%, #ff6b64 100%);
+  color: #ffffff;
   border-radius: 12px;
-  margin-top: 15px;
-  margin-bottom: 30px;
-  overflow: hidden;
-}
-
-@media (max-width: 768px) {
-  #map {
-    height: 300px;
-  }
-}
-
-/* review section styling */
-.review-card {
-  border: 1px solid #e2e8f0 !important;
-  background-color: #fff;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.review-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* wishlist button & heart styling */
-.wishlist-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.6rem;
-  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(225, 70, 64, 0.32);
+  transition: transform var(--wl-transition-bounce);
 }
 
-.wishlist-btn:hover {
-  transform: scale(1.18);
+.wl-brand-wrapper:hover .wl-brand-mark {
+  transform: rotate(12deg) scale(1.06);
 }
 
-.wishlist-btn:active {
-  transform: scale(0.92);
+.wl-brand-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--wl-dark);
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
 
-.wishlist-heart-filled {
-  color: #fe424d;
-  filter: drop-shadow(0 2px 4px rgba(254, 66, 77, 0.3));
+.wl-brand-dot {
+  color: var(--wl-brand);
 }
 
-.wishlist-heart-empty {
-  color: #555555;
+/* Search Capsule */
+.wl-search-capsule {
+  background: #ffffff;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-full);
+  padding: 0.3rem 0.4rem 0.3rem 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  box-shadow: var(--wl-shadow-sm);
+  transition: all var(--wl-transition-fast);
+  max-width: 460px;
+  width: 100%;
 }
 
-/* Show page wishlist action button */
-.wishlist-btn-show {
+.wl-search-capsule:focus-within,
+.wl-search-capsule:hover {
+  box-shadow: var(--wl-shadow-md);
+  border-color: var(--wl-brand);
+}
+
+.wl-search-input {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--wl-dark);
+  width: 100%;
+  padding: 0.35rem 0;
+}
+
+.wl-search-input::placeholder {
+  color: var(--wl-muted);
+  font-weight: 400;
+}
+
+.wl-search-btn {
+  background: var(--wl-brand);
+  color: #ffffff !important;
+  border: none;
+  border-radius: var(--wl-radius-full);
+  padding: 0.5rem 1.1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.45rem 1rem;
-  border-radius: 2rem;
-  border: 1px solid #d1d5db;
-  background-color: #ffffff;
   cursor: pointer;
-  font-weight: 500;
-  font-size: 0.95rem;
-  color: #222222;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(225, 70, 64, 0.28);
+  transition: all var(--wl-transition-fast);
+  white-space: nowrap;
 }
 
-.wishlist-btn-show:hover {
-  background-color: #f8fafc;
-  border-color: #9ca3af;
+.wl-search-btn:hover {
+  background: var(--wl-brand-hover);
+  box-shadow: 0 4px 12px rgba(225, 70, 64, 0.4);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.wishlist-btn-show:active {
-  transform: scale(0.96);
+/* Navigation Links */
+.wl-nav-link {
+  color: var(--wl-secondary) !important;
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.5rem 0.85rem !important;
+  border-radius: var(--wl-radius-full);
+  transition: all var(--wl-transition-fast);
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
 }
 
-.wishlist-btn-show .fa-heart {
-  font-size: 1.15rem;
+.wl-nav-link:hover {
+  color: var(--wl-dark) !important;
+  background: var(--wl-light-gray);
 }
 
-/* Wishlist card styling */
-.wishlist-card {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  border-radius: 1rem !important;
-  overflow: hidden;
+.wl-nav-link.active {
+  color: var(--wl-brand) !important;
+  background: var(--wl-brand-light);
+}
+
+/* User Menu Button & Dropdown */
+.wl-user-pill {
+  border: 1px solid var(--wl-border);
+  background: #ffffff;
+  border-radius: var(--wl-radius-full);
+  padding: 0.35rem 0.85rem 0.35rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  transition: all var(--wl-transition-fast);
+  text-decoration: none;
+  color: var(--wl-dark) !important;
+}
+
+.wl-user-pill:hover {
+  box-shadow: var(--wl-shadow-md);
+  border-color: #cbd5e1;
+}
+
+.wl-avatar-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--wl-dark);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Buttons (Unified Primitive System)
+   ========================================================================== */
+
+.wl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--wl-font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.65rem 1.35rem;
+  border-radius: var(--wl-radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none !important;
+  transition: all var(--wl-transition-fast);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.wl-btn:active {
+  transform: scale(0.98);
+}
+
+/* Brand Primary */
+.wl-btn-primary {
+  background: linear-gradient(135deg, var(--wl-brand) 0%, #eb524c 100%);
+  color: #ffffff !important;
+  border-color: var(--wl-brand);
+  box-shadow: var(--wl-shadow-sm);
+}
+
+.wl-btn-primary:hover {
+  background: linear-gradient(135deg, var(--wl-brand-hover) 0%, #e14640 100%);
+  color: #ffffff !important;
+  box-shadow: var(--wl-shadow-brand);
+  transform: translateY(-1px);
+}
+
+/* Dark Slate Secondary */
+.wl-btn-dark {
+  background: var(--wl-dark);
+  color: #ffffff !important;
+  border-color: var(--wl-dark);
+  box-shadow: var(--wl-shadow-sm);
+}
+
+.wl-btn-dark:hover {
+  background: var(--wl-dark-hover);
+  color: #ffffff !important;
+  box-shadow: var(--wl-shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Outline Slate */
+.wl-btn-outline {
+  background: #ffffff;
+  color: var(--wl-dark) !important;
+  border-color: var(--wl-border);
+}
+
+.wl-btn-outline:hover {
+  background: var(--wl-light-gray);
+  border-color: #cbd5e1;
+  color: var(--wl-dark) !important;
+  transform: translateY(-1px);
+}
+
+/* Outline Brand */
+.wl-btn-outline-brand {
+  background: #ffffff;
+  color: var(--wl-brand) !important;
+  border-color: var(--wl-brand);
+}
+
+.wl-btn-outline-brand:hover {
+  background: var(--wl-brand-light);
+  color: var(--wl-brand-hover) !important;
+  border-color: var(--wl-brand-hover);
+}
+
+/* Ghost Button */
+.wl-btn-ghost {
+  background: transparent;
+  color: var(--wl-secondary) !important;
+  border-color: transparent;
+}
+
+.wl-btn-ghost:hover {
+  background: var(--wl-light-gray);
+  color: var(--wl-dark) !important;
+}
+
+/* Sizing Modifiers */
+.wl-btn-sm {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.84rem;
+  border-radius: var(--wl-radius-sm);
+}
+
+.wl-btn-lg {
+  padding: 0.85rem 1.75rem;
+  font-size: 1.05rem;
+  border-radius: var(--wl-radius-lg);
+}
+
+.wl-btn-pill {
+  border-radius: var(--wl-radius-full);
+}
+
+/* Backward-Compatible Button Aliases (Ensures tests & existing classes still work) */
+.add-btn,
+.edit-btn {
+  background: var(--wl-brand) !important;
+  color: #ffffff !important;
   border: none !important;
+  font-weight: 600;
+  border-radius: var(--wl-radius-md) !important;
+  transition: all var(--wl-transition-fast) !important;
 }
 
-.wishlist-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12) !important;
+.add-btn:hover,
+.edit-btn:hover {
+  background: var(--wl-brand-hover) !important;
+  box-shadow: var(--wl-shadow-brand) !important;
 }
 
-.wishlist-card .card-img-top {
-  height: 18rem;
-  object-fit: cover;
-  border-radius: 1rem 1rem 0 0 !important;
+.btn-white {
+  background-color: #ffffff !important;
+  color: var(--wl-dark) !important;
+  border: 1px solid var(--wl-border) !important;
+  border-radius: var(--wl-radius-md);
 }
 
-/* Floating heart button on cards */
+.btn-white:hover {
+  background-color: var(--wl-light-gray) !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* ==========================================================================
+   Cards (Unified Elevation & Layout)
+   ========================================================================== */
+
+.wl-card {
+  background: var(--wl-surface);
+  border: 1px solid var(--wl-border) !important;
+  border-radius: var(--wl-radius-xl) !important;
+  box-shadow: var(--wl-shadow-sm);
+  transition: all var(--wl-transition-base);
+  overflow: hidden;
+}
+
+.wl-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--wl-shadow-lg) !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Travel Listing Card */
+.listing-card {
+  background: transparent !important;
+  border: none !important;
+  border-radius: var(--wl-radius-xl);
+  margin-bottom: 2rem;
+  position: relative;
+  transition: transform var(--wl-transition-base);
+}
+
+.listing-card-media-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 75%; /* 4:3 aspect ratio */
+  border-radius: var(--wl-radius-xl);
+  overflow: hidden;
+  background-color: var(--wl-light-gray);
+  box-shadow: var(--wl-shadow-xs);
+}
+
+.listing-card-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover !important;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.listing-link:hover .listing-card-img {
+  transform: scale(1.04);
+}
+
+.listing-card-overlay-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.45) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.card-img-overlay {
+  display: none !important; /* Eliminates legacy 'abcd' overlay bug */
+}
+
+/* Category Badge on Card */
+.listing-card-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 5;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: var(--wl-radius-full);
+}
+
+/* Card Content Details */
+.listing-card-info {
+  padding: 0.75rem 0.25rem 0 0.25rem;
+}
+
+.listing-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--wl-dark);
+  margin-bottom: 0.15rem;
+  line-height: 1.35;
+}
+
+.listing-card-location {
+  font-size: 0.86rem;
+  color: var(--wl-secondary);
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.listing-card-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.listing-card-price {
+  font-weight: 800;
+  color: var(--wl-dark);
+  font-size: 1.05rem;
+}
+
+.listing-card-period {
+  font-size: 0.85rem;
+  color: var(--wl-secondary);
+}
+
+.tax-info {
+  display: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--wl-brand);
+  background: var(--wl-brand-light);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--wl-radius-full);
+}
+
+.listing-link {
+  text-decoration: none !important;
+  color: inherit !important;
+  display: block;
+}
+
+/* Wishlist Heart Button */
 .wishlist-floating-btn {
   position: absolute;
   top: 12px;
   right: 12px;
   z-index: 10;
   background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
   border: none;
   border-radius: 50%;
   width: 38px;
   height: 38px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.16);
   cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition: all var(--wl-transition-fast);
 }
 
 .wishlist-floating-btn:hover {
   transform: scale(1.15);
   background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.24);
 }
 
-.wishlist-floating-btn .fa-heart {
+.wishlist-floating-btn:active {
+  transform: scale(0.92);
+}
+
+.wishlist-heart-filled {
+  color: var(--wl-brand);
+  font-size: 1.15rem;
+  filter: drop-shadow(0 2px 4px rgba(225, 70, 64, 0.3));
+}
+
+.wishlist-heart-empty {
+  color: #475569;
+  font-size: 1.15rem;
+  transition: color var(--wl-transition-fast);
+}
+
+.wishlist-floating-btn:hover .wishlist-heart-empty {
+  color: var(--wl-brand);
+}
+
+/* ==========================================================================
+   Category Navigation & Filter Bar
+   ========================================================================== */
+
+.wl-filter-container {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem 0 0.75rem 0;
+  border-bottom: 1px solid var(--wl-border);
+  margin-bottom: 2rem;
+}
+
+.wl-filters-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE */
+  padding: 0.35rem 0.25rem;
+  flex-grow: 1;
+}
+
+.wl-filters-scroll::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
+}
+
+.wl-filter-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: var(--wl-radius-lg);
+  color: var(--wl-secondary);
+  text-decoration: none !important;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all var(--wl-transition-fast);
+  white-space: nowrap;
+  min-width: 68px;
+}
+
+.wl-filter-chip i {
+  font-size: 1.25rem;
+  transition: transform var(--wl-transition-fast);
+}
+
+.wl-filter-chip span {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.wl-filter-chip:hover {
+  color: var(--wl-dark);
+  background: var(--wl-surface);
+  border-color: var(--wl-border);
+  box-shadow: var(--wl-shadow-xs);
+}
+
+.wl-filter-chip:hover i {
+  transform: translateY(-2px);
+}
+
+.wl-filter-chip.active {
+  color: var(--wl-brand);
+  background: var(--wl-brand-light);
+  border-color: rgba(225, 70, 64, 0.25);
+  box-shadow: var(--wl-shadow-xs);
+}
+
+.wl-filter-chip.active i {
+  color: var(--wl-brand);
+}
+
+/* Tax Toggle Capsule */
+.wl-tax-toggle-box {
+  background: #ffffff;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-full);
+  padding: 0.55rem 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  box-shadow: var(--wl-shadow-xs);
+  flex-shrink: 0;
+  transition: border-color var(--wl-transition-fast);
+}
+
+.wl-tax-toggle-box:hover {
+  border-color: #cbd5e1;
+}
+
+.wl-tax-toggle-box label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--wl-dark);
+  cursor: pointer;
+  margin: 0;
+  user-select: none;
+}
+
+.form-check-input:checked {
+  background-color: var(--wl-brand) !important;
+  border-color: var(--wl-brand) !important;
+}
+
+/* ==========================================================================
+   Form Controls & Modern Input Styling
+   ========================================================================== */
+
+.wl-form-label {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--wl-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.45rem;
+  display: block;
+}
+
+.wl-form-control,
+.form-control,
+.form-select {
+  font-family: var(--wl-font-sans);
+  border-radius: var(--wl-radius-md) !important;
+  border: 1px solid var(--wl-border) !important;
+  padding: 0.72rem 1rem !important;
+  font-size: 0.95rem !important;
+  color: var(--wl-dark) !important;
+  background-color: #ffffff !important;
+  transition: all var(--wl-transition-fast) !important;
+}
+
+.wl-form-control:focus,
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--wl-brand) !important;
+  box-shadow: 0 0 0 3.5px var(--wl-brand-ring) !important;
+  outline: none !important;
+}
+
+.input-group-text {
+  border-radius: var(--wl-radius-md) !important;
+  border: 1px solid var(--wl-border) !important;
+  background-color: var(--wl-light-gray) !important;
+  color: var(--wl-secondary) !important;
+}
+
+/* ==========================================================================
+   Badges & Pills
+   ========================================================================== */
+
+.wl-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--wl-radius-full);
+  border: 1px solid transparent;
+  line-height: 1.2;
+}
+
+.wl-badge-success, .badge.bg-success {
+  background-color: var(--wl-success-light) !important;
+  color: var(--wl-success) !important;
+  border-color: var(--wl-success-border) !important;
+}
+
+.wl-badge-warning, .badge.bg-warning {
+  background-color: var(--wl-warning-light) !important;
+  color: var(--wl-warning) !important;
+  border-color: var(--wl-warning-border) !important;
+}
+
+.wl-badge-danger, .badge.bg-danger {
+  background-color: var(--wl-danger-light) !important;
+  color: var(--wl-danger) !important;
+  border-color: var(--wl-danger-border) !important;
+}
+
+.wl-badge-info, .badge.bg-info {
+  background-color: var(--wl-info-light) !important;
+  color: var(--wl-info) !important;
+  border-color: var(--wl-info-border) !important;
+}
+
+.wl-badge-secondary, .badge.bg-secondary {
+  background-color: var(--wl-light-gray) !important;
+  color: var(--wl-secondary) !important;
+  border-color: var(--wl-border) !important;
+}
+
+.wl-badge-dark, .badge.bg-dark {
+  background-color: var(--wl-dark) !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Floating Flash Alerts
+   ========================================================================== */
+
+.wl-flash-container {
+  max-width: 650px;
+  margin: 0 auto 1.5rem auto;
+}
+
+.wl-flash-toast {
+  border-radius: var(--wl-radius-lg) !important;
+  border: 1px solid var(--wl-border) !important;
+  background: #ffffff !important;
+  box-shadow: var(--wl-shadow-lg) !important;
+  padding: 1rem 1.25rem !important;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wl-flash-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   font-size: 1.1rem;
 }
 
-/* Empty wishlist container */
-.empty-wishlist-container {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 3.5rem 2rem;
+/* ==========================================================================
+   Footer (Professional Multi-Column Layout)
+   ========================================================================== */
+
+.wl-footer {
   background: #ffffff;
-  border-radius: 1.25rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  border: 1px solid #f1f5f9;
+  border-top: 1px solid var(--wl-border);
+  padding: 3.5rem 0 2rem 0;
+  margin-top: auto;
 }
 
-.empty-wishlist-icon {
-  font-size: 3.5rem;
-  color: #fe424d;
-  opacity: 0.9;
+.wl-footer-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--wl-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   margin-bottom: 1.25rem;
-  display: inline-block;
-  animation: pulse-heart 2.2s infinite ease-in-out;
 }
 
-@keyframes pulse-heart {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
+.wl-footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-/* Booking Card & Form Styling */
-.booking-card {
-  border-radius: 1rem !important;
-  border: 1px solid #e2e8f0 !important;
-  background-color: #ffffff;
+.wl-footer-links li {
+  margin-bottom: 0.65rem;
 }
 
-.booking-inputs-box {
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
+.wl-footer-links a {
+  color: var(--wl-secondary);
+  text-decoration: none;
+  font-size: 0.92rem;
+  transition: color var(--wl-transition-fast);
 }
 
-/* User Dashboard Styling */
-.dashboard-welcome-card {
-  background: linear-gradient(135deg, #ffffff 0%, #fbfbfc 100%);
-  border: 1px solid #f1f5f9 !important;
+.wl-footer-links a:hover {
+  color: var(--wl-brand);
 }
 
-.dashboard-avatar-circle {
-  width: 54px;
-  height: 54px;
-  display: flex;
+.wl-footer-social-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--wl-light-gray);
+  color: var(--wl-secondary);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  text-decoration: none !important;
+  transition: all var(--wl-transition-fast);
+}
+
+.wl-footer-social-btn:hover {
+  background: var(--wl-brand);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(225, 70, 64, 0.3);
+}
+
+.wl-footer-bottom {
+  padding-top: 2rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--wl-border);
+  color: var(--wl-muted);
+  font-size: 0.88rem;
+}
+
+/* ==========================================================================
+   Details / Show Page & Booking Widget
+   ========================================================================== */
+
+.wl-detail-hero-img {
+  width: 100%;
+  height: 480px;
+  object-fit: cover;
+  border-radius: var(--wl-radius-2xl);
+  box-shadow: var(--wl-shadow-md);
+}
+
+@media (max-width: 768px) {
+  .wl-detail-hero-img {
+    height: 280px;
+    border-radius: var(--wl-radius-xl);
+  }
+}
+
+.wl-reservation-card {
+  position: sticky;
+  top: 6rem;
+  background: #ffffff;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-2xl);
+  padding: 1.75rem;
+  box-shadow: var(--wl-shadow-lg);
+}
+
+/* Leaflet Map */
+#map {
+  height: 420px;
+  width: 100%;
+  border-radius: var(--wl-radius-2xl) !important;
+  border: 1px solid var(--wl-border);
+  box-shadow: var(--wl-shadow-sm);
+  overflow: hidden;
+}
+
+/* Starability custom tint matching brand amber */
+.starability-slot input:checked ~ label,
+.starability-result:after {
+  filter: hue-rotate(15deg);
+}
+
+/* Review Cards */
+.review-card {
+  border: 1px solid var(--wl-border) !important;
+  border-radius: var(--wl-radius-xl) !important;
+  background-color: #ffffff;
+  transition: all var(--wl-transition-base);
+}
+
+.review-card:hover {
+  box-shadow: var(--wl-shadow-md) !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Dashboards */
+.dashboard-welcome-card {
+  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%) !important;
+  border: 1px solid var(--wl-border) !important;
+  border-radius: var(--wl-radius-2xl) !important;
 }
 
 .dashboard-stat-card {
   background: #ffffff;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  border: 1px solid var(--wl-border) !important;
+  border-radius: var(--wl-radius-xl) !important;
+  transition: all var(--wl-transition-base);
 }
 
 .dashboard-stat-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07) !important;
-  border-color: #e2e8f0 !important;
+  box-shadow: var(--wl-shadow-md) !important;
+  border-color: #cbd5e1 !important;
 }
 
 .stat-icon-wrapper {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  display: flex;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
 }
 
-.dashboard-booking-snippet {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+/* Empty States */
+.empty-state-card {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  background: #ffffff;
+  border-radius: var(--wl-radius-2xl);
+  box-shadow: var(--wl-shadow-sm);
+  border: 1px solid var(--wl-border);
+  text-align: center;
 }
 
-.dashboard-booking-snippet:hover {
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+.empty-state-icon {
+  font-size: 3.5rem;
+  color: var(--wl-brand);
+  opacity: 0.85;
+  margin-bottom: 1.25rem;
 }
-
-.btn-white {
-  background-color: #ffffff;
-  color: #333333;
-  border-color: #e2e8f0;
-}
-
-.btn-white:hover {
-  background-color: #f8fafc;
-  color: #111111;
-  border-color: #cbd5e1;
-}
-
-#bookingFilterTabs .nav-link.active {
-  background-color: #222222;
-  color: #ffffff !important;
-}
-
-#bookingFilterTabs .nav-link {
-  color: #4b5563;
-  border: 1px solid #e5e7eb;
-  transition: all 0.2s ease;
-}
-
-#bookingFilterTabs .nav-link:hover {
-  background-color: #f3f4f6;
-}
-
-/* Bootstrap 5.0.2 compatibility for bg-opacity and soft status badges */
-.bg-success.bg-opacity-10 {
-  background-color: #d1e7dd !important;
-  color: #0f5132 !important;
-}
-.bg-danger.bg-opacity-10 {
-  background-color: #f8d7da !important;
-  color: #842029 !important;
-}
-.bg-warning.bg-opacity-10,
-.bg-warning.bg-opacity-25 {
-  background-color: #fff3cd !important;
-  color: #664d03 !important;
-}
-.bg-primary.bg-opacity-10 {
-  background-color: #cfe2ff !important;
-  color: #084298 !important;
-}
-.bg-secondary.bg-opacity-10 {
-  background-color: #e2e3e5 !important;
-  color: #41464b !important;
-}
-.bg-info.bg-opacity-10 {
-  background-color: #cff4fc !important;
-  color: #055160 !important;
-}
-.bg-dark.bg-opacity-75 {
-  background-color: rgba(33, 37, 41, 0.75) !important;
-  color: #ffffff !important;
-}
-.bg-dark.bg-opacity-10 {
-  background-color: #d3d3d4 !important;
-  color: #141619 !important;
-}
-.bg-light.bg-opacity-50 {
-  background-color: rgba(248, 249, 250, 0.6) !important;
-}
-.bg-light.bg-opacity-25 {
-  background-color: rgba(248, 249, 250, 0.35) !important;
-}
-
-
-
-

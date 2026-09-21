@@ -1,14 +1,88 @@
-<footer>
-    <div class="f-info">
-        <div class="f-info-socials">
-            <i class="fa-brands fa-square-facebook"></i>
-            <i class="fa-brands fa-square-instagram"></i>
-            <i class="fa-brands fa-linkedin"></i>
+<footer class="wl-footer mt-auto">
+  <div class="container">
+    <div class="row g-4 pb-4">
+      <!-- Brand Column -->
+      <div class="col-12 col-md-4">
+        <a class="wl-brand-wrapper mb-3 d-inline-flex" href="/listings">
+          <div class="wl-brand-mark">
+            <i class="fa-solid fa-compass"></i>
+          </div>
+          <span class="wl-brand-title">WanderLust<span class="wl-brand-dot">.</span></span>
+        </a>
+        <p class="text-secondary small pe-md-4 mb-3">
+          Discover unique stays, vacation homes, and extraordinary experiences across the globe. Built for modern travelers and discerning hosts.
+        </p>
+        <div class="d-flex align-items-center gap-2 f-info-socials">
+          <a href="#" class="wl-footer-social-btn" aria-label="Facebook">
+            <i class="fa-brands fa-facebook-f"></i>
+          </a>
+          <a href="#" class="wl-footer-social-btn" aria-label="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a href="#" class="wl-footer-social-btn" aria-label="LinkedIn">
+            <i class="fa-brands fa-linkedin-in"></i>
+          </a>
+          <a href="#" class="wl-footer-social-btn" aria-label="X (Twitter)">
+            <i class="fa-brands fa-x-twitter"></i>
+          </a>
         </div>
-        <div class="f-info-brand">&copy; WanderLust Private Limited</div>
-        <div class="f-info-links">
-            <a href="/privacy">Privacy</a>
-            <a href="/terms">Terms</a>
-        </div>
+      </div>
+
+      <!-- Quick Links: Explore -->
+      <div class="col-6 col-md-2 offset-md-1">
+        <h6 class="wl-footer-title">Explore</h6>
+        <ul class="wl-footer-links">
+          <li><a href="/listings">All Destinations</a></li>
+          <li><a href="/listings?category=Trending">Trending Stays</a></li>
+          <li><a href="/listings?category=Iconic+Cities">Iconic Cities</a></li>
+          <li><a href="/listings?category=Mountains">Mountain Escapes</a></li>
+          <li><a href="/listings?category=Amazing+Pools">Amazing Pools</a></li>
+        </ul>
+      </div>
+
+      <!-- Quick Links: Hosting -->
+      <div class="col-6 col-md-2">
+        <h6 class="wl-footer-title">Hosting</h6>
+        <ul class="wl-footer-links">
+          <li><a href="/become-host">Become a Host</a></li>
+          <li><a href="/listings/new">List Your Home</a></li>
+          <li><a href="/host/dashboard">Host Dashboard</a></li>
+          <li><a href="/host/bookings">Booking Requests</a></li>
+        </ul>
+      </div>
+
+      <!-- Quick Links: Trust & Safety -->
+      <div class="col-12 col-md-3">
+        <h6 class="wl-footer-title">Trust &amp; Safety</h6>
+        <ul class="wl-footer-links">
+          <li class="d-flex align-items-center gap-2 text-secondary small mb-2">
+            <i class="fa-solid fa-shield-halved text-success"></i>
+            <span>Verified Guest Reviews</span>
+          </li>
+          <li class="d-flex align-items-center gap-2 text-secondary small mb-2">
+            <i class="fa-solid fa-lock text-primary"></i>
+            <span>100% Secure Razorpay Checkout</span>
+          </li>
+          <li class="d-flex align-items-center gap-2 text-secondary small mb-2">
+            <i class="fa-solid fa-bolt text-warning"></i>
+            <span>Instant Booking Confirmation</span>
+          </li>
+        </ul>
+      </div>
     </div>
+
+    <!-- Bottom Bar -->
+    <div class="wl-footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 pt-3">
+      <div class="f-info-brand">
+        &copy; <%= new Date().getFullYear() %> WanderLust Travel Inc. All rights reserved.
+      </div>
+      <div class="f-info-links d-flex align-items-center gap-3">
+        <a href="/listings" class="text-secondary text-decoration-none small hover-brand">Explore</a>
+        <span>•</span>
+        <a href="#privacy" class="text-secondary text-decoration-none small hover-brand">Privacy Policy</a>
+        <span>•</span>
+        <a href="#terms" class="text-secondary text-decoration-none small hover-brand">Terms of Service</a>
+      </div>
+    </div>
+  </div>
 </footer>

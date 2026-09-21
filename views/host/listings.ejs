@@ -24,10 +24,10 @@
           </p>
         </div>
         <div class="d-flex gap-2">
-          <a href="/host/dashboard" class="btn btn-outline-dark px-3 py-2 fw-semibold">
+          <a href="/host/dashboard" class="wl-btn wl-btn-outline wl-btn-sm wl-btn-pill">
             <i class="fa-solid fa-gauge-high me-1"></i>Host Dashboard
           </a>
-          <a href="/listings/new" class="btn btn-dark add-btn text-white px-3 py-2 fw-semibold shadow-sm">
+          <a href="/listings/new" class="wl-btn wl-btn-primary wl-btn-sm wl-btn-pill add-btn">
             <i class="fa-solid fa-plus me-1"></i>Add New Listing
           </a>
         </div>
@@ -93,15 +93,15 @@
 
                 <!-- Action Buttons: View, Edit, Delete (reusing existing routes) -->
                 <div class="d-flex gap-2 pt-3 border-top align-items-center">
-                  <a href="/listings/<%= listing._id %>" class="btn btn-sm btn-outline-dark flex-grow-1 fw-semibold">
+                  <a href="/listings/<%= listing._id %>" class="wl-btn wl-btn-outline wl-btn-sm wl-btn-pill flex-grow-1">
                     <i class="fa-regular fa-eye me-1"></i>View
                   </a>
-                  <a href="/listings/<%= listing._id %>/edit" class="btn btn-sm btn-outline-primary fw-semibold">
+                  <a href="/listings/<%= listing._id %>/edit" class="wl-btn wl-btn-outline wl-btn-sm wl-btn-pill">
                     <i class="fa-solid fa-pen-to-square me-1"></i>Edit
                   </a>
-                  <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline" data-confirm="Archive this listing? It will be hidden from public search, but all bookings, history, and reviews will be safely preserved.">
+                  <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline m-0" data-confirm="Archive this listing? It will be hidden from public search, but all bookings, history, and reviews will be safely preserved.">
                     <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
-                    <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" title="Archive Listing">
+                    <button type="submit" class="wl-btn wl-btn-outline wl-btn-sm wl-btn-pill text-danger border-danger" title="Archive Listing">
                       <i class="fa-solid fa-box-archive me-1"></i><%= listing.isActive === false ? 'Archived' : 'Archive' %>
                     </button>
                   </form>

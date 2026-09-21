@@ -1,7 +1,28 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row mt-3">
-    <div class="alert alert-danger col-6 offset-3" role="alert">
-        <p class="alert-heading"><%= err.message %></p>
+<div class="row my-5 justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6 text-center">
+    <div class="card border-0 shadow-sm rounded-4 p-5 bg-white">
+      <div class="mb-4">
+        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 text-danger" style="width: 80px; height: 80px;">
+          <i class="fa-solid fa-compass-drafting fa-2xl"></i>
+        </div>
+      </div>
+      <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-pill fw-semibold mx-auto mb-3">
+        <%= (typeof err !== 'undefined' && err.statusCode) ? `Error ${err.statusCode}` : 'Notice' %>
+      </span>
+      <h3 class="fw-bold text-dark mb-2">Something went off the map</h3>
+      <p class="text-secondary small mb-4 px-md-3">
+        <%= (typeof err !== 'undefined' && err.message) ? err.message : "The page or destination you are looking for could not be reached." %>
+      </p>
+      <div class="d-flex justify-content-center gap-2 flex-wrap">
+        <a href="/listings" class="wl-btn wl-btn-primary wl-btn-sm wl-btn-pill px-4">
+          <i class="fa-solid fa-compass me-1"></i>Explore All Listings
+        </a>
+        <a href="javascript:history.back()" class="wl-btn wl-btn-outline wl-btn-sm wl-btn-pill px-4">
+          <i class="fa-solid fa-arrow-left me-1"></i>Go Back
+        </a>
+      </div>
     </div>
+  </div>
 </div>

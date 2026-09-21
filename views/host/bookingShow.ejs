@@ -7,22 +7,22 @@
   const displayTotalPrice = toRupees(booking.totalPrice);
 %>
 
-<div class="row mt-4 mb-5">
-  <div class="col-12 col-lg-10 offset-lg-1">
+<div class="row mt-3 mb-5 justify-content-center">
+  <div class="col-12 col-lg-10">
     <!-- Top Breadcrumb Navigation -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <a href="/host/bookings" class="text-decoration-none text-muted small fw-medium">
+      <a href="/host/bookings" class="wl-btn wl-btn-ghost wl-btn-sm wl-btn-pill">
         <i class="fa-solid fa-arrow-left me-1"></i>Back to Bookings Received
       </a>
       <div class="d-flex gap-2">
-        <a href="/host/dashboard" class="text-decoration-none text-muted small fw-medium">
+        <a href="/host/dashboard" class="wl-btn wl-btn-ghost wl-btn-sm wl-btn-pill">
           <i class="fa-solid fa-gauge-high me-1"></i>Host Dashboard
         </a>
       </div>
     </div>
 
     <!-- Main Container Card -->
-    <div class="card border shadow-sm rounded-4 p-4 p-md-5 bg-white">
+    <div class="card wl-card border-0 shadow-sm p-4 p-md-5 bg-white">
       <!-- Header: Booking ID, Created Date & Status -->
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start pb-4 mb-4 border-bottom gap-3">
         <div>
@@ -81,13 +81,13 @@
             <div class="d-flex gap-2 flex-wrap align-items-center">
               <form method="POST" action="/host/bookings/<%= booking._id %>/confirm" class="m-0">
                 <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
-                <button type="submit" class="btn btn-success px-4 py-2 fw-semibold shadow-sm">
+                <button type="submit" class="wl-btn wl-btn-sm wl-btn-pill btn-success text-white shadow-sm">
                   <i class="fa-solid fa-circle-check me-1"></i>Confirm Booking
                 </button>
               </form>
               <form method="POST" action="/host/bookings/<%= booking._id %>/cancel" class="m-0" data-confirm="Are you sure you want to decline this booking request? The guest will be fully refunded.">
                 <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
-                <button type="submit" class="btn btn-outline-danger px-4 py-2 fw-semibold">
+                <button type="submit" class="wl-btn wl-btn-outline wl-btn-sm wl-btn-pill text-danger border-danger">
                   <i class="fa-solid fa-ban me-1"></i>Decline &amp; Refund
                 </button>
               </form>

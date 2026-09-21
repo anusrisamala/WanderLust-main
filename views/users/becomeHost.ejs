@@ -1,39 +1,39 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row mt-4 mb-5 justify-content-center">
+<div class="row mt-3 mb-5 justify-content-center">
   <div class="col-12 col-md-8 col-lg-6">
     <!-- Back to Dashboard -->
     <div class="mb-3">
-      <a href="/dashboard" class="text-decoration-none text-muted small fw-medium">
+      <a href="/dashboard" class="wl-btn wl-btn-ghost wl-btn-sm wl-btn-pill">
         <i class="fa-solid fa-arrow-left me-1"></i>Back to Dashboard
       </a>
     </div>
 
-    <div class="card border shadow-sm rounded-4 p-4 p-md-5">
+    <div class="card wl-card border-0 shadow-sm p-4 p-md-5 bg-white">
       <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
-        <div class="stat-icon-wrapper bg-danger bg-opacity-10 text-danger p-3 rounded-circle" style="width: 54px; height: 54px; display: flex; align-items: center; justify-content: center;">
-          <i class="fa-solid fa-house-chimney-user fa-xl"></i>
+        <div class="wl-avatar-circle" style="width: 54px; height: 54px; font-size: 1.3rem; background: var(--wl-brand);">
+          <i class="fa-solid fa-house-chimney-user"></i>
         </div>
         <div>
-          <h3 class="fw-bold mb-0">Become a Host</h3>
-          <p class="text-muted small mb-0">Turn your space into your next opportunity</p>
+          <h3 class="fw-bold mb-0 text-dark">Become a Host</h3>
+          <p class="text-secondary small mb-0">Turn your space into your next travel opportunity</p>
         </div>
       </div>
 
       <div class="mb-4">
         <h5 class="fw-bold text-dark mb-2">Welcome to Hosting on WanderLust!</h5>
-        <p class="text-secondary small">
-          As a Host, you can list your properties, welcome travelers from around the world, and manage your hosted stays.
+        <p class="text-secondary small mb-4">
+          As a Host, you can publish properties, welcome travelers from around the world, and manage your hosted bookings seamlessly.
         </p>
 
-        <div class="bg-light rounded-4 p-3 mb-3 border">
+        <div class="bg-light rounded-4 p-3 mb-4 border">
           <div class="d-flex align-items-start gap-3 mb-3">
             <div class="text-success mt-1">
               <i class="fa-solid fa-circle-check fa-lg"></i>
             </div>
             <div>
-              <strong class="d-block text-dark small">Keep all Traveler capabilities</strong>
-              <span class="text-muted small" style="font-size: 0.8rem;">You retain your existing bookings, wishlist, and traveler profile. No need for a separate account.</span>
+              <strong class="d-block text-dark small">Retain Traveler Perks</strong>
+              <span class="text-secondary small" style="font-size: 0.8rem;">You keep your existing trips, wishlist, and traveler profile in one unified account.</span>
             </div>
           </div>
 
@@ -42,8 +42,8 @@
               <i class="fa-solid fa-house fa-lg"></i>
             </div>
             <div>
-              <strong class="d-block text-dark small">Create & manage listings</strong>
-              <span class="text-muted small" style="font-size: 0.8rem;">Publish your places with photos, prices, categories, and custom details.</span>
+              <strong class="d-block text-dark small">Publish Custom Listings</strong>
+              <span class="text-secondary small" style="font-size: 0.8rem;">Showcase your villa, apartment, or cabin with photos, pricing, and amenities.</span>
             </div>
           </div>
 
@@ -52,22 +52,21 @@
               <i class="fa-solid fa-gauge-high fa-lg"></i>
             </div>
             <div>
-              <strong class="d-block text-dark small">Host Dashboard access</strong>
-              <span class="text-muted small" style="font-size: 0.8rem;">Access your hosted listings and quick hosting tools directly from your account.</span>
+              <strong class="d-block text-dark small">Host Portal Access</strong>
+              <span class="text-secondary small" style="font-size: 0.8rem;">Manage guest reservation requests, check-in schedules, and revenue metrics.</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Confirmation Form -->
-      <!-- SECURITY: No user ID or role is sent by client. Backend strictly uses req.user._id and sets role = "HOST" -->
       <form action="/become-host" method="POST">
         <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
         <div class="d-grid gap-2">
-          <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm py-2">
-            <i class="fa-solid fa-check me-2"></i>Confirm & Become a Host
+          <button type="submit" class="wl-btn wl-btn-primary wl-btn-pill py-3 fw-bold shadow-sm">
+            <i class="fa-solid fa-check me-2"></i>Confirm &amp; Activate Host Status
           </button>
-          <a href="/dashboard" class="btn btn-outline-secondary fw-semibold py-2">
+          <a href="/dashboard" class="wl-btn wl-btn-outline wl-btn-pill py-2 text-center fw-semibold">
             Cancel
           </a>
         </div>

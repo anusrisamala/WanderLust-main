@@ -1,18 +1,27 @@
 <% if (success && success.length > 0) { %>
-<div class="alert alert-success alert-dismissible fade show mt-3 col-6 offset-3" role="alert">
-    <%= success %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="wl-flash-container">
+  <div class="alert alert-success alert-dismissible fade show wl-flash-toast shadow-sm border-0 d-flex align-items-center" role="alert">
+    <div class="wl-flash-icon bg-success bg-opacity-10 text-success">
+      <i class="fa-solid fa-circle-check"></i>
+    </div>
+    <div class="flex-grow-1 fw-semibold text-dark small pe-3">
+      <%= success %>
+    </div>
+    <button type="button" class="btn-close ms-auto shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
 </div>
 <% } %>
 
-
-
-
-
-
 <% if (error && error.length > 0) { %>
-<div class="alert alert-danger alert-dismissible fade show mt-3 col-6 offset-3" role="alert">
-    <%= error %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="wl-flash-container">
+  <div class="alert alert-danger alert-dismissible fade show wl-flash-toast shadow-sm border-0 d-flex align-items-center" role="alert">
+    <div class="wl-flash-icon bg-danger bg-opacity-10 text-danger">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <div class="flex-grow-1 fw-semibold text-dark small pe-3">
+      <%= error %>
+    </div>
+    <button type="button" class="btn-close ms-auto shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
 </div>
 <% } %>

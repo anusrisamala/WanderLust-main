@@ -1,41 +1,67 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row mt-3">
-    <h1 class="col-6 offset-3">Login on Wanderlust</h1>
+<div class="row my-5 justify-content-center">
+  <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
+    <div class="card wl-card border-0 shadow-lg p-4 p-md-5 bg-white">
+      <!-- Auth Header -->
+      <div class="text-center mb-4">
+        <a class="wl-brand-wrapper mb-3 d-inline-flex" href="/listings">
+          <div class="wl-brand-mark">
+            <i class="fa-solid fa-compass"></i>
+          </div>
+          <span class="wl-brand-title">WanderLust<span class="wl-brand-dot">.</span></span>
+        </a>
+        <h3 class="fw-bold mb-1 text-dark">Welcome back</h3>
+        <p class="text-secondary small mb-0">Sign in to manage your bookings and saved stays</p>
+      </div>
 
-    <div class="col-6 offset-3">
-        <form action="/login" method="POST" class="needs-validation" novalidate>
-            <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+      <!-- Login Form -->
+      <form action="/login" method="POST" class="needs-validation" novalidate>
+        <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
 
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
+        <div class="mb-3">
+          <label for="username" class="wl-form-label">Username</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-user text-muted"></i></span>
+            <input
+              name="username"
+              id="username"
+              type="text"
+              class="form-control wl-form-control"
+              placeholder="Enter your username"
+              required
+              autocomplete="username"
+            />
+            <div class="invalid-feedback">Please enter your username.</div>
+          </div>
+        </div>
 
-                <input
-                    name="username"
-                    id="username"
-                    type="text"
-                    class="form-control"
-                    required
-                />
+        <div class="mb-4">
+          <label for="password" class="wl-form-label">Password</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-lock text-muted"></i></span>
+            <input
+              name="password"
+              id="password"
+              type="password"
+              class="form-control wl-form-control"
+              placeholder="••••••••"
+              required
+              autocomplete="current-password"
+            />
+            <div class="invalid-feedback">Please enter your password.</div>
+          </div>
+        </div>
 
-            </div>
+        <button class="wl-btn wl-btn-primary wl-btn-pill w-100 py-3 fw-bold shadow-sm mb-3 add-btn" type="submit">
+          Sign In to WanderLust
+        </button>
 
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-
-                <input
-                    name="password"
-                    id="password"
-                    type="password"
-                    class="form-control"
-                    required
-                />
-
-                
-            </div>
-            <button class="btn btn-success">Login</button>
-
-
-        </form>
+        <div class="text-center pt-2 border-top">
+          <span class="text-secondary small">Don't have an account yet?</span>
+          <a href="/signup" class="text-danger fw-bold small text-decoration-none ms-1">Create Account</a>
+        </div>
+      </form>
     </div>
+  </div>
 </div>

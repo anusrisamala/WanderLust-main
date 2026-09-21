@@ -1,40 +1,41 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row mt-4 mb-5 justify-content-center">
+<div class="row mt-3 mb-5 justify-content-center">
   <div class="col-12 col-md-8 col-lg-6">
     <!-- Back to Dashboard -->
     <div class="mb-3">
-      <a href="/dashboard" class="text-decoration-none text-muted small fw-medium">
+      <a href="/dashboard" class="wl-btn wl-btn-ghost wl-btn-sm wl-btn-pill">
         <i class="fa-solid fa-arrow-left me-1"></i>Back to Dashboard
       </a>
     </div>
 
-    <div class="card border shadow-sm rounded-4 p-4 p-md-5">
+    <div class="card wl-card border-0 shadow-sm p-4 p-md-5 bg-white">
       <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
-        <div class="stat-icon-wrapper bg-danger bg-opacity-10 text-danger p-3 rounded-circle" style="width: 52px; height: 52px;">
-          <i class="fa-solid fa-user-pen fa-lg"></i>
+        <div class="wl-avatar-circle" style="width: 52px; height: 52px; font-size: 1.2rem; background: var(--wl-brand);">
+          <i class="fa-solid fa-user-pen"></i>
         </div>
         <div>
-          <h3 class="fw-bold mb-0">Edit Profile</h3>
-          <p class="text-muted small mb-0">Update your username and email address</p>
+          <h3 class="fw-bold mb-0 text-dark">Edit Profile</h3>
+          <p class="text-secondary small mb-0">Update your traveler profile details</p>
         </div>
       </div>
 
       <!-- Edit Profile Form -->
       <form action="/profile" method="POST" novalidate class="needs-validation">
         <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+
         <!-- Username Input -->
-        <div class="mb-4">
-          <label for="username" class="form-label fw-bold small text-uppercase text-secondary">
+        <div class="mb-3">
+          <label for="username" class="wl-form-label">
             Username <span class="text-danger">*</span>
           </label>
           <div class="input-group">
-            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-at"></i></span>
+            <span class="input-group-text"><i class="fa-solid fa-at text-muted"></i></span>
             <input
               type="text"
               name="username"
               id="username"
-              class="form-control"
+              class="form-control wl-form-control"
               value="<%= user.username %>"
               required
               minlength="2"
@@ -49,17 +50,17 @@
         </div>
 
         <!-- Email Input -->
-        <div class="mb-4">
-          <label for="email" class="form-label fw-bold small text-uppercase text-secondary">
+        <div class="mb-3">
+          <label for="email" class="wl-form-label">
             Email Address <span class="text-danger">*</span>
           </label>
           <div class="input-group">
-            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-envelope"></i></span>
+            <span class="input-group-text"><i class="fa-solid fa-envelope text-muted"></i></span>
             <input
               type="email"
               name="email"
               id="email"
-              class="form-control"
+              class="form-control wl-form-control"
               value="<%= user.email %>"
               required
               autocomplete="email"
@@ -67,13 +68,13 @@
             <div class="invalid-feedback">Please enter a valid email address.</div>
           </div>
           <div class="form-text small text-muted mt-1">
-            Used for booking notifications and account communications.
+            Used for trip receipts, security alerts, and bookings.
           </div>
         </div>
 
-        <!-- Read-Only Account Information -->
-        <div class="bg-light rounded-3 p-3 mb-4 small border">
-          <span class="fw-bold text-secondary text-uppercase d-block mb-2" style="font-size: 0.75rem;">
+        <!-- Read-Only Account Security Details -->
+        <div class="bg-light rounded-4 p-3 mb-4 small border">
+          <span class="fw-bold text-secondary text-uppercase d-block mb-2 font-monospace" style="font-size: 0.72rem;">
             <i class="fa-solid fa-shield-halved me-1 text-success"></i>Account Security Details
           </span>
           <div class="d-flex justify-content-between mb-1">
@@ -82,7 +83,7 @@
           </div>
           <div class="d-flex justify-content-between">
             <span class="text-muted">Member Since:</span>
-            <span class="text-secondary fw-medium">
+            <span class="text-dark fw-semibold">
               <%= user.createdAt ? new Date(user.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : (user._id ? new Date(user._id.getTimestamp()).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "Active Member") %>
             </span>
           </div>
@@ -90,10 +91,10 @@
 
         <!-- Action Buttons -->
         <div class="d-flex gap-2">
-          <button type="submit" class="btn add-btn text-white px-4 py-2 fw-semibold shadow-sm flex-fill">
+          <button type="submit" class="wl-btn wl-btn-primary wl-btn-pill px-4 py-2 fw-semibold flex-fill add-btn">
             <i class="fa-solid fa-check me-1"></i>Save Changes
           </button>
-          <a href="/dashboard" class="btn btn-outline-secondary px-4 py-2 fw-semibold">
+          <a href="/dashboard" class="wl-btn wl-btn-outline wl-btn-pill px-4 py-2 fw-semibold">
             Cancel
           </a>
         </div>

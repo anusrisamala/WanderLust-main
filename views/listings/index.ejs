@@ -1,66 +1,4 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WanderLust</title>
-</head> -->
 <% layout("/layouts/boilerplate") %>
-
-<!-- <body>-->
-    <!-- <h3>All Listings</h3>  -->
-    <!-- <form action="/listings/new" method="get">
-        <button>Create New Listing</button>
-    </form> -->
-    
-<!-- </body> -->
-<!-- </html> -->
-
-  <style>
-    #filters{
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .filter {
-      text-align: center;
-      margin-right: 2rem;
-      margin-top: 2rem;
-      opacity: 0.7;
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .filter:hover {
-      opacity: 1;
-      cursor: pointer;
-    }
-
-    .filter.active-filter {
-      opacity: 1;
-      border-bottom: 2px solid #000;
-    }
-
-    .filter p{
-      font-size: 0.8rem;
-    }
-
-    .tax-info{
-      display: none;
-    }
-
-    .tax-toggle{
-      border: 1px solid black;
-      border-radius: 1rem;
-      height: 1rem;
-      padding: 1.5rem;
-      margin-left:5rem ;
-      display: flex;
-      align-items: center;
-      font-size: 0.9rem;
-    }
-  </style>
 
 <%
   const currentSearch = (typeof searchQuery !== "undefined" && searchQuery) ? searchQuery : "";
@@ -76,126 +14,178 @@
   }
 %>
 
-<div id="filters">
-  <a href="<%= getFilterUrl('') %>" class="filter <%= !currentCategory ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-house"></i></div>
-    <p>All</p>
-  </a>
-  <a href="<%= getFilterUrl('Trending') %>" class="filter <%= currentCategory === 'Trending' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-fire"></i></div>
-    <p>Trending</p>
-  </a>
-  <a href="<%= getFilterUrl('Rooms') %>" class="filter <%= currentCategory === 'Rooms' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-bed"></i></div>
-    <p>Rooms</p>
-  </a>
-  <a href="<%= getFilterUrl('Iconic Cities') %>" class="filter <%= currentCategory === 'Iconic Cities' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-mountain-city"></i></div>
-    <p>Iconic Cities</p>
-  </a>
-  <a href="<%= getFilterUrl('Mountains') %>" class="filter <%= currentCategory === 'Mountains' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-mountain"></i></div>
-    <p>Mountains</p>
-  </a>
-  <a href="<%= getFilterUrl('Castles') %>" class="filter <%= currentCategory === 'Castles' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-fort-awesome"></i></div>
-    <p>Castles</p>
-  </a>
-  <a href="<%= getFilterUrl('Amazing Pools') %>" class="filter <%= currentCategory === 'Amazing Pools' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-person-swimming"></i></div>
-    <p>Amazing Pools</p>
-  </a>
-  <a href="<%= getFilterUrl('Camping') %>" class="filter <%= currentCategory === 'Camping' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-campground"></i></div>
-    <p>Camping</p>
-  </a>
-  <a href="<%= getFilterUrl('Farms') %>" class="filter <%= currentCategory === 'Farms' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-cow"></i></div>
-    <p>Farms</p>
-  </a>
-  <a href="<%= getFilterUrl('Arctic') %>" class="filter <%= currentCategory === 'Arctic' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-snowflake"></i></div>
-    <p>Arctic</p>
-  </a>
-  <a href="<%= getFilterUrl('Domes') %>" class="filter <%= currentCategory === 'Domes' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-igloo"></i></div>
-    <p>Domes</p>
-  </a>
-  <a href="<%= getFilterUrl('Boats') %>" class="filter <%= currentCategory === 'Boats' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-snowflake"></i></div>
-    <p>Boats</p>
-  </a>
+<!-- Category Filter & Tax Toggle Bar -->
+<div class="wl-filter-container">
+  <div class="wl-filters-scroll" id="filters">
+    <a href="<%= getFilterUrl('') %>" class="wl-filter-chip filter <%= !currentCategory ? 'active active-filter' : '' %>">
+      <i class="fa-solid fa-house"></i>
+      <span>All</span>
+    </a>
+    <a href="<%= getFilterUrl('Trending') %>" class="wl-filter-chip filter <%= currentCategory === 'Trending' ? 'active active-filter' : '' %>">
+      <i class="fa-solid fa-fire"></i>
+      <span>Trending</span>
+    </a>
+    <a href="<%= getFilterUrl('Rooms') %>" class="wl-filter-chip filter <%= currentCategory === 'Rooms' ? 'active active-filter' : '' %>">
+      <i class="fa-solid fa-bed"></i>
+      <span>Rooms</span>
+    </a>
+    <a href="<%= getFilterUrl('Iconic Cities') %>" class="wl-filter-chip filter <%= currentCategory === 'Iconic Cities' ? 'active active-filter' : '' %>">
+      <i class="fa-solid fa-mountain-city"></i>
+      <span>Cities</span>
+    </a>
+    <a href="<%= getFilterUrl('Mountains') %>" class="wl-filter-chip filter <%= currentCategory === 'Mountains' ? 'active active-filter' : '' %>">
+      <i class="fa-solid fa-mountain"></i>
+      <span>Mountains</span>
+    </a>
+    <a href="<%= getFilterUrl('Castles') %>" class="wl-filter-chip filter <%= currentCategory === 'Castles' ? 'active active-filter' : '' %>">
+      <i class="fa-solid fa-fort-awesome"></i>
+      <span>Castles</span>
+    </a>
+    <a href="<%= getFilterUrl('Amazing Pools') %>" class="wl-filter-chip filter <%= currentCategory === 'Amazing Pools' ? 'active active-filter' : '' %>">
+      <i class="fa-solid fa-person-swimming"></i>
+      <span>Pools</span>
+    </a>
+    <a href="<%= getFilterUrl('Camping') %>" class="wl-filter-chip filter <%= currentCategory === 'Camping' ? 'active active-filter' : '' %>">
+      <i class="fa-solid fa-campground"></i>
+      <span>Camping</span>
+    </a>
+    <a href="<%= getFilterUrl('Farms') %>" class="wl-filter-chip filter <%= currentCategory === 'Farms' ? 'active active-filter' : '' %>">
+      <i class="fa-solid fa-cow"></i>
+      <span>Farms</span>
+    </a>
+    <a href="<%= getFilterUrl('Arctic') %>" class="wl-filter-chip filter <%= currentCategory === 'Arctic' ? 'active active-filter' : '' %>">
+      <i class="fa-solid fa-snowflake"></i>
+      <span>Arctic</span>
+    </a>
+    <a href="<%= getFilterUrl('Domes') %>" class="wl-filter-chip filter <%= currentCategory === 'Domes' ? 'active active-filter' : '' %>">
+      <i class="fa-solid fa-igloo"></i>
+      <span>Domes</span>
+    </a>
+    <a href="<%= getFilterUrl('Boats') %>" class="wl-filter-chip filter <%= currentCategory === 'Boats' ? 'active active-filter' : '' %>">
+      <i class="fa-solid fa-sailboat"></i>
+      <span>Boats</span>
+    </a>
+  </div>
 
-  <div class="tax-toggle">
-    <div class="form-check-reverse form-switch">
-  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-  <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
-</div>
+  <!-- Tax Toggle Switch Capsule -->
+  <div class="wl-tax-toggle-box tax-toggle">
+    <div class="form-check form-switch m-0 p-0 d-flex align-items-center gap-2">
+      <input class="form-check-input ms-0 mt-0 cursor-pointer" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+      <label class="form-check-label small fw-semibold" for="flexSwitchCheckDefault">Display taxes</label>
+    </div>
   </div>
 </div>
 
+<!-- Search / Category Active Banner -->
 <% if (currentSearch && currentCategory) { %>
-  <div class="mt-3 mb-2">
-    <h4>Search results for "<%= currentSearch %>" in <%= currentCategory %></h4>
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h4 class="fw-bold mb-1">Results for "<%= currentSearch %>" in <%= currentCategory %></h4>
+      <p class="text-secondary small mb-0"><%= allListings.length %> <%= allListings.length === 1 ? 'place' : 'places' %> found matching your criteria</p>
+    </div>
+    <a href="/listings" class="wl-btn wl-btn-outline wl-btn-sm wl-btn-pill">Clear Filters</a>
   </div>
 <% } else if (currentSearch) { %>
-  <div class="mt-3 mb-2">
-    <h4>Search results for "<%= currentSearch %>"</h4>
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h4 class="fw-bold mb-1">Stays in "<%= currentSearch %>"</h4>
+      <p class="text-secondary small mb-0"><%= allListings.length %> <%= allListings.length === 1 ? 'place' : 'places' %> available</p>
+    </div>
+    <a href="/listings" class="wl-btn wl-btn-outline wl-btn-sm wl-btn-pill">Clear Search</a>
   </div>
 <% } else if (currentCategory) { %>
-  <div class="mt-3 mb-2">
-    <h4><%= currentCategory %></h4>
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h4 class="fw-bold mb-1"><%= currentCategory %> Stays</h4>
+      <p class="text-secondary small mb-0">Curated collection of <%= currentCategory.toLowerCase() %> listings</p>
+    </div>
+    <a href="/listings" class="wl-btn wl-btn-outline wl-btn-sm wl-btn-pill">View All</a>
   </div>
 <% } %>
 
-<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
-  <% if (allListings.length === 0) { %>
-    <div class="col-12 mt-3 mb-5">
-      <% if (currentSearch && currentCategory) { %>
-        <h5>No listings found for "<%= currentSearch %>" in <%= currentCategory %>.</h5>
-        <p class="text-muted">
-          Try <a href="/listings/search?q=<%= encodeURIComponent(currentSearch) %>">viewing all results for "<%= currentSearch %>"</a> or <a href="/listings">browse all listings</a>.
+<!-- Listings Grid -->
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4 mb-5">
+  <% if (!allListings || allListings.length === 0) { %>
+    <div class="col-12 my-5">
+      <div class="empty-state-card">
+        <i class="fa-solid fa-map-location-dot empty-state-icon"></i>
+        <h4 class="fw-bold mb-2">No matching stays found</h4>
+        <p class="text-secondary small mb-4" style="max-width: 420px; margin: 0 auto;">
+          <% if (currentSearch && currentCategory) { %>
+            We couldn't find any listings for "<strong><%= currentSearch %></strong>" in <strong><%= currentCategory %></strong>.
+          <% } else if (currentSearch) { %>
+            We couldn't find any stays matching "<strong><%= currentSearch %></strong>".
+          <% } else if (currentCategory) { %>
+            No listings currently available in the <strong><%= currentCategory %></strong> category.
+          <% } else { %>
+            There are no listings published yet. Be the first host to share a space!
+          <% } %>
         </p>
-      <% } else if (currentSearch) { %>
-        <h5>No listings found for "<%= currentSearch %>".</h5>
-        <p class="text-muted">Try searching with different keywords or <a href="/listings">browse all listings</a>.</p>
-      <% } else if (currentCategory) { %>
-        <h5>No listings found in <%= currentCategory %>.</h5>
-        <p class="text-muted"><a href="/listings">Browse all listings</a></p>
-      <% } else { %>
-        <h5>No listings found.</h5>
-        <p class="text-muted"><a href="/listings">Browse all listings</a></p>
-      <% } %>
-    </div>
-  <% } %>
-  <% for(let listing of allListings) { %>
-    <a href="/listings/<%= listing._id %>" class="listing-link">
-    <div class="card col listing-card" >
-      <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" style="height: 20rem;"/>
-      <div class="card-img-overlay">abcd</div>
-      <div class="card-body">
-        <p class="card-text">
-          <b><%= listing.title %></b> <br />
-          &#8377;<%= listing.price?.toLocaleString("en-IN") || "0" %>/ night
-          <i class="tax-info">&nbsp; &nbsp; +5% GST</i>
-        </p>
+        <div class="d-flex justify-content-center gap-2">
+          <a href="/listings" class="wl-btn wl-btn-primary wl-btn-sm wl-btn-pill px-4">Browse All Stays</a>
+          <% if (typeof currUser !== 'undefined' && currUser) { %>
+            <a href="/listings/new" class="wl-btn wl-btn-outline wl-btn-sm wl-btn-pill px-4">Add Listing</a>
+          <% } %>
+        </div>
       </div>
     </div>
-    </a>
+  <% } %>
+
+  <% for(let listing of allListings) { %>
+    <div class="col">
+      <a href="/listings/<%= listing._id %>" class="listing-link">
+        <div class="card listing-card h-100">
+          <div class="listing-card-media-wrapper">
+            <img
+              src="<%= (listing.image && listing.image.url) ? listing.image.url : '/images/default.jpg' %>"
+              class="listing-card-img card-img-top"
+              alt="<%= listing.title %>"
+              loading="lazy"
+            />
+            <div class="listing-card-overlay-gradient"></div>
+            <% if (listing.category) { %>
+              <span class="listing-card-badge"><%= listing.category %></span>
+            <% } %>
+          </div>
+
+          <div class="card-body listing-card-info">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <h6 class="listing-card-title text-truncate" title="<%= listing.title %>">
+                <b><%= listing.title %></b>
+              </h6>
+            </div>
+            
+            <p class="listing-card-location">
+              <i class="fa-solid fa-location-dot text-danger" style="font-size: 0.8rem;"></i>
+              <span class="text-truncate"><%= listing.location %><% if (listing.country) { %>, <%= listing.country %><% } %></span>
+            </p>
+
+            <div class="card-text listing-card-price-row mt-1">
+              <span class="listing-card-price">&#8377;<%= (listing.price || 0).toLocaleString("en-IN") %></span>
+              <span class="listing-card-period">/ night</span>
+              <span class="tax-info ms-1">+5% GST</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
   <% } %>
 </div>
 
-
 <script>
-  let taxSwitch = document.getElementById("flexSwitchCheckDefault");
-  taxSwitch.addEventListener("click",()=>{
-    let taxInfo = document.getElementsByClassName("tax-info");
-    for(info of taxInfo){
-      if(info.style.display != "inline"){
-          info.style.display = "inline";
-      }else{
-        info.style.display = "none";
-      }
-    }
-  })
+  (() => {
+    const taxSwitch = document.getElementById("flexSwitchCheckDefault");
+    if (!taxSwitch) return;
+
+    taxSwitch.addEventListener("change", () => {
+      const taxInfos = document.querySelectorAll(".tax-info");
+      taxInfos.forEach((info) => {
+        if (taxSwitch.checked) {
+          info.style.display = "inline-block";
+        } else {
+          info.style.display = "none";
+        }
+      });
+    });
+  })();
 </script>

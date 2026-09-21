@@ -1,112 +1,150 @@
-<% layout("layouts/boilerplate") %>
-<div class="row">
-  <div class="col-8 offset-2">
-    <br><br>
-    <h3>Create a new Listing</h3>
+<% layout("/layouts/boilerplate") %>
 
-    <form method="POST" action="/listings?_csrf=<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>" novalidate class="needs-validation " enctype="multipart/form-data">
-      <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+<div class="row mt-3 mb-5 justify-content-center">
+  <div class="col-12 col-lg-8">
+    <!-- Back to Listings -->
+    <div class="mb-3">
+      <a href="/listings" class="wl-btn wl-btn-ghost wl-btn-sm wl-btn-pill">
+        <i class="fa-solid fa-arrow-left me-1"></i>Back to All Listings
+      </a>
+    </div>
 
-      <div class="mb-3">
-        <label class="form-label">Title</label>
-        <input name="listing[title]"
-               placeholder="Add a catchy title"
-               type="text"
-               class="form-control"
-               required>
-        <div class="invalid-feedback">
-          Please provide a title.
+    <div class="card wl-card border-0 shadow-lg p-4 p-md-5 bg-white">
+      <div class="mb-4 pb-3 border-bottom">
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-1 rounded-pill small fw-semibold">
+            Hosting Portal
+          </span>
         </div>
-        <div class="=valid-feedback">
-            Looks Good.
-        </div>
+        <h2 class="fw-bold text-dark mb-1">Create a New Listing</h2>
+        <p class="text-secondary small mb-0">Share your home, villa, or retreat with travelers from around the world</p>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">Category</label>
-        <select name="listing[category]" class="form-select" required>
-          <option value="" disabled selected>Select a category</option>
-          <option value="Trending">Trending</option>
-          <option value="Rooms">Rooms</option>
-          <option value="Iconic Cities">Iconic Cities</option>
-          <option value="Mountains">Mountains</option>
-          <option value="Castles">Castles</option>
-          <option value="Amazing Pools">Amazing Pools</option>
-          <option value="Camping">Camping</option>
-          <option value="Farms">Farms</option>
-          <option value="Arctic">Arctic</option>
-          <option value="Domes">Domes</option>
-          <option value="Boats">Boats</option>
-        </select>
-        <div class="invalid-feedback">
-          Please select a category.
-        </div>
-      </div>
+      <form method="POST" action="/listings?_csrf=<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>" novalidate class="needs-validation" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
 
-      <div class="mb-3">
-        <label class="form-label">Description</label>
-        <textarea name="listing[description]"
-                  class="form-control"
-                  required></textarea>
-        <div class="invalid-feedback">
-          Please provide a description.
+        <!-- Title -->
+        <div class="mb-4">
+          <label class="wl-form-label" for="title">Listing Title <span class="text-danger">*</span></label>
+          <input
+            name="listing[title]"
+            id="title"
+            placeholder="e.g. Modern Cliffside Villa with Infinity Pool"
+            type="text"
+            class="form-control wl-form-control"
+            required
+          />
+          <div class="invalid-feedback">Please provide a descriptive title.</div>
+          <div class="form-text small text-muted">Catchy titles attract up to 40% more booking views.</div>
         </div>
-      </div>
 
-  
-      <div class="mb-3">
-        <label class="form-label">Upload Image</label>
-        <input name="listing[image]"
-               type="file"
-               class="form-control"
-               required>
-        <div class="invalid-feedback">
-          Please upload an image for the listing.
-        </div>
-      </div>
+        <!-- Category & Price Row -->
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-md-6">
+            <label class="wl-form-label" for="category">Category <span class="text-danger">*</span></label>
+            <select name="listing[category]" id="category" class="form-select wl-form-control" required>
+              <option value="" disabled selected>Select property style</option>
+              <option value="Trending">Trending</option>
+              <option value="Rooms">Rooms</option>
+              <option value="Iconic Cities">Iconic Cities</option>
+              <option value="Mountains">Mountains</option>
+              <option value="Castles">Castles</option>
+              <option value="Amazing Pools">Amazing Pools</option>
+              <option value="Camping">Camping</option>
+              <option value="Farms">Farms</option>
+              <option value="Arctic">Arctic</option>
+              <option value="Domes">Domes</option>
+              <option value="Boats">Boats</option>
+            </select>
+            <div class="invalid-feedback">Please select a category.</div>
+          </div>
 
-      <div class="row">
-        <div class="mb-3 col-md-4">
-          <label class="form-label">Price</label>
-          <input name="listing[price]"
-                 placeholder="1200"
-                 type="number"
-                 class="form-control"
-                 required>
-          <div class="invalid-feedback">
-            Please enter a valid price.
+          <div class="col-12 col-md-6">
+            <label class="wl-form-label" for="price">Price per Night (INR) <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text">&#8377;</span>
+              <input
+                name="listing[price]"
+                id="price"
+                placeholder="2500"
+                type="number"
+                min="100"
+                class="form-control wl-form-control"
+                required
+              />
+              <div class="invalid-feedback">Please enter a valid price.</div>
+            </div>
           </div>
         </div>
 
-        <div class="mb-3 col-md-8">
-          <label class="form-label">Country</label>
-          <input name="listing[country]"
-                 placeholder="India"
-                 type="text"
-                 class="form-control"
-                 required>
-          <div class="invalid-feedback">
-            Please enter the country.
+        <!-- Description -->
+        <div class="mb-4">
+          <label class="wl-form-label" for="description">Property Description <span class="text-danger">*</span></label>
+          <textarea
+            name="listing[description]"
+            id="description"
+            rows="5"
+            placeholder="Describe the bedrooms, view, neighborhood, amenities, and unique features..."
+            class="form-control wl-form-control"
+            required
+          ></textarea>
+          <div class="invalid-feedback">Please provide a detailed description.</div>
+        </div>
+
+        <!-- Photo Upload -->
+        <div class="mb-4">
+          <label class="wl-form-label" for="image">Upload Cover Image <span class="text-danger">*</span></label>
+          <input
+            name="listing[image]"
+            id="image"
+            type="file"
+            accept="image/*"
+            class="form-control wl-form-control"
+            required
+          />
+          <div class="invalid-feedback">Please upload an image for the listing.</div>
+          <div class="form-text small text-muted">Upload high-resolution photos (JPG, PNG, WebP) for the best presentation.</div>
+        </div>
+
+        <!-- Location & Country Row -->
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-md-6">
+            <label class="wl-form-label" for="location">City / Location <span class="text-danger">*</span></label>
+            <input
+              name="listing[location]"
+              id="location"
+              placeholder="e.g. Udaipur, Rajasthan"
+              type="text"
+              class="form-control wl-form-control"
+              required
+            />
+            <div class="invalid-feedback">Please enter the location.</div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label class="wl-form-label" for="country">Country <span class="text-danger">*</span></label>
+            <input
+              name="listing[country]"
+              id="country"
+              placeholder="India"
+              type="text"
+              class="form-control wl-form-control"
+              required
+            />
+            <div class="invalid-feedback">Please enter the country.</div>
           </div>
         </div>
-      </div>
 
-      <div class="mb-3">
-        <label class="form-label">Location</label>
-        <input name="listing[location]"
-               placeholder="Jaipur, Rajasthan"
-               type="text"
-               class="form-control"
-               required>
-        <div class="invalid-feedback">
-          Please enter the location.
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 pt-3 border-top">
+          <button type="submit" class="wl-btn wl-btn-primary wl-btn-pill px-5 py-3 fw-bold add-btn flex-grow-1">
+            <i class="fa-solid fa-plus me-1"></i>Publish Listing
+          </button>
+          <a href="/listings" class="wl-btn wl-btn-outline wl-btn-pill px-4 py-3 fw-semibold">
+            Cancel
+          </a>
         </div>
-      </div>
-
-      <br><br>
-      <button class="btn btn-dark add-btn">Add</button>
-      <br><br>
-
-    </form>
+      </form>
+    </div>
   </div>
 </div>

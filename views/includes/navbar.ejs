@@ -1,72 +1,130 @@
-<style
->
-  .search-btn{
-    background-color: #fe424d;
-    color: #fff;
-    border-radius: 25px;
-    padding: 0 1rem 0 1rem;
-  }
-
-  .search-btn:hover{
-    background-color: #fe424d;
-    color: #fff;
-  }
-
-  .search-btn i{
-    display: inline;
-    margin-right: 0.5rem;
-  }
-
-  .search-inp{
-    border-radius: 25px;
-    padding: 0 3rem 0.5rem 3rem;
-    font-size: 0.8rem;
-  }
-
-</style>
-
-
-
-<nav class="navbar navbar-expand-md  bg-body-light border-bottom sticky-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-
-        <a class="nav-link" href="/listings">Explore</a>
-
+<nav class="navbar navbar-expand-lg wl-navbar sticky-top">
+  <div class="container-fluid px-lg-4">
+    <!-- Brand Logo -->
+    <a class="navbar-brand wl-brand-wrapper" href="/listings">
+      <div class="wl-brand-mark">
+        <i class="fa-solid fa-compass"></i>
       </div>
-      <div class="navbar-nav ms-auto">
-        <form class="d-flex" role="search" action="/listings/search" method="GET">
+      <span class="wl-brand-title">WanderLust<span class="wl-brand-dot">.</span></span>
+    </a>
+
+    <!-- Mobile Toggler -->
+    <button class="navbar-toggler border-0 shadow-none p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fa-solid fa-bars fs-4 text-dark"></i>
+    </button>
+
+    <!-- Collapsible Menu -->
+    <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarNavAltMarkup">
+      <!-- Search Capsule (Centered on desktop) -->
+      <div class="mx-auto my-2 my-lg-0 w-100" style="max-width: 480px;">
+        <form class="wl-search-capsule w-100 m-0" role="search" action="/listings/search" method="GET">
           <% if (typeof category !== 'undefined' && category) { %>
             <input type="hidden" name="category" value="<%= category %>">
           <% } %>
-          <input class="form-control me-2 search-inp" type="search" name="q" placeholder="Search your next destinaton" value="<%= typeof searchQuery !== 'undefined' && searchQuery ? searchQuery : '' %>">
-          <button class="btn search-btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+          <i class="fa-solid fa-magnifying-glass text-muted fs-6 ms-1"></i>
+          <input
+            class="wl-search-input search-inp"
+            type="search"
+            name="q"
+            placeholder="Search destinations, villas, cities..."
+            value="<%= typeof searchQuery !== 'undefined' && searchQuery ? searchQuery : '' %>"
+            autocomplete="off"
+          />
+          <button class="wl-search-btn search-btn" type="submit">
+            Search
+          </button>
         </form>
       </div>
-      <div class="navbar-nav ms-auto">
+
+      <!-- Action Navigation -->
+      <div class="navbar-nav ms-auto align-items-lg-center gap-1 gap-lg-2">
+        <a class="wl-nav-link" href="/listings">
+          <i class="fa-regular fa-compass me-1 text-danger"></i>Explore
+        </a>
+
         <% const currentUser = (typeof currUser !== "undefined") ? currUser : null; %>
-        <% if(!currentUser){ %>
-          <a class="nav-link" href="/listings/new">Airbnb your home</a>
-          <a class="nav-link active" href="/signup"><b>SignUp</b></a>
-          <a class="nav-link" href="/login"><b>LogIn</b></a>
-        <% } %>
-        <% if(currentUser){ %>
-          <a class="nav-link" href="/dashboard"><i class="fa-solid fa-gauge-high me-1"></i>Dashboard</a>
+        <% if (!currentUser) { %>
+          <a class="wl-nav-link" href="/listings/new">
+            Host your home
+          </a>
+          <div class="d-flex align-items-center gap-2 ms-lg-2 mt-2 mt-lg-0">
+            <a class="wl-btn wl-btn-outline wl-btn-sm wl-btn-pill" href="/login">
+              Log In
+            </a>
+            <a class="wl-btn wl-btn-primary wl-btn-sm wl-btn-pill" href="/signup">
+              Sign Up
+            </a>
+          </div>
+        <% } else { %>
           <% if (currentUser.role === "USER") { %>
-            <a class="nav-link" href="/become-host"><i class="fa-solid fa-house-chimney-user me-1"></i>Become a Host</a>
+            <a class="wl-nav-link" href="/become-host">
+              <i class="fa-solid fa-house-chimney-user me-1 text-danger"></i>Become a Host
+            </a>
           <% } else if (currentUser.role === "HOST") { %>
-            <a class="nav-link" href="/listings/new"><i class="fa-solid fa-plus me-1"></i>Add Listing</a>
-            <a class="nav-link" href="/host/dashboard"><i class="fa-solid fa-hotel me-1"></i>Host Dashboard</a>
-            <a class="nav-link" href="/host/listings"><i class="fa-solid fa-house-user me-1"></i>My Listings</a>
+            <a class="wl-btn wl-btn-primary wl-btn-sm wl-btn-pill me-lg-1" href="/listings/new">
+              <i class="fa-solid fa-plus me-1"></i>Add Listing
+            </a>
+            <a class="wl-nav-link" href="/host/dashboard">
+              <i class="fa-solid fa-gauge-high me-1 text-primary"></i>Host Hub
+            </a>
           <% } %>
-          <a class="nav-link" href="/wishlist"><i class="fa-regular fa-heart me-1"></i>Wishlist</a>
-          <a class="nav-link" href="/bookings"><i class="fa-regular fa-calendar-check me-1"></i>My Bookings</a>
-          <a class="nav-link" href="/logout">Logout</a>
+
+          <a class="wl-nav-link" href="/wishlist" title="Wishlist">
+            <i class="fa-regular fa-heart me-1 text-danger"></i>Wishlist
+          </a>
+          <a class="wl-nav-link" href="/bookings" title="My Bookings">
+            <i class="fa-regular fa-calendar-check me-1 text-success"></i>Trips
+          </a>
+
+          <!-- User Profile Dropdown -->
+          <div class="nav-item dropdown ms-lg-2 mt-2 mt-lg-0">
+            <a class="wl-user-pill dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="wl-avatar-circle">
+                <%= currentUser.username ? currentUser.username.charAt(0).toUpperCase() : 'U' %>
+              </div>
+              <span class="d-none d-xl-inline fw-semibold small"><%= currentUser.username %></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-2" aria-labelledby="navbarUserDropdown" style="min-width: 220px;">
+              <li class="px-3 py-2 border-bottom mb-1">
+                <span class="d-block fw-bold text-dark"><%= currentUser.username %></span>
+                <span class="d-block text-muted small text-truncate"><%= currentUser.email || '' %></span>
+                <span class="badge bg-light text-dark border mt-1 font-monospace" style="font-size: 0.68rem;">Role: <%= currentUser.role || 'USER' %></span>
+              </li>
+              <li>
+                <a class="dropdown-item rounded-3 py-2 small fw-semibold" href="/dashboard">
+                  <i class="fa-solid fa-gauge-high me-2 text-secondary"></i>Traveler Dashboard
+                </a>
+              </li>
+              <% if (currentUser.role === "HOST") { %>
+                <li>
+                  <a class="dropdown-item rounded-3 py-2 small fw-semibold" href="/host/dashboard">
+                    <i class="fa-solid fa-hotel me-2 text-primary"></i>Host Dashboard
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item rounded-3 py-2 small fw-semibold" href="/host/listings">
+                    <i class="fa-solid fa-house-user me-2 text-primary"></i>My Listings
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item rounded-3 py-2 small fw-semibold" href="/host/bookings">
+                    <i class="fa-solid fa-calendar-check me-2 text-primary"></i>Bookings Received
+                  </a>
+                </li>
+              <% } %>
+              <li>
+                <a class="dropdown-item rounded-3 py-2 small fw-semibold" href="/profile/edit">
+                  <i class="fa-solid fa-user-pen me-2 text-secondary"></i>Edit Profile
+                </a>
+              </li>
+              <li><hr class="dropdown-divider my-1"></li>
+              <li>
+                <a class="dropdown-item rounded-3 py-2 small fw-semibold text-danger" href="/logout">
+                  <i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Log Out
+                </a>
+              </li>
+            </ul>
+          </div>
         <% } %>
       </div>
     </div>

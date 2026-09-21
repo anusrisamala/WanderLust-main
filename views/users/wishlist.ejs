@@ -1,27 +1,45 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row mt-4 mb-2">
+<div class="row mt-3 mb-4">
   <div class="col-12">
-    <h3 class="fw-bold"><i class="fa-solid fa-heart text-danger me-2"></i>My Wishlist ❤️</h3>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+      <div>
+        <h3 class="fw-bold mb-1">
+          <i class="fa-solid fa-heart text-danger me-2"></i>My Saved Wishlist
+        </h3>
+        <p class="text-secondary small mb-0">
+          Your saved vacation properties, luxury retreats, and favorite destinations.
+        </p>
+      </div>
+      <div>
+        <a href="/listings" class="wl-btn wl-btn-outline wl-btn-sm wl-btn-pill">
+          <i class="fa-solid fa-magnifying-glass me-1"></i>Discover More
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 
 <% if (!wishlist || wishlist.length === 0) { %>
   <div class="row my-5">
     <div class="col-12 text-center">
-      <div class="empty-wishlist-container">
-        <i class="fa-solid fa-heart empty-wishlist-icon"></i>
-        <h4 class="fw-bold mb-2">Your wishlist is empty ❤️</h4>
-        <p class="text-muted mb-4">Explore listings and save your favorite stays for future trips.</p>
-        <a href="/listings" class="btn btn-dark add-btn px-4 py-2">Explore Listings</a>
+      <div class="empty-state-card">
+        <i class="fa-regular fa-heart empty-state-icon"></i>
+        <h4 class="fw-bold mb-2">Your wishlist is currently empty</h4>
+        <p class="text-secondary small mb-4" style="max-width: 440px; margin: 0 auto;">
+          Save homes and experiences you love by clicking the heart icon on any listing card.
+        </p>
+        <a href="/listings" class="wl-btn wl-btn-primary wl-btn-sm wl-btn-pill px-4">
+          <i class="fa-solid fa-compass me-1"></i>Explore Places
+        </a>
       </div>
     </div>
   </div>
 <% } else { %>
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 g-4 mt-1 mb-5">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4 mb-5">
     <% for (let listing of wishlist) { %>
       <div class="col">
-        <div class="card listing-card wishlist-card h-100 position-relative shadow-sm">
+        <div class="card listing-card h-100 position-relative">
           <!-- Wishlist remove button -->
           <form method="POST" action="/listings/<%= listing._id %>/wishlist" class="m-0">
             <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
@@ -31,21 +49,31 @@
           </form>
 
           <a href="/listings/<%= listing._id %>" class="listing-link">
-            <img
-              src="<%= (listing.image && listing.image.url) ? listing.image.url : '' %>"
-              class="card-img-top"
-              alt="<%= listing.title %>"
-            />
-            <div class="card-body p-3">
-              <p class="card-text mb-1">
-                <b class="fs-6"><%= listing.title %></b>
+            <div class="listing-card-media-wrapper">
+              <img
+                src="<%= (listing.image && listing.image.url) ? listing.image.url : '/images/default.jpg' %>"
+                class="listing-card-img card-img-top"
+                alt="<%= listing.title %>"
+                loading="lazy"
+              />
+              <div class="listing-card-overlay-gradient"></div>
+              <% if (listing.category) { %>
+                <span class="listing-card-badge"><%= listing.category %></span>
+              <% } %>
+            </div>
+
+            <div class="card-body listing-card-info">
+              <h6 class="listing-card-title text-truncate" title="<%= listing.title %>">
+                <b><%= listing.title %></b>
+              </h6>
+              <p class="listing-card-location">
+                <i class="fa-solid fa-location-dot text-danger" style="font-size: 0.8rem;"></i>
+                <span class="text-truncate"><%= listing.location %><% if (listing.country) { %>, <%= listing.country %><% } %></span>
               </p>
-              <p class="card-text text-muted small mb-2">
-                <i class="fa-solid fa-location-dot me-1"></i><%= listing.location %>, <%= listing.country %>
-              </p>
-              <p class="card-text mb-0">
-                <span class="fw-bold">&#8377;<%= listing.price ? listing.price.toLocaleString("en-IN") : "0" %></span> <span class="text-muted">/ night</span>
-              </p>
+              <div class="card-text listing-card-price-row mt-1">
+                <span class="listing-card-price">&#8377;<%= (listing.price || 0).toLocaleString("en-IN") %></span>
+                <span class="listing-card-period">/ night</span>
+              </div>
             </div>
           </a>
         </div>
@@ -53,4 +81,3 @@
     <% } %>
   </div>
 <% } %>
-

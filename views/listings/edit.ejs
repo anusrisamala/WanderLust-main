@@ -1,26 +1,49 @@
 <% layout("layouts/boilerplate") %>
-<div class="row mt-3">
-    <div class="col-8 offset-2" >
-    <h3>Edit your Listing</h3>
-<form method="POST" action="/listings/<%= listing._id %>?_method=PUT&_csrf=<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>" novalidate class="needs-validation" enctype="multipart/form-data">
-    <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
 
+<div class="row mt-3 mb-5 justify-content-center">
+  <div class="col-12 col-lg-8">
+    <!-- Back to Listing -->
     <div class="mb-3">
-        <label for="title" class="form-label">Title</label>
-        <input name="listing[title]" id="title" value="<%= listing.title %>" type="text" class="form-control" required/>
-        <div class="invalid-feedback">
-          Please provide a title.
-        </div>
-        <div class="=valid-feedback">
-            Looks Good.
-        </div>
+      <a href="/listings/<%= listing._id %>" class="wl-btn wl-btn-ghost wl-btn-sm wl-btn-pill">
+        <i class="fa-solid fa-arrow-left me-1"></i>Back to Property
+      </a>
     </div>
 
-    <div class="mb-3">
-        <label for="category" class="form-label">Category</label>
-        <select name="listing[category]" id="category" class="form-select" required>
-            <option value="" disabled <%= !listing.category ? "selected" : "" %>>Select a category</option>
-            <% const categories = [
+    <div class="card wl-card border-0 shadow-lg p-4 p-md-5 bg-white">
+      <div class="mb-4 pb-3 border-bottom">
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-1 rounded-pill small fw-semibold">
+            Property Editor
+          </span>
+        </div>
+        <h2 class="fw-bold text-dark mb-1">Edit Listing</h2>
+        <p class="text-secondary small mb-0">Update pricing, description, photos, or location details for this stay</p>
+      </div>
+
+      <form method="POST" action="/listings/<%= listing._id %>?_method=PUT&_csrf=<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>" novalidate class="needs-validation" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+
+        <!-- Title -->
+        <div class="mb-4">
+          <label for="title" class="wl-form-label">Listing Title <span class="text-danger">*</span></label>
+          <input
+            name="listing[title]"
+            id="title"
+            value="<%= listing.title %>"
+            type="text"
+            class="form-control wl-form-control"
+            required
+          />
+          <div class="invalid-feedback">Please provide a title.</div>
+        </div>
+
+        <!-- Category & Price Row -->
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-md-6">
+            <label for="category" class="wl-form-label">Category <span class="text-danger">*</span></label>
+            <select name="listing[category]" id="category" class="form-select wl-form-control" required>
+              <option value="" disabled <%= !listing.category ? "selected" : "" %>>Select a category</option>
+              <% const categories = [
                 "Trending",
                 "Rooms",
                 "Iconic Cities",
@@ -32,65 +55,109 @@
                 "Arctic",
                 "Domes",
                 "Boats"
-            ]; %>
-            <% for(let cat of categories) { %>
+              ]; %>
+              <% for(let cat of categories) { %>
                 <option value="<%= cat %>" <%= listing.category === cat ? "selected" : "" %>><%= cat %></option>
-            <% } %>
-        </select>
-        <div class="invalid-feedback">
-            Please select a category.
-        </div>
-    </div>
+              <% } %>
+            </select>
+            <div class="invalid-feedback">Please select a category.</div>
+          </div>
 
-    <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-        <textarea name="listing[description]" id="description" class="form-control" required><%= listing.description %></textarea>
-        <div class="invalid-feedback">
-          Please provide a description.
-        </div>
-    </div>
-    <div class="mb-3">
-      Original Listing Image <br>
-      <img src="<%= originalImageUrl %>" />
-    </div>
-     
-    <div class="mb-3">
-        <label for="image" class="form-label">Upload Image Link</label>
-        <input name="listing[image]" id="image" type="file" class="form-control" />
-        <!-- <div class="invalid-feedback">
-          Please provide an image link.
-        </div> -->
-    </div>
-
-    <div class="row">
-        <div class="mb-3 col-md-4">
-            <label for="price" class="form-label">Price</label>
-            <input name="listing[price]" id="price" value="<%= listing.price %>" type="number" class="form-control" required />
-            <div class="invalid-feedback">
-            Please enter a valid price.
+          <div class="col-12 col-md-6">
+            <label for="price" class="wl-form-label">Price per Night (INR) <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text">&#8377;</span>
+              <input
+                name="listing[price]"
+                id="price"
+                value="<%= listing.price %>"
+                type="number"
+                min="100"
+                class="form-control wl-form-control"
+                required
+              />
+              <div class="invalid-feedback">Please enter a valid price.</div>
+            </div>
           </div>
         </div>
 
-        <div class="mb-3 col-md-8">
-            <label for="country" class="form-label">Country</label>
-            <input name="listing[country]" id="country" value="<%= listing.country %>" type="text" class="form-control" required/>
-            <div class="invalid-feedback">
-            Please enter the country.
+        <!-- Description -->
+        <div class="mb-4">
+          <label for="description" class="wl-form-label">Description <span class="text-danger">*</span></label>
+          <textarea
+            name="listing[description]"
+            id="description"
+            rows="5"
+            class="form-control wl-form-control"
+            required
+          ><%= listing.description %></textarea>
+          <div class="invalid-feedback">Please provide a description.</div>
+        </div>
+
+        <!-- Current & Replace Image -->
+        <div class="mb-4 bg-light rounded-4 p-3 border">
+          <label class="wl-form-label mb-2">Current Cover Image</label>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <img
+              src="<%= originalImageUrl %>"
+              class="rounded-3 object-fit-cover border shadow-sm"
+              style="width: 140px; height: 95px;"
+              alt="Current cover"
+            />
+            <div class="small text-secondary">
+              <strong>Keep current image:</strong> Leave the file upload below empty unless you want to replace this photo.
+            </div>
+          </div>
+          <label for="image" class="wl-form-label mb-1">Replace Image (Optional)</label>
+          <input
+            name="listing[image]"
+            id="image"
+            type="file"
+            accept="image/*"
+            class="form-control wl-form-control"
+          />
+        </div>
+
+        <!-- Location & Country Row -->
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-md-6">
+            <label for="location" class="wl-form-label">City / Location <span class="text-danger">*</span></label>
+            <input
+              name="listing[location]"
+              id="location"
+              value="<%= listing.location %>"
+              type="text"
+              class="form-control wl-form-control"
+              required
+            />
+            <div class="invalid-feedback">Please enter the location.</div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label for="country" class="wl-form-label">Country <span class="text-danger">*</span></label>
+            <input
+              name="listing[country]"
+              id="country"
+              value="<%= listing.country %>"
+              type="text"
+              class="form-control wl-form-control"
+              required
+            />
+            <div class="invalid-feedback">Please enter the country.</div>
           </div>
         </div>
-    </div>
 
-
-    <div class="mb-3">
-        <label for="location" class="form-label">Location</label>
-        <input name="listing[location]" id="location" value="<%= listing.location %>" type="text" class="form-control" required />
-        <div class="invalid-feedback">
-          Please enter the location.
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 pt-3 border-top">
+          <button type="submit" class="wl-btn wl-btn-primary wl-btn-pill px-5 py-3 fw-bold edit-btn flex-grow-1">
+            <i class="fa-solid fa-check me-1"></i>Save Listing Changes
+          </button>
+          <a href="/listings/<%= listing._id %>" class="wl-btn wl-btn-outline wl-btn-pill px-4 py-3 fw-semibold">
+            Cancel
+          </a>
         </div>
+      </form>
     </div>
-    <br><br>
-    <button class="btn btn-dark edit-btn mt-3 mb-3">Edit</button>
-</form>
-</div>
+  </div>
 </div>
 <script src="/js/script.js"></script>
