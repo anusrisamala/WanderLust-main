@@ -1176,7 +1176,14 @@ h1, h2, h3, h4, h5, h6,
   flex-shrink: 0;
 }
 
-/* KPI Stat Cards (6 Proportional Cards with Animations) */
+/* KPI Stat Cards (Unified Proportional Cards with Animations) */
+@media (min-width: 1200px) {
+  .row-cols-xl-7 > * {
+    flex: 0 0 auto;
+    width: 14.285714%;
+  }
+}
+
 .wl-kpi-card {
   background: #ffffff;
   border: 1px solid var(--wl-border);
