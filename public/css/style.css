@@ -1023,3 +1023,80 @@ h1, h2, h3, h4, h5, h6,
   opacity: 0.85;
   margin-bottom: 1.25rem;
 }
+
+/* ==========================================================================
+   Explore Page Hero Banner
+   ========================================================================== */
+.wl-explore-hero-banner {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=85') center 65% / cover no-repeat;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3.5rem 3.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+}
+
+.wl-explore-hero-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(10, 30, 35, 0.72) 0%, rgba(10, 30, 35, 0.35) 55%, rgba(10, 30, 35, 0.15) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wl-explore-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 620px;
+}
+
+.wl-explore-hero-tagline {
+  color: #F6AD55;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+
+.wl-explore-hero-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 3.4rem;
+  font-weight: 700;
+  line-height: 1.12;
+  color: #ffffff !important;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.wl-explore-hero-sub {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 520px;
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .wl-explore-hero-banner {
+    padding: 2.25rem 1.5rem;
+    min-height: 280px;
+    border-radius: 18px;
+  }
+  .wl-explore-hero-title {
+    font-size: 2.25rem;
+  }
+  .wl-explore-hero-sub {
+    font-size: 0.95rem;
+  }
+}
+

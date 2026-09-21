@@ -14,6 +14,19 @@
   }
 %>
 
+<!-- Explore Page Hero Banner -->
+<% if (!currentSearch && !currentCategory) { %>
+  <div class="wl-explore-hero-banner">
+    <div class="wl-explore-hero-content">
+      <div class="wl-explore-hero-tagline">EXPLORE &bull; STAY &bull; EXPERIENCE</div>
+      <h1 class="wl-explore-hero-title">Find your next<br>escape</h1>
+      <p class="wl-explore-hero-sub">
+        Discover unique stays, hidden gems and unforgettable experiences around the world.
+      </p>
+    </div>
+  </div>
+<% } %>
+
 <!-- Category Filter & Tax Toggle Bar -->
 <div class="wl-filter-container">
   <div class="wl-filters-scroll" id="filters">
