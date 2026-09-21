@@ -4,30 +4,30 @@
   <div class="col-12">
     <!-- Breadcrumb / Back to Host Dashboard -->
     <div class="mb-3">
-      <a href="/host/dashboard" class="text-decoration-none text-muted small fw-medium">
+      <a href="/host/dashboard" class="wl-btn wl-btn-ghost wl-btn-sm">
         <i class="fa-solid fa-arrow-left me-1"></i>Back to Host Dashboard
       </a>
     </div>
 
     <!-- Header & Action Bar -->
-    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+    <div class="card border rounded-3 p-4 mb-4 bg-white shadow-xs">
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
         <div>
           <div class="d-flex align-items-center gap-2 mb-1">
-            <h2 class="fw-bold mb-0">My Hosted Listings</h2>
+            <h2 class="fw-bold mb-0 fs-3">My Hosted Listings</h2>
             <span class="badge bg-secondary fs-6 align-middle">
               <%= hostListings ? hostListings.length : 0 %>
             </span>
           </div>
           <p class="text-muted small mb-0">
-            View, manage, edit, or delete the properties you have hosted on WanderLust.
+            View, edit, archive, or manage the properties you have listed on WanderLust.
           </p>
         </div>
         <div class="d-flex gap-2">
-          <a href="/host/dashboard" class="btn btn-outline-dark px-3 py-2 fw-semibold">
-            <i class="fa-solid fa-gauge-high me-1"></i>Host Dashboard
+          <a href="/host/dashboard" class="wl-btn wl-btn-outline wl-btn-sm">
+            <i class="fa-solid fa-gauge-high me-1"></i>Host Portal
           </a>
-          <a href="/listings/new" class="btn btn-dark add-btn text-white px-3 py-2 fw-semibold shadow-sm">
+          <a href="/listings/new" class="wl-btn wl-btn-primary wl-btn-sm add-btn text-white">
             <i class="fa-solid fa-plus me-1"></i>Add New Listing
           </a>
         </div>
@@ -37,15 +37,15 @@
     <!-- Listings Content -->
     <% if (!hostListings || hostListings.length === 0) { %>
       <!-- Empty State -->
-      <div class="card border shadow-sm rounded-4 p-5 text-center my-4 bg-white">
-        <div class="py-5">
-          <i class="fa-solid fa-house-circle-check fa-4x text-muted mb-3 opacity-50"></i>
-          <h4 class="fw-bold mb-2">You haven't created any listings yet.</h4>
-          <p class="text-muted small mb-4" style="max-width: 480px; margin: 0 auto;">
-            Share your space with travelers from across the world. Add photos, pricing, and details to start welcoming guests.
+      <div class="wl-form-card p-5 text-center my-4 bg-white mx-auto" style="max-width: 540px;">
+        <div class="py-4">
+          <i class="fa-solid fa-house-circle-check fa-3x text-muted mb-3 opacity-50"></i>
+          <h4 class="fw-bold mb-2">You haven't listed any spaces yet</h4>
+          <p class="text-muted small mb-4">
+            Welcome travelers from around the globe. Upload photos, set your pricing, and publish your first listing.
           </p>
-          <a href="/listings/new" class="btn btn-danger btn-lg add-btn text-white px-4 py-2 fw-bold shadow-sm">
-            <i class="fa-solid fa-plus me-2"></i>Add Your First Listing
+          <a href="/listings/new" class="wl-btn wl-btn-primary wl-btn-lg add-btn text-white">
+            <i class="fa-solid fa-plus me-2"></i>Create First Listing
           </a>
         </div>
       </div>
@@ -54,55 +54,56 @@
       <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
         <% for (let listing of hostListings) { %>
           <div class="col">
-            <div class="card h-100 border shadow-sm rounded-4 overflow-hidden bg-white">
-              <!-- Listing Image & Category Badge -->
-              <div class="position-relative">
-                <img
-                  src="<%= (listing.image && listing.image.url) ? listing.image.url : '/images/default.jpg' %>"
-                  class="card-img-top object-fit-cover"
-                  style="height: 200px; border-radius: 1rem 1rem 0 0 !important;"
-                  alt="<%= listing.title %>"
-                />
+            <div class="card listing-card wl-listing-card h-100 bg-white">
+              <!-- Media -->
+              <div class="wl-card-media">
+                <a href="/listings/<%= listing._id %>" class="listing-link">
+                  <img
+                    src="<%= (listing.image && listing.image.url) ? listing.image.url : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' %>"
+                    class="card-img-top"
+                    alt="<%= listing.title %>"
+                  />
+                </a>
                 <% if (listing.category) { %>
-                  <span class="position-absolute top-0 start-0 m-2 badge bg-dark bg-opacity-75 px-2 py-1 small">
+                  <span class="wl-card-badge">
                     <%= listing.category %>
                   </span>
                 <% } %>
                 <% if (listing.isActive === false) { %>
-                  <span class="position-absolute top-0 end-0 m-2 badge bg-secondary px-2 py-1 small shadow-sm">
+                  <span class="position-absolute top-0 end-0 m-2 badge bg-secondary px-2 py-1 small shadow-xs">
                     <i class="fa-solid fa-box-archive me-1"></i>Archived
                   </span>
                 <% } %>
               </div>
 
-              <!-- Listing Card Body -->
-              <div class="card-body p-3 d-flex flex-column justify-content-between">
-                <div>
-                  <h5 class="fw-bold mb-1 text-truncate" title="<%= listing.title %>">
-                    <%= listing.title %>
-                  </h5>
-                  <p class="text-muted small mb-2 text-truncate">
-                    <i class="fa-solid fa-location-dot me-1 text-danger"></i>
-                    <%= listing.location %><% if (listing.country) { %>, <%= listing.country %><% } %>
-                  </p>
-                  <p class="mb-3">
-                    <span class="fs-5 fw-bold text-dark">&#8377;<%= (listing.price || 0).toLocaleString("en-IN") %></span>
-                    <span class="text-muted small"> / night</span>
-                  </p>
+              <!-- Body -->
+              <div class="wl-card-content">
+                <div class="wl-card-header-row">
+                  <h3 class="wl-card-title"><%= listing.title %></h3>
+                </div>
+                <div class="wl-card-location">
+                  <i class="fa-solid fa-location-dot me-1 small" style="color: var(--wl-secondary);"></i>
+                  <%= listing.location %><% if (listing.country) { %>, <%= listing.country %><% } %>
+                </div>
+                <div class="wl-card-pricing">
+                  <div>
+                    <span class="wl-card-rate">&#8377;<%= (listing.price || 0).toLocaleString("en-IN") %></span>
+                    <span class="wl-card-rate-period">/ night</span>
+                  </div>
                 </div>
 
-                <!-- Action Buttons: View, Edit, Delete (reusing existing routes) -->
-                <div class="d-flex gap-2 pt-3 border-top align-items-center">
-                  <a href="/listings/<%= listing._id %>" class="btn btn-sm btn-outline-dark flex-grow-1 fw-semibold">
-                    <i class="fa-regular fa-eye me-1"></i>View
+                <!-- Host Card Actions -->
+                <div class="d-flex gap-2 pt-3 mt-3 border-top align-items-center">
+                  <a href="/listings/<%= listing._id %>" class="wl-btn wl-btn-outline wl-btn-sm flex-grow-1">
+                    View
                   </a>
-                  <a href="/listings/<%= listing._id %>/edit" class="btn btn-sm btn-outline-primary fw-semibold">
-                    <i class="fa-solid fa-pen-to-square me-1"></i>Edit
+                  <a href="/listings/<%= listing._id %>/edit" class="wl-btn wl-btn-outline wl-btn-sm edit-btn">
+                    Edit
                   </a>
-                  <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline" data-confirm="Archive this listing? It will be hidden from public search, but all bookings, history, and reviews will be safely preserved.">
+                  <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline m-0" data-confirm="Archive this listing? It will be hidden from public search, but all bookings, history, and reviews will be safely preserved.">
                     <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
-                    <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold" title="Archive Listing">
-                      <i class="fa-solid fa-box-archive me-1"></i><%= listing.isActive === false ? 'Archived' : 'Archive' %>
+                    <button type="submit" class="wl-btn wl-btn-outline text-danger border-danger-subtle wl-btn-sm" title="Archive Listing">
+                      <i class="fa-solid fa-box-archive"></i>
                     </button>
                   </form>
                 </div>

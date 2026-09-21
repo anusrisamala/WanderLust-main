@@ -4,19 +4,19 @@
   <div class="col-12 col-md-8 col-lg-6">
     <!-- Back to Dashboard -->
     <div class="mb-3">
-      <a href="/dashboard" class="text-decoration-none text-muted small fw-medium">
+      <a href="/dashboard" class="wl-btn wl-btn-ghost wl-btn-sm">
         <i class="fa-solid fa-arrow-left me-1"></i>Back to Dashboard
       </a>
     </div>
 
-    <div class="card border shadow-sm rounded-4 p-4 p-md-5">
+    <div class="wl-form-card p-4 p-md-5">
       <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
-        <div class="stat-icon-wrapper bg-danger bg-opacity-10 text-danger p-3 rounded-circle" style="width: 52px; height: 52px;">
+        <div class="stat-icon-wrapper rounded-circle" style="width: 52px; height: 52px; background-color: var(--wl-primary-subtle); color: var(--wl-primary);">
           <i class="fa-solid fa-user-pen fa-lg"></i>
         </div>
         <div>
-          <h3 class="fw-bold mb-0">Edit Profile</h3>
-          <p class="text-muted small mb-0">Update your username and email address</p>
+          <h3 class="fw-bold mb-0 fs-4">Edit Profile</h3>
+          <p class="text-muted small mb-0">Update your username and contact email</p>
         </div>
       </div>
 
@@ -25,11 +25,11 @@
         <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
         <!-- Username Input -->
         <div class="mb-4">
-          <label for="username" class="form-label fw-bold small text-uppercase text-secondary">
+          <label for="username" class="form-label">
             Username <span class="text-danger">*</span>
           </label>
           <div class="input-group">
-            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-at"></i></span>
+            <span class="input-group-text bg-light text-muted border-end-0"><i class="fa-solid fa-at"></i></span>
             <input
               type="text"
               name="username"
@@ -50,11 +50,11 @@
 
         <!-- Email Input -->
         <div class="mb-4">
-          <label for="email" class="form-label fw-bold small text-uppercase text-secondary">
+          <label for="email" class="form-label">
             Email Address <span class="text-danger">*</span>
           </label>
           <div class="input-group">
-            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-envelope"></i></span>
+            <span class="input-group-text bg-light text-muted border-end-0"><i class="fa-solid fa-envelope"></i></span>
             <input
               type="email"
               name="email"
@@ -67,7 +67,7 @@
             <div class="invalid-feedback">Please enter a valid email address.</div>
           </div>
           <div class="form-text small text-muted mt-1">
-            Used for booking notifications and account communications.
+            Used for booking confirmations and host notifications.
           </div>
         </div>
 
@@ -90,10 +90,10 @@
 
         <!-- Action Buttons -->
         <div class="d-flex gap-2">
-          <button type="submit" class="btn add-btn text-white px-4 py-2 fw-semibold shadow-sm flex-fill">
+          <button type="submit" class="wl-btn wl-btn-primary add-btn flex-fill">
             <i class="fa-solid fa-check me-1"></i>Save Changes
           </button>
-          <a href="/dashboard" class="btn btn-outline-secondary px-4 py-2 fw-semibold">
+          <a href="/dashboard" class="wl-btn wl-btn-outline">
             Cancel
           </a>
         </div>

@@ -3,19 +3,19 @@
 <!-- 1. Header / Welcome Banner with Quick Actions -->
 <div class="row mt-4 mb-4">
   <div class="col-12">
-    <div class="card border-0 shadow-sm rounded-4 dashboard-welcome-card p-4">
+    <div class="card border rounded-3 shadow-xs dashboard-welcome-card p-4">
       <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
         <div class="d-flex align-items-center gap-3">
-          <div class="dashboard-avatar-circle">
-            <i class="fa-solid fa-crown fa-2xl text-danger"></i>
+          <div class="dashboard-avatar-circle" style="width: 52px; height: 52px; border-radius: var(--wl-r-pill); background-color: var(--wl-primary-subtle); color: var(--wl-primary); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700;">
+            <i class="fa-solid fa-hotel"></i>
           </div>
           <div>
             <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
-              <h2 class="fw-bold mb-0">
-                Welcome, <%= user.username ? user.username : "Host" %>! 👋
+              <h2 class="fw-bold mb-0 fs-3">
+                Host Portal — <%= user.username ? user.username : "Host" %>
               </h2>
-              <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 fw-semibold small">
-                Host Portal
+              <span class="badge bg-light text-secondary border px-2 py-1 small">
+                Verified Host
               </span>
             </div>
             <div class="d-flex flex-wrap align-items-center gap-2 text-muted small">
@@ -30,17 +30,17 @@
 
         <!-- Quick Actions -->
         <div class="d-flex gap-2 flex-wrap align-items-center">
-          <a href="/listings/new" class="btn btn-dark add-btn text-white px-3 py-2 fw-semibold shadow-sm">
+          <a href="/listings/new" class="wl-btn wl-btn-primary wl-btn-sm add-btn text-white shadow-xs">
             <i class="fa-solid fa-plus me-1"></i>Add Listing
           </a>
-          <a href="/host/listings" class="btn btn-outline-dark px-3 py-2 fw-semibold">
+          <a href="/host/listings" class="wl-btn wl-btn-outline wl-btn-sm">
             <i class="fa-solid fa-house-chimney me-1"></i>My Listings
           </a>
-          <a href="/host/bookings" class="btn btn-outline-dark px-3 py-2 fw-semibold">
+          <a href="/host/bookings" class="wl-btn wl-btn-outline wl-btn-sm">
             <i class="fa-solid fa-calendar-check me-1"></i>Bookings Received
           </a>
-          <a href="/dashboard" class="btn btn-outline-secondary px-3 py-2 fw-semibold">
-            <i class="fa-solid fa-user me-1"></i>User Dashboard
+          <a href="/dashboard" class="wl-btn wl-btn-outline wl-btn-sm">
+            <i class="fa-solid fa-user me-1"></i>Traveler Mode
           </a>
         </div>
       </div>

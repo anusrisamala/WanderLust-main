@@ -8,29 +8,31 @@
   const displayRefundAmount = toRupees(booking.refundAmount || booking.totalPrice);
 %>
 
-<div class="row mt-4 mb-5">
-  <div class="col-12 col-lg-8 offset-lg-2">
-    <!-- Breadcrumb / Back Link -->
+<div class="row justify-content-center mt-4 mb-5">
+  <div class="col-12 col-lg-8">
+    <!-- Top Bar -->
     <div class="mb-3 d-flex justify-content-between align-items-center">
-      <a href="/bookings/<%= booking._id %>" class="text-decoration-none text-muted small fw-semibold">
-        <i class="fa-solid fa-arrow-left me-1"></i>Back to Booking Confirmation
+      <a href="/bookings/<%= booking._id %>" class="wl-btn wl-btn-ghost wl-btn-sm">
+        <i class="fa-solid fa-arrow-left me-1"></i>Back to Booking Details
       </a>
-      <span class="badge bg-light text-secondary border small">
-        <i class="fa-solid fa-shield-halved me-1 text-success"></i>100% Secure Payment
+      <span class="badge bg-white text-secondary border shadow-xs px-2 py-1">
+        <i class="fa-solid fa-shield-halved me-1 text-success"></i>100% Encrypted Escrow
       </span>
     </div>
 
     <!-- Alert placeholder for AJAX error feedback -->
-    <div id="paymentAlert" class="alert d-none rounded-3 mb-3 shadow-sm" role="alert"></div>
+    <div id="paymentAlert" class="alert d-none rounded-3 mb-3 shadow-xs" role="alert"></div>
 
-    <div class="card border shadow-sm rounded-4 p-4 p-md-5 bg-white">
+    <div class="wl-form-card p-4 p-md-5">
       <!-- Checkout Header -->
       <div class="text-center mb-4 pb-3 border-bottom">
         <div class="mb-2">
-          <i class="fa-solid fa-credit-card text-danger fs-1"></i>
+          <span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 58px; height: 58px; background-color: var(--wl-primary-subtle); color: var(--wl-primary);">
+            <i class="fa-solid fa-credit-card fs-3"></i>
+          </span>
         </div>
-        <h2 class="fw-bold mb-1">Checkout &amp; Payment</h2>
-        <p class="text-muted mb-2">Review your reservation details and complete payment securely</p>
+        <h2 class="fw-bold mb-1 fs-3">Secure Checkout</h2>
+        <p class="text-muted small mb-3">Review your reservation details and complete payment securely</p>
 
         <!-- Payment Status Badge -->
         <% if (booking.status === "CANCELLED") { %>
@@ -90,7 +92,7 @@
               </div>
               <form method="POST" action="/bookings/<%= booking._id %>/refund" class="mt-2" data-confirm="Are you sure you want to request a full refund of ₹<%= displayTotalPrice.toLocaleString() %>?">
                 <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
-                <button type="submit" class="btn btn-sm btn-outline-warning text-dark fw-semibold">
+                <button type="submit" class="wl-btn wl-btn-outline text-dark fw-semibold wl-btn-sm">
                   <i class="fa-solid fa-rotate-left me-1"></i>Request Full Refund
                 </button>
               </form>
@@ -110,7 +112,7 @@
               <button
                 type="button"
                 id="retryPaymentBtn"
-                class="btn btn-sm btn-danger fw-semibold px-3 py-2"
+                class="wl-btn wl-btn-danger wl-btn-sm"
               >
                 <i class="fa-solid fa-rotate-right me-1"></i>Retry Payment
               </button>
@@ -144,126 +146,127 @@
       <% } %>
 
       <!-- Listing Information Card -->
-      <div class="card mb-4 border-0 bg-light rounded-3 p-3">
+      <div class="card mb-4 border rounded-3 bg-light p-3">
         <div class="row g-3 align-items-center">
           <% if (booking.listing && booking.listing.image && booking.listing.image.url) { %>
             <div class="col-12 col-sm-4">
               <img
                 src="<%= booking.listing.image.url %>"
                 class="img-fluid rounded-3 w-100 object-fit-cover"
-                style="height: 140px;"
+                style="height: 130px; object-fit: cover;"
                 alt="<%= booking.listing.title %>"
               />
             </div>
           <% } %>
           <div class="col-12 <%= (booking.listing && booking.listing.image && booking.listing.image.url) ? 'col-sm-8' : 'col-12' %>">
-            <small class="text-muted text-uppercase fw-semibold">Listing</small>
-            <h4 class="fw-bold mb-1"><%= booking.listing ? booking.listing.title : "Listing Unavailable" %></h4>
-            <p class="text-muted mb-2">
+            <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.75rem;">Listing</small>
+            <h4 class="fw-bold mb-1 fs-5"><%= booking.listing ? booking.listing.title : "Listing Unavailable" %></h4>
+            <p class="text-muted mb-2 small">
               <i class="fa-solid fa-location-dot me-1 text-danger"></i>
-              <strong>Location:</strong> <%= booking.listing ? booking.listing.location : "N/A" %><% if (booking.listing && booking.listing.country) { %>, <%= booking.listing.country %><% } %>
+              <span><%= booking.listing ? booking.listing.location : "N/A" %><% if (booking.listing && booking.listing.country) { %>, <%= booking.listing.country %><% } %></span>
             </p>
-            <p class="mb-0 fw-semibold">
-              <strong>Price per night:</strong> &#8377;<%= displayPricePerNight.toLocaleString("en-IN") %>
+            <p class="mb-0 small fw-semibold">
+              <span class="text-muted">Rate:</span> &#8377;<%= displayPricePerNight.toLocaleString("en-IN") %> / night
             </p>
           </div>
         </div>
       </div>
 
-      <!-- Reservation Details Table/Grid -->
-      <h5 class="fw-bold mb-3">Reservation Details</h5>
+      <!-- Reservation Matrix -->
+      <h5 class="fw-bold mb-3 fs-6 text-uppercase text-secondary">Reservation Details</h5>
       <div class="row g-3 mb-4 bg-light rounded-3 p-3 mx-0">
         <div class="col-6 col-md-3">
-          <small class="text-muted d-block">Check-in</small>
+          <small class="text-muted d-block small">Check-in</small>
           <span class="fw-bold fs-6"><%= new Date(booking.checkInDate || booking.checkIn).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) %></span>
           <% if (booking.checkInTime) { %>
             <small class="text-muted d-block"><i class="fa-regular fa-clock me-1"></i><%= booking.checkInTime %></small>
           <% } %>
         </div>
         <div class="col-6 col-md-3">
-          <small class="text-muted d-block">Check-out</small>
+          <small class="text-muted d-block small">Check-out</small>
           <span class="fw-bold fs-6"><%= new Date(booking.checkOutDate || booking.checkOut).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) %></span>
           <% if (booking.checkOutTime) { %>
             <small class="text-muted d-block"><i class="fa-regular fa-clock me-1"></i><%= booking.checkOutTime %></small>
           <% } %>
         </div>
         <div class="col-6 col-md-3">
-          <small class="text-muted d-block">Guests</small>
+          <small class="text-muted d-block small">Guests</small>
           <span class="fw-bold fs-6"><%= booking.guests %> <%= booking.guests === 1 ? 'guest' : 'guests' %></span>
         </div>
         <div class="col-6 col-md-3">
-          <small class="text-muted d-block">Number of nights</small>
+          <small class="text-muted d-block small">Duration</small>
           <span class="fw-bold fs-6"><%= booking.numberOfNights || nights %> <%= (booking.numberOfNights || nights) === 1 ? 'night' : 'nights' %></span>
         </div>
       </div>
 
       <!-- Price Breakdown -->
       <div class="border-top pt-3 mb-4">
-        <h5 class="fw-bold mb-3">Price Breakdown</h5>
-        <div class="d-flex justify-content-between text-muted mb-2">
-          <span>Price per night:</span>
+        <h5 class="fw-bold mb-3 fs-6 text-uppercase text-secondary">Price Breakdown</h5>
+        <div class="d-flex justify-content-between text-muted mb-2 small">
+          <span>Base Nightly Rate:</span>
           <span>&#8377;<%= displayPricePerNight.toLocaleString("en-IN") %></span>
         </div>
-        <div class="d-flex justify-content-between text-muted mb-2">
-          <span>Base price (<%= displayPricePerNight.toLocaleString("en-IN") %> &times; <%= booking.numberOfNights || nights %> <%= (booking.numberOfNights || nights) === 1 ? 'night' : 'nights' %>):</span>
+        <div class="d-flex justify-content-between text-muted mb-2 small">
+          <span>Base Subtotal (<%= displayPricePerNight.toLocaleString("en-IN") %> &times; <%= booking.numberOfNights || nights %> <%= (booking.numberOfNights || nights) === 1 ? 'night' : 'nights' %>):</span>
           <span>&#8377;<%= displayBasePrice.toLocaleString("en-IN") %></span>
         </div>
-        <div class="d-flex justify-content-between text-muted mb-2">
+        <div class="d-flex justify-content-between text-muted mb-2 small">
           <span>GST / Tax (<%= booking.taxRate != null ? booking.taxRate : 5 %>%):</span>
           <span>&#8377;<%= displayTaxAmount.toLocaleString("en-IN") %></span>
         </div>
         <hr class="my-2 text-muted">
-        <div class="d-flex justify-content-between fw-bold fs-5 align-items-center">
+        <div class="d-flex justify-content-between fw-bold fs-5 align-items-baseline">
           <span>Total Amount:</span>
-          <span class="text-danger fs-4">&#8377;<%= displayTotalPrice.toLocaleString("en-IN") %></span>
+          <span style="color: var(--wl-primary);" class="fs-4">&#8377;<%= displayTotalPrice.toLocaleString("en-IN") %></span>
         </div>
       </div>
 
-      <!-- Payment Action / Button Section -->
+      <!-- Payment Action Section -->
       <% if (booking.status !== "CANCELLED" && (booking.paymentStatus === "PENDING" || !booking.paymentStatus)) { %>
-        <div class="card border-0 bg-light rounded-4 p-4 text-center mb-4">
+        <div class="card border rounded-3 bg-light p-4 text-center mb-4">
           <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
             <i class="fa-solid fa-shield-halved text-success"></i>
             <% if (typeof isSimulator !== 'undefined' && isSimulator) { %>
-              <span class="fw-semibold small text-muted">Local Payment Simulator Mode</span>
+              <span class="fw-semibold small text-muted">Local Payment Simulator Active</span>
             <% } else { %>
-              <span class="fw-semibold small text-muted">Secure Payment Checkout</span>
+              <span class="fw-semibold small text-muted">Razorpay Secure Checkout</span>
             <% } %>
           </div>
           <p class="text-muted small mb-3">
-            Click below to proceed to payment for <strong>&#8377;<%= displayTotalPrice.toLocaleString("en-IN") %></strong>.
+            Click below to complete escrow payment for <strong>&#8377;<%= displayTotalPrice.toLocaleString("en-IN") %></strong>.
           </p>
 
           <button
             type="button"
             id="payNowBtn"
-            class="btn btn-danger add-btn btn-lg py-3 px-5 fw-bold shadow-sm"
+            class="wl-btn wl-btn-accent btn-danger add-btn btn-lg py-3 px-5 fw-bold shadow-sm"
           >
             <i class="fa-solid fa-lock me-2"></i>Pay Now &#8377;<%= displayTotalPrice.toLocaleString("en-IN") %>
           </button>
           <% if (typeof isSimulator !== 'undefined' && isSimulator) { %>
-            <small class="text-muted mt-2 d-block"><i class="fa-solid fa-flask text-danger me-1"></i>Running with offline Local Payment Simulator (no external gateway calls)</small>
+            <small class="text-muted mt-2 d-block"><i class="fa-solid fa-flask text-secondary me-1"></i>Local Simulator active (no external gateway calls)</small>
           <% } else { %>
-            <small class="text-muted mt-2 d-block">Powered by Razorpay Payments (UPI, Cards, Netbanking, Wallets)</small>
+            <small class="text-muted mt-2 d-block">Supports UPI, NetBanking, Cards, and Wallets</small>
           <% } %>
         </div>
       <% } %>
 
       <!-- Navigation & Auxiliary Action Buttons -->
-      <div class="d-flex gap-3 mt-2 flex-wrap align-items-center border-top pt-3">
-        <a href="/bookings/<%= booking._id %>" class="btn btn-outline-dark px-4 py-2">
-          <i class="fa-regular fa-file-lines me-1"></i>View Booking Details
+      <div class="d-flex gap-2 mt-2 flex-wrap align-items-center border-top pt-3">
+        <a href="/bookings/<%= booking._id %>" class="wl-btn wl-btn-outline wl-btn-sm">
+          <i class="fa-regular fa-file-lines me-1"></i>View Details
         </a>
-        <a href="/bookings" class="btn btn-outline-secondary px-4 py-2">
+        <a href="/bookings" class="wl-btn wl-btn-outline wl-btn-sm">
           <i class="fa-solid fa-calendar-days me-1"></i>My Bookings
         </a>
-        <a href="/dashboard" class="btn btn-outline-secondary px-4 py-2">
+        <a href="/dashboard" class="wl-btn wl-btn-outline wl-btn-sm">
           <i class="fa-solid fa-user me-1"></i>User Dashboard
         </a>
       </div>
     </div>
   </div>
 </div>
+
 
 <!-- Razorpay Test Mode Simulator Modal -->
 <div class="modal fade" id="simulatedPaymentModal" tabindex="-1" aria-labelledby="simModalTitle" aria-hidden="true">

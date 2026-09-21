@@ -1,51 +1,72 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row mt-4 mb-2">
-  <div class="col-12">
-    <h3 class="fw-bold"><i class="fa-solid fa-heart text-danger me-2"></i>My Wishlist ❤️</h3>
+<div class="row mt-4 mb-3">
+  <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+    <div>
+      <h2 class="fw-bold mb-1">
+        <i class="fa-solid fa-heart text-danger me-2"></i>Saved Stays &amp; Wishlist
+      </h2>
+      <p class="text-muted small mb-0">Your personally curated collection of properties for upcoming getaways.</p>
+    </div>
+    <div>
+      <a href="/listings" class="wl-btn wl-btn-outline wl-btn-sm">
+        <i class="fa-solid fa-compass me-1"></i>Discover More Stays
+      </a>
+    </div>
   </div>
 </div>
 
 <% if (!wishlist || wishlist.length === 0) { %>
   <div class="row my-5">
     <div class="col-12 text-center">
-      <div class="empty-wishlist-container">
-        <i class="fa-solid fa-heart empty-wishlist-icon"></i>
-        <h4 class="fw-bold mb-2">Your wishlist is empty ❤️</h4>
-        <p class="text-muted mb-4">Explore listings and save your favorite stays for future trips.</p>
-        <a href="/listings" class="btn btn-dark add-btn px-4 py-2">Explore Listings</a>
+      <div class="wl-form-card py-5 mx-auto" style="max-width: 500px;">
+        <div class="mb-3">
+          <i class="fa-regular fa-heart fa-3x text-muted opacity-50"></i>
+        </div>
+        <h4 class="fw-bold mb-2">Your wishlist is empty</h4>
+        <p class="text-muted small mb-4">Click the heart icon on any property to save it to your personal shortlist.</p>
+        <a href="/listings" class="wl-btn wl-btn-primary">Explore Stays</a>
       </div>
     </div>
   </div>
 <% } else { %>
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 g-4 mt-1 mb-5">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-1 mb-5">
     <% for (let listing of wishlist) { %>
       <div class="col">
-        <div class="card listing-card wishlist-card h-100 position-relative shadow-sm">
-          <!-- Wishlist remove button -->
-          <form method="POST" action="/listings/<%= listing._id %>/wishlist" class="m-0">
-            <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
-            <button type="submit" class="wishlist-floating-btn" title="Remove from wishlist">
-              <i class="fa-solid fa-heart wishlist-heart-filled"></i>
-            </button>
-          </form>
+        <div class="card listing-card wl-listing-card h-100">
+          <div class="wl-card-media">
+            <a href="/listings/<%= listing._id %>" class="listing-link">
+              <img
+                src="<%= (listing.image && listing.image.url) ? listing.image.url : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' %>"
+                class="card-img-top"
+                alt="<%= listing.title %>"
+              />
+            </a>
 
-          <a href="/listings/<%= listing._id %>" class="listing-link">
-            <img
-              src="<%= (listing.image && listing.image.url) ? listing.image.url : '' %>"
-              class="card-img-top"
-              alt="<%= listing.title %>"
-            />
-            <div class="card-body p-3">
-              <p class="card-text mb-1">
-                <b class="fs-6"><%= listing.title %></b>
-              </p>
-              <p class="card-text text-muted small mb-2">
-                <i class="fa-solid fa-location-dot me-1"></i><%= listing.location %>, <%= listing.country %>
-              </p>
-              <p class="card-text mb-0">
-                <span class="fw-bold">&#8377;<%= listing.price ? listing.price.toLocaleString("en-IN") : "0" %></span> <span class="text-muted">/ night</span>
-              </p>
+            <!-- Wishlist remove button -->
+            <form method="POST" action="/listings/<%= listing._id %>/wishlist" class="m-0">
+              <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+              <button type="submit" class="wishlist-floating-btn" title="Remove from wishlist" aria-label="Remove from wishlist">
+                <i class="fa-solid fa-heart wishlist-heart-filled"></i>
+              </button>
+            </form>
+          </div>
+
+          <a href="/listings/<%= listing._id %>" class="listing-link text-decoration-none">
+            <div class="wl-card-content">
+              <div class="wl-card-header-row">
+                <h3 class="wl-card-title"><%= listing.title %></h3>
+              </div>
+              <div class="wl-card-location">
+                <i class="fa-solid fa-location-dot me-1 small" style="color: var(--wl-secondary);"></i>
+                <span><%= listing.location %>, <%= listing.country %></span>
+              </div>
+              <div class="wl-card-pricing">
+                <div>
+                  <span class="wl-card-rate">&#8377;<%= listing.price ? listing.price.toLocaleString("en-IN") : "0" %></span>
+                  <span class="wl-card-rate-period">/ night</span>
+                </div>
+              </div>
             </div>
           </a>
         </div>
@@ -53,4 +74,3 @@
     <% } %>
   </div>
 <% } %>
-

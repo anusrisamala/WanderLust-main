@@ -12,20 +12,20 @@
   };
 %>
 
-<div class="row mt-4 mb-3">
+<div class="row mt-4 mb-4">
   <div class="col-12">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
       <div>
-        <h3 class="fw-bold mb-1">
-          <i class="fa-solid fa-calendar-days text-danger me-2"></i>My Bookings
-        </h3>
+        <h2 class="fw-bold mb-1">
+          <i class="fa-solid fa-calendar-check me-2" style="color: var(--wl-secondary);"></i>My Trips &amp; Bookings
+        </h2>
         <p class="text-muted small mb-0">
-          Track, manage, and review all your upcoming and past travel reservations.
+          Manage reservations, payment receipts, and travel schedules across all your stays.
         </p>
       </div>
       <div>
-        <a href="/listings" class="btn btn-outline-dark rounded-pill px-3 py-2 fw-semibold small">
-          <i class="fa-solid fa-magnifying-glass me-1"></i>Explore More Places
+        <a href="/listings" class="wl-btn wl-btn-outline wl-btn-sm">
+          <i class="fa-solid fa-compass me-1"></i>Explore New Stays
         </a>
       </div>
     </div>
@@ -33,52 +33,52 @@
 </div>
 
 <!-- Filter Pills / Tabs -->
-<div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
-  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+<div class="card border rounded-3 p-3 mb-4 bg-white shadow-xs">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
     <div class="d-flex flex-wrap gap-2 align-items-center">
       <span class="fw-bold small text-uppercase text-secondary me-1">
-        <i class="fa-solid fa-filter me-1 text-danger"></i>Filter By:
+        <i class="fa-solid fa-filter me-1" style="color: var(--wl-secondary);"></i>Status:
       </span>
       <a
         href="/bookings"
-        class="btn btn-sm <%= activeStatus === 'ALL' ? 'btn-dark fw-bold' : 'btn-outline-secondary' %> rounded-pill px-3"
+        class="wl-btn wl-btn-sm <%= activeStatus === 'ALL' ? 'wl-btn-primary' : 'wl-btn-outline' %>"
       >
-        All <span class="badge <%= activeStatus === 'ALL' ? 'bg-light text-dark' : 'bg-secondary text-white' %> ms-1"><%= counts.ALL %></span>
+        All <span class="badge <%= activeStatus === 'ALL' ? 'bg-white text-dark' : 'bg-secondary text-white' %> ms-1"><%= counts.ALL %></span>
       </a>
       <a
         href="/bookings?status=CONFIRMED"
-        class="btn btn-sm <%= activeStatus === 'CONFIRMED' ? 'btn-success text-white fw-bold' : 'btn-outline-secondary' %> rounded-pill px-3"
+        class="wl-btn wl-btn-sm <%= activeStatus === 'CONFIRMED' ? 'btn-success text-white' : 'wl-btn-outline' %>"
       >
         <i class="fa-solid fa-circle-check me-1"></i>Confirmed
-        <span class="badge <%= activeStatus === 'CONFIRMED' ? 'bg-light text-dark' : 'bg-secondary text-white' %> ms-1"><%= counts.CONFIRMED %></span>
+        <span class="badge <%= activeStatus === 'CONFIRMED' ? 'bg-white text-dark' : 'bg-secondary text-white' %> ms-1"><%= counts.CONFIRMED %></span>
       </a>
       <a
         href="/bookings?status=PENDING"
-        class="btn btn-sm <%= activeStatus === 'PENDING' ? 'btn-warning text-dark fw-bold' : 'btn-outline-secondary' %> rounded-pill px-3"
+        class="wl-btn wl-btn-sm <%= activeStatus === 'PENDING' ? 'btn-warning text-dark' : 'wl-btn-outline' %>"
       >
         <i class="fa-regular fa-clock me-1"></i>Pending
         <span class="badge <%= activeStatus === 'PENDING' ? 'bg-dark text-white' : 'bg-secondary text-white' %> ms-1"><%= counts.PENDING %></span>
       </a>
       <a
         href="/bookings?status=COMPLETED"
-        class="btn btn-sm <%= activeStatus === 'COMPLETED' ? 'btn-info text-dark fw-bold' : 'btn-outline-secondary' %> rounded-pill px-3"
+        class="wl-btn wl-btn-sm <%= activeStatus === 'COMPLETED' ? 'btn-info text-white' : 'wl-btn-outline' %>"
       >
         <i class="fa-solid fa-flag-checkered me-1"></i>Completed
         <span class="badge <%= activeStatus === 'COMPLETED' ? 'bg-dark text-white' : 'bg-secondary text-white' %> ms-1"><%= counts.COMPLETED %></span>
       </a>
       <a
         href="/bookings?status=REFUNDED"
-        class="btn btn-sm <%= activeStatus === 'REFUNDED' ? 'btn-secondary text-white fw-bold' : 'btn-outline-secondary' %> rounded-pill px-3"
+        class="wl-btn wl-btn-sm <%= activeStatus === 'REFUNDED' ? 'btn-secondary text-white' : 'wl-btn-outline' %>"
       >
         <i class="fa-solid fa-rotate-left me-1"></i>Refunded
-        <span class="badge <%= activeStatus === 'REFUNDED' ? 'bg-light text-dark' : 'bg-dark text-white' %> ms-1"><%= counts.REFUNDED %></span>
+        <span class="badge <%= activeStatus === 'REFUNDED' ? 'bg-white text-dark' : 'bg-dark text-white' %> ms-1"><%= counts.REFUNDED %></span>
       </a>
       <a
         href="/bookings?status=CANCELLED"
-        class="btn btn-sm <%= activeStatus === 'CANCELLED' ? 'btn-danger text-white fw-bold' : 'btn-outline-secondary' %> rounded-pill px-3"
+        class="wl-btn wl-btn-sm <%= activeStatus === 'CANCELLED' ? 'btn-danger text-white' : 'wl-btn-outline' %>"
       >
         <i class="fa-solid fa-ban me-1"></i>Cancelled
-        <span class="badge <%= activeStatus === 'CANCELLED' ? 'bg-light text-dark' : 'bg-secondary text-white' %> ms-1"><%= counts.CANCELLED %></span>
+        <span class="badge <%= activeStatus === 'CANCELLED' ? 'bg-white text-dark' : 'bg-secondary text-white' %> ms-1"><%= counts.CANCELLED %></span>
       </a>
     </div>
     <div class="text-muted small">
@@ -90,22 +90,24 @@
 <% if (!bookings || bookings.length === 0) { %>
   <div class="row my-5">
     <div class="col-12 text-center">
-      <div class="empty-wishlist-container p-5 border rounded-4 bg-white shadow-sm">
-        <i class="fa-regular fa-calendar-xmark fa-4x text-muted mb-3 opacity-50"></i>
+      <div class="wl-form-card py-5 mx-auto" style="max-width: 540px;">
+        <div class="mb-3">
+          <i class="fa-regular fa-calendar-xmark fa-3x" style="color: var(--wl-secondary);"></i>
+        </div>
         <h4 class="fw-bold mb-2">No <%= activeStatus !== 'ALL' ? activeStatus.toLowerCase() + ' ' : '' %>bookings found</h4>
-        <p class="text-muted mb-4" style="max-width: 480px; margin: 0 auto;">
+        <p class="text-muted mb-4 small" style="max-width: 440px; margin: 0 auto;">
           <% if (activeStatus !== 'ALL') { %>
             You do not currently have any bookings with status <strong><%= activeStatus %></strong>.
           <% } else { %>
-            When you book a stay, your reservations and confirmation details will appear here.
+            You have not booked any stays yet. Explore our curated collections to start planning your next journey.
           <% } %>
         </p>
         <% if (activeStatus !== 'ALL') { %>
-          <a href="/bookings" class="btn btn-outline-dark px-4 py-2 rounded-pill fw-semibold">
+          <a href="/bookings" class="wl-btn wl-btn-outline">
             <i class="fa-solid fa-rotate-left me-1"></i>View All Bookings
           </a>
         <% } else { %>
-          <a href="/listings" class="btn btn-dark add-btn px-4 py-2 rounded-pill fw-semibold">
+          <a href="/listings" class="wl-btn wl-btn-primary">
             <i class="fa-solid fa-compass me-1"></i>Explore Listings
           </a>
         <% } %>
@@ -116,68 +118,67 @@
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
     <% for (let booking of bookings) { %>
       <div class="col">
-        <div class="card h-100 border shadow-sm rounded-4 overflow-hidden bg-white">
-          <!-- Listing Image -->
+        <div class="card h-100 border rounded-3 overflow-hidden bg-white shadow-xs wl-booking-card">
+          <!-- Listing Image & Status Badges -->
           <div class="position-relative">
             <img
-              src="<%= (booking.listing && booking.listing.image && booking.listing.image.url) ? booking.listing.image.url : '/images/default.jpg' %>"
+              src="<%= (booking.listing && booking.listing.image && booking.listing.image.url) ? booking.listing.image.url : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' %>"
               class="card-img-top object-fit-cover"
-              style="height: 200px; border-radius: 1rem 1rem 0 0 !important;"
+              style="height: 190px; width: 100%; object-fit: cover;"
               alt="<%= booking.listing ? booking.listing.title : 'Listing' %>"
             />
-            <!-- Status Badges Overlay -->
-            <div class="position-absolute top-0 end-0 m-3 d-flex flex-column align-items-end gap-1">
+            <div class="position-absolute top-0 end-0 m-2 d-flex flex-column align-items-end gap-1">
               <!-- Booking Status Badge -->
               <% if (booking.status === "CONFIRMED") { %>
-                <span class="badge bg-success text-white px-3 py-2 rounded-pill shadow-sm fw-semibold">
+                <span class="badge bg-success text-white px-2 py-1 rounded-pill small fw-semibold">
                   <i class="fa-solid fa-circle-check me-1"></i>Confirmed
                 </span>
               <% } else if (booking.status === "AWAITING_HOST_APPROVAL") { %>
-                <span class="badge bg-primary text-white px-3 py-2 rounded-pill shadow-sm fw-semibold">
-                  <i class="fa-solid fa-clock-rotate-left me-1"></i>Awaiting Approval
+                <span class="badge bg-primary text-white px-2 py-1 rounded-pill small fw-semibold">
+                  <i class="fa-solid fa-clock-rotate-left me-1"></i>Awaiting Host
                 </span>
               <% } else if (booking.status === "PENDING_PAYMENT" || booking.status === "PENDING") { %>
-                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm fw-semibold">
+                <span class="badge bg-warning text-dark px-2 py-1 rounded-pill small fw-semibold">
                   <i class="fa-regular fa-clock me-1"></i>Awaiting Payment
                 </span>
               <% } else if (booking.status === "COMPLETED") { %>
-                <span class="badge bg-info text-dark px-3 py-2 rounded-pill shadow-sm fw-semibold">
+                <span class="badge bg-info text-dark px-2 py-1 rounded-pill small fw-semibold">
                   <i class="fa-solid fa-flag-checkered me-1"></i>Completed
                 </span>
               <% } else if (booking.status === "CANCELLED") { %>
-                <span class="badge bg-danger text-white px-3 py-2 rounded-pill shadow-sm fw-semibold">
+                <span class="badge bg-danger text-white px-2 py-1 rounded-pill small fw-semibold">
                   <i class="fa-solid fa-ban me-1"></i>Cancelled
                 </span>
               <% } else { %>
-                <span class="badge bg-secondary text-white px-3 py-2 rounded-pill shadow-sm fw-semibold">
+                <span class="badge bg-secondary text-white px-2 py-1 rounded-pill small fw-semibold">
                   <%= booking.status %>
                 </span>
               <% } %>
 
               <!-- Payment Status Badge -->
               <% if (booking.paymentStatus === "PAID") { %>
-                <span class="badge bg-success text-white px-2 py-1 rounded-pill shadow-sm small fw-medium">
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill small" style="font-size: 0.72rem;">
                   <i class="fa-solid fa-receipt me-1"></i>Paid
                 </span>
               <% } else if (booking.paymentStatus === "REFUNDED") { %>
-                <span class="badge bg-secondary text-white px-2 py-1 rounded-pill shadow-sm small fw-medium">
+                <span class="badge bg-secondary-subtle text-secondary border px-2 py-1 rounded-pill small" style="font-size: 0.72rem;">
                   <i class="fa-solid fa-rotate-left me-1"></i>Refunded
                 </span>
               <% } else if (booking.paymentStatus === "FAILED") { %>
-                <span class="badge bg-danger text-white px-2 py-1 rounded-pill shadow-sm small fw-medium">
-                  <i class="fa-solid fa-circle-xmark me-1"></i>Payment Failed
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill small" style="font-size: 0.72rem;">
+                  <i class="fa-solid fa-circle-xmark me-1"></i>Failed
                 </span>
               <% } else if (booking.status !== "CANCELLED") { %>
-                <span class="badge bg-warning text-dark px-2 py-1 rounded-pill shadow-sm small fw-medium">
+                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill small" style="font-size: 0.72rem;">
                   <i class="fa-solid fa-hourglass-half me-1"></i>Unpaid
                 </span>
               <% } %>
             </div>
           </div>
 
-          <div class="card-body p-4 d-flex flex-column justify-content-between">
+          <div class="card-body p-3 d-flex flex-column justify-content-between">
             <div>
-              <h5 class="card-title fw-bold mb-1">
+              <h5 class="card-title fw-bold mb-1 fs-6">
                 <%= booking.listing ? booking.listing.title : "Listing Unavailable" %>
               </h5>
               <p class="text-muted small mb-3">
@@ -209,7 +210,7 @@
                   const displayTotalPrice = toRupees(booking.totalPrice);
                 %>
                 <div class="d-flex justify-content-between mb-1">
-                  <span class="text-muted">Base Price:</span>
+                  <span class="text-muted">Base Rate:</span>
                   <span class="fw-semibold">&#8377;<%= displayBasePrice.toLocaleString("en-IN") %></span>
                 </div>
                 <div class="d-flex justify-content-between mb-1">
@@ -217,36 +218,36 @@
                   <span class="fw-semibold">&#8377;<%= displayTaxAmount.toLocaleString("en-IN") %></span>
                 </div>
                 <div class="d-flex justify-content-between border-top pt-1 mt-1">
-                  <span class="text-muted">Booked on:</span>
+                  <span class="text-muted">Booked:</span>
                   <span class="text-muted"><%= new Date(booking.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) %></span>
                 </div>
               </div>
 
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted small">Total Price:</span>
-                <span class="fs-5 fw-bold text-danger">&#8377;<%= displayTotalPrice.toLocaleString("en-IN") %></span>
+                <span class="text-muted small">Total with taxes:</span>
+                <span class="fs-5 fw-bold" style="color: var(--wl-primary);">&#8377;<%= displayTotalPrice.toLocaleString("en-IN") %></span>
               </div>
             </div>
 
-            <!-- Card Footer Action Buttons -->
+            <!-- Card Action Buttons -->
             <div class="d-flex gap-2 flex-wrap align-items-center pt-2 border-top">
-              <a href="/bookings/<%= booking._id %>" class="btn btn-outline-dark flex-grow-1 py-2 px-3 fw-semibold rounded-pill">
-                <i class="fa-solid fa-circle-info me-1"></i>View Details
+              <a href="/bookings/<%= booking._id %>" class="wl-btn wl-btn-outline wl-btn-sm flex-grow-1">
+                <i class="fa-solid fa-file-invoice me-1"></i>Details &amp; Receipt
               </a>
 
               <% if (booking.status !== "CANCELLED" && (booking.paymentStatus === "PENDING" || !booking.paymentStatus)) { %>
-                <a href="/bookings/<%= booking._id %>/payment" class="btn btn-danger add-btn px-3 py-2 fw-semibold text-white rounded-pill shadow-sm">
+                <a href="/bookings/<%= booking._id %>/payment" class="wl-btn wl-btn-accent wl-btn-sm add-btn text-white">
                   <i class="fa-solid fa-credit-card me-1"></i>Pay Now
                 </a>
               <% } else if (booking.paymentStatus === "FAILED" && booking.status !== "CANCELLED") { %>
-                <a href="/bookings/<%= booking._id %>/payment" class="btn btn-outline-danger px-3 py-2 fw-semibold rounded-pill">
+                <a href="/bookings/<%= booking._id %>/payment" class="wl-btn wl-btn-outline text-danger border-danger-subtle wl-btn-sm">
                   <i class="fa-solid fa-rotate-right me-1"></i>Retry Payment
                 </a>
               <% } %>
 
               <% if (booking.status === "COMPLETED" && booking.listing) { %>
-                <a href="/listings/<%= booking.listing._id || booking.listing %>#reviews" class="btn btn-outline-success py-2 px-3 fw-semibold rounded-pill" title="Review Stay">
-                  <i class="fa-solid fa-star me-1 text-warning"></i>Review Stay
+                <a href="/listings/<%= booking.listing._id || booking.listing %>#reviews" class="wl-btn wl-btn-outline wl-btn-sm" title="Review Stay">
+                  <i class="fa-solid fa-star me-1 text-warning"></i>Review
                 </a>
               <% } %>
 
@@ -254,14 +255,14 @@
                 <% if (booking.paymentStatus === "PAID") { %>
                   <form method="POST" action="/bookings/<%= booking._id %>/cancel" class="m-0" data-confirm="Are you sure you want to cancel this booking? A full refund of &#8377;<%= displayTotalPrice.toLocaleString('en-IN') %> will be automatically processed.">
                     <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
-                    <button type="submit" class="btn btn-outline-danger py-2 px-3 fw-semibold rounded-pill" title="Cancel Booking & Refund">
-                      <i class="fa-solid fa-ban me-1"></i>Cancel & Refund
+                    <button type="submit" class="wl-btn wl-btn-outline text-danger border-danger-subtle wl-btn-sm" title="Cancel Booking & Refund">
+                      <i class="fa-solid fa-ban me-1"></i>Cancel &amp; Refund
                     </button>
                   </form>
                 <% } else { %>
                   <form method="POST" action="/bookings/<%= booking._id %>/cancel" class="m-0" data-confirm="Are you sure you want to cancel this booking?">
                     <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
-                    <button type="submit" class="btn btn-outline-danger py-2 px-3 fw-semibold rounded-pill" title="Cancel Booking">
+                    <button type="submit" class="wl-btn wl-btn-outline text-danger border-danger-subtle wl-btn-sm" title="Cancel Booking">
                       <i class="fa-solid fa-ban me-1"></i>Cancel
                     </button>
                   </form>

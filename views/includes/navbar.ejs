@@ -1,74 +1,108 @@
-<style
->
-  .search-btn{
-    background-color: #fe424d;
-    color: #fff;
-    border-radius: 25px;
-    padding: 0 1rem 0 1rem;
-  }
+<nav class="navbar navbar-expand-lg wl-navbar border-bottom sticky-top">
+  <div class="container-fluid px-lg-4">
+    <!-- Brand Mark -->
+    <a class="navbar-brand wl-brand" href="/listings">
+      <span class="wl-brand-icon"><i class="fa-solid fa-compass"></i></span>
+      <span class="wl-brand-name">Wander<span>Lust</span></span>
+    </a>
 
-  .search-btn:hover{
-    background-color: #fe424d;
-    color: #fff;
-  }
-
-  .search-btn i{
-    display: inline;
-    margin-right: 0.5rem;
-  }
-
-  .search-inp{
-    border-radius: 25px;
-    padding: 0 3rem 0.5rem 3rem;
-    font-size: 0.8rem;
-  }
-
-</style>
-
-
-
-<nav class="navbar navbar-expand-md  bg-body-light border-bottom sticky-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
-      <span class="navbar-toggler-icon"></span>
+    <!-- Mobile Toggler -->
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#wlNavbarMain" aria-controls="wlNavbarMain" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fa-solid fa-bars text-dark fs-5"></i>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
 
-        <a class="nav-link" href="/listings">Explore</a>
+    <!-- Collapsible Menu -->
+    <div class="collapse navbar-collapse" id="wlNavbarMain">
+      <!-- Left Link -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="/listings"><i class="fa-solid fa-compass me-1"></i> Explore Stays</a>
+        </li>
+      </ul>
 
-      </div>
-      <div class="navbar-nav ms-auto">
-        <form class="d-flex" role="search" action="/listings/search" method="GET">
+      <!-- Center Search Capsule -->
+      <div class="d-flex justify-content-center my-2 my-lg-0 mx-auto">
+        <form class="wl-search-capsule" role="search" action="/listings/search" method="GET">
           <% if (typeof category !== 'undefined' && category) { %>
             <input type="hidden" name="category" value="<%= category %>">
           <% } %>
-          <input class="form-control me-2 search-inp" type="search" name="q" placeholder="Search your next destinaton" value="<%= typeof searchQuery !== 'undefined' && searchQuery ? searchQuery : '' %>">
-          <button class="btn search-btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+          <input 
+            class="form-control wl-search-input search-inp" 
+            type="search" 
+            name="q" 
+            placeholder="Search destinations, cities, or stays..." 
+            value="<%= typeof searchQuery !== 'undefined' && searchQuery ? searchQuery : '' %>"
+            autocomplete="off"
+          >
+          <button class="wl-search-btn search-btn" type="submit" aria-label="Search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
         </form>
       </div>
-      <div class="navbar-nav ms-auto">
+
+      <!-- Right Nav / User Menu -->
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-1">
         <% const currentUser = (typeof currUser !== "undefined") ? currUser : null; %>
+        
         <% if(!currentUser){ %>
-          <a class="nav-link" href="/listings/new">Airbnb your home</a>
-          <a class="nav-link active" href="/signup"><b>SignUp</b></a>
-          <a class="nav-link" href="/login"><b>LogIn</b></a>
+          <li class="nav-item">
+            <a class="nav-link" href="/listings/new"><i class="fa-solid fa-plus-circle me-1"></i> List Your Property</a>
+          </li>
+          <li class="nav-item ms-lg-2">
+            <a class="nav-link fw-semibold" href="/login">Sign In</a>
+          </li>
+          <li class="nav-item">
+            <a class="wl-btn wl-btn-primary wl-btn-sm ms-lg-2" href="/signup">Get Started</a>
+          </li>
         <% } %>
+
         <% if(currentUser){ %>
-          <a class="nav-link" href="/dashboard"><i class="fa-solid fa-gauge-high me-1"></i>Dashboard</a>
           <% if (currentUser.role === "USER") { %>
-            <a class="nav-link" href="/become-host"><i class="fa-solid fa-house-chimney-user me-1"></i>Become a Host</a>
+            <li class="nav-item">
+              <a class="nav-link" href="/become-host"><i class="fa-solid fa-house-chimney-user me-1 text-secondary"></i> Become a Host</a>
+            </li>
           <% } else if (currentUser.role === "HOST") { %>
-            <a class="nav-link" href="/listings/new"><i class="fa-solid fa-plus me-1"></i>Add Listing</a>
-            <a class="nav-link" href="/host/dashboard"><i class="fa-solid fa-hotel me-1"></i>Host Dashboard</a>
-            <a class="nav-link" href="/host/listings"><i class="fa-solid fa-house-user me-1"></i>My Listings</a>
+            <li class="nav-item">
+              <a class="nav-link" href="/listings/new"><i class="fa-solid fa-plus me-1 text-secondary"></i> Add Listing</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/host/dashboard"><i class="fa-solid fa-hotel me-1 text-secondary"></i> Host Portal</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/host/listings"><i class="fa-solid fa-house-user me-1 text-secondary"></i> My Listings</a>
+            </li>
           <% } %>
-          <a class="nav-link" href="/wishlist"><i class="fa-regular fa-heart me-1"></i>Wishlist</a>
-          <a class="nav-link" href="/bookings"><i class="fa-regular fa-calendar-check me-1"></i>My Bookings</a>
-          <a class="nav-link" href="/logout">Logout</a>
+
+          <li class="nav-item">
+            <a class="nav-link" href="/wishlist" title="Wishlist"><i class="fa-regular fa-heart me-1"></i> Wishlist</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/bookings" title="My Bookings"><i class="fa-regular fa-calendar-check me-1"></i> Trips</a>
+          </li>
+
+          <!-- User Profile Dropdown -->
+          <li class="nav-item dropdown ms-lg-2">
+            <a class="wl-user-menu-btn dropdown-toggle" href="#" id="userMenuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="wl-user-avatar"><%= currentUser.username ? currentUser.username.charAt(0).toUpperCase() : 'U' %></span>
+              <span class="d-none d-lg-inline fs-6 fw-semibold"><%= currentUser.username %></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end wl-dropdown-menu" aria-labelledby="userMenuDropdown">
+              <li>
+                <div class="px-3 py-2 border-bottom mb-1">
+                  <div class="fw-bold text-truncate" style="max-width: 180px;"><%= currentUser.username %></div>
+                  <div class="small text-muted text-truncate" style="max-width: 180px;"><%= currentUser.email || 'Guest Explorer' %></div>
+                  <span class="badge bg-light text-dark border mt-1 font-monospace" style="font-size: 0.7rem;"><%= currentUser.role || 'USER' %></span>
+                </div>
+              </li>
+              <li><a class="dropdown-item wl-dropdown-item" href="/dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+              <li><a class="dropdown-item wl-dropdown-item" href="/wishlist"><i class="fa-regular fa-heart"></i> Saved Stays</a></li>
+              <li><a class="dropdown-item wl-dropdown-item" href="/bookings"><i class="fa-regular fa-calendar-check"></i> Bookings & Invoices</a></li>
+              <li><hr class="dropdown-divider my-1"></li>
+              <li><a class="dropdown-item wl-dropdown-item text-danger" href="/logout"><i class="fa-solid fa-arrow-right-from-bracket text-danger"></i> Log Out</a></li>
+            </ul>
+          </li>
         <% } %>
-      </div>
+      </ul>
     </div>
   </div>
 </nav>

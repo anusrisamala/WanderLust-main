@@ -1,18 +1,23 @@
 <% if (success && success.length > 0) { %>
-<div class="alert alert-success alert-dismissible fade show mt-3 col-6 offset-3" role="alert">
-    <%= success %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="alert alert-success alert-dismissible fade show wl-toast-alert d-flex align-items-center gap-3 mt-3" role="alert" style="background-color: var(--wl-success-subtle); border-color: rgba(21, 128, 61, 0.2); color: var(--wl-success);">
+      <i class="fa-solid fa-circle-check fs-5 flex-shrink-0"></i>
+      <div class="flex-grow-1"><%= success %></div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
 </div>
 <% } %>
 
-
-
-
-
-
 <% if (error && error.length > 0) { %>
-<div class="alert alert-danger alert-dismissible fade show mt-3 col-6 offset-3" role="alert">
-    <%= error %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="alert alert-danger alert-dismissible fade show wl-toast-alert d-flex align-items-center gap-3 mt-3" role="alert" style="background-color: var(--wl-danger-subtle); border-color: rgba(185, 28, 28, 0.2); color: var(--wl-danger);">
+      <i class="fa-solid fa-triangle-exclamation fs-5 flex-shrink-0"></i>
+      <div class="flex-grow-1"><%= error %></div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
 </div>
 <% } %>

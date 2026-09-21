@@ -1,66 +1,4 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WanderLust</title>
-</head> -->
 <% layout("/layouts/boilerplate") %>
-
-<!-- <body>-->
-    <!-- <h3>All Listings</h3>  -->
-    <!-- <form action="/listings/new" method="get">
-        <button>Create New Listing</button>
-    </form> -->
-    
-<!-- </body> -->
-<!-- </html> -->
-
-  <style>
-    #filters{
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .filter {
-      text-align: center;
-      margin-right: 2rem;
-      margin-top: 2rem;
-      opacity: 0.7;
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .filter:hover {
-      opacity: 1;
-      cursor: pointer;
-    }
-
-    .filter.active-filter {
-      opacity: 1;
-      border-bottom: 2px solid #000;
-    }
-
-    .filter p{
-      font-size: 0.8rem;
-    }
-
-    .tax-info{
-      display: none;
-    }
-
-    .tax-toggle{
-      border: 1px solid black;
-      border-radius: 1rem;
-      height: 1rem;
-      padding: 1.5rem;
-      margin-left:5rem ;
-      display: flex;
-      align-items: center;
-      font-size: 0.9rem;
-    }
-  </style>
 
 <%
   const currentSearch = (typeof searchQuery !== "undefined" && searchQuery) ? searchQuery : "";
@@ -76,126 +14,180 @@
   }
 %>
 
-<div id="filters">
-  <a href="<%= getFilterUrl('') %>" class="filter <%= !currentCategory ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-house"></i></div>
-    <p>All</p>
-  </a>
-  <a href="<%= getFilterUrl('Trending') %>" class="filter <%= currentCategory === 'Trending' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-fire"></i></div>
-    <p>Trending</p>
-  </a>
-  <a href="<%= getFilterUrl('Rooms') %>" class="filter <%= currentCategory === 'Rooms' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-bed"></i></div>
-    <p>Rooms</p>
-  </a>
-  <a href="<%= getFilterUrl('Iconic Cities') %>" class="filter <%= currentCategory === 'Iconic Cities' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-mountain-city"></i></div>
-    <p>Iconic Cities</p>
-  </a>
-  <a href="<%= getFilterUrl('Mountains') %>" class="filter <%= currentCategory === 'Mountains' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-mountain"></i></div>
-    <p>Mountains</p>
-  </a>
-  <a href="<%= getFilterUrl('Castles') %>" class="filter <%= currentCategory === 'Castles' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-fort-awesome"></i></div>
-    <p>Castles</p>
-  </a>
-  <a href="<%= getFilterUrl('Amazing Pools') %>" class="filter <%= currentCategory === 'Amazing Pools' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-person-swimming"></i></div>
-    <p>Amazing Pools</p>
-  </a>
-  <a href="<%= getFilterUrl('Camping') %>" class="filter <%= currentCategory === 'Camping' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-campground"></i></div>
-    <p>Camping</p>
-  </a>
-  <a href="<%= getFilterUrl('Farms') %>" class="filter <%= currentCategory === 'Farms' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-cow"></i></div>
-    <p>Farms</p>
-  </a>
-  <a href="<%= getFilterUrl('Arctic') %>" class="filter <%= currentCategory === 'Arctic' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-snowflake"></i></div>
-    <p>Arctic</p>
-  </a>
-  <a href="<%= getFilterUrl('Domes') %>" class="filter <%= currentCategory === 'Domes' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-igloo"></i></div>
-    <p>Domes</p>
-  </a>
-  <a href="<%= getFilterUrl('Boats') %>" class="filter <%= currentCategory === 'Boats' ? 'active-filter' : '' %>">
-    <div><i class="fa-solid fa-snowflake"></i></div>
-    <p>Boats</p>
-  </a>
+<!-- Category Filters & Tax Toggle Bar -->
+<div class="wl-filters-bar">
+  <div class="wl-category-track" id="filters">
+    <a href="<%= getFilterUrl('') %>" class="wl-category-chip <%= !currentCategory ? 'active' : '' %>">
+      <i class="fa-solid fa-compass"></i>
+      <span>All Stays</span>
+    </a>
+    <a href="<%= getFilterUrl('Trending') %>" class="wl-category-chip <%= currentCategory === 'Trending' ? 'active' : '' %>">
+      <i class="fa-solid fa-fire"></i>
+      <span>Trending</span>
+    </a>
+    <a href="<%= getFilterUrl('Rooms') %>" class="wl-category-chip <%= currentCategory === 'Rooms' ? 'active' : '' %>">
+      <i class="fa-solid fa-bed"></i>
+      <span>Rooms</span>
+    </a>
+    <a href="<%= getFilterUrl('Iconic Cities') %>" class="wl-category-chip <%= currentCategory === 'Iconic Cities' ? 'active' : '' %>">
+      <i class="fa-solid fa-city"></i>
+      <span>Iconic Cities</span>
+    </a>
+    <a href="<%= getFilterUrl('Mountains') %>" class="wl-category-chip <%= currentCategory === 'Mountains' ? 'active' : '' %>">
+      <i class="fa-solid fa-mountain-sun"></i>
+      <span>Mountains</span>
+    </a>
+    <a href="<%= getFilterUrl('Castles') %>" class="wl-category-chip <%= currentCategory === 'Castles' ? 'active' : '' %>">
+      <i class="fa-solid fa-chess-rook"></i>
+      <span>Castles</span>
+    </a>
+    <a href="<%= getFilterUrl('Amazing Pools') %>" class="wl-category-chip <%= currentCategory === 'Amazing Pools' ? 'active' : '' %>">
+      <i class="fa-solid fa-water-ladder"></i>
+      <span>Villas & Pools</span>
+    </a>
+    <a href="<%= getFilterUrl('Camping') %>" class="wl-category-chip <%= currentCategory === 'Camping' ? 'active' : '' %>">
+      <i class="fa-solid fa-campground"></i>
+      <span>Camping</span>
+    </a>
+    <a href="<%= getFilterUrl('Farms') %>" class="wl-category-chip <%= currentCategory === 'Farms' ? 'active' : '' %>">
+      <i class="fa-solid fa-wheat-awn"></i>
+      <span>Countryside</span>
+    </a>
+    <a href="<%= getFilterUrl('Arctic') %>" class="wl-category-chip <%= currentCategory === 'Arctic' ? 'active' : '' %>">
+      <i class="fa-solid fa-snowflake"></i>
+      <span>Arctic</span>
+    </a>
+    <a href="<%= getFilterUrl('Domes') %>" class="wl-category-chip <%= currentCategory === 'Domes' ? 'active' : '' %>">
+      <i class="fa-solid fa-igloo"></i>
+      <span>Domes</span>
+    </a>
+    <a href="<%= getFilterUrl('Boats') %>" class="wl-category-chip <%= currentCategory === 'Boats' ? 'active' : '' %>">
+      <i class="fa-solid fa-sailboat"></i>
+      <span>Houseboats</span>
+    </a>
+  </div>
 
-  <div class="tax-toggle">
-    <div class="form-check-reverse form-switch">
-  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-  <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
-</div>
+  <!-- Tax Toggle Capsule -->
+  <div class="wl-tax-toggle tax-toggle">
+    <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
+      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+      <label class="form-check-label mb-0" for="flexSwitchCheckDefault">Display total with taxes</label>
+    </div>
   </div>
 </div>
 
+<!-- Search & Filter Summary Banner -->
 <% if (currentSearch && currentCategory) { %>
-  <div class="mt-3 mb-2">
-    <h4>Search results for "<%= currentSearch %>" in <%= currentCategory %></h4>
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h5 class="fw-bold mb-0">Results for "<%= currentSearch %>" in <span style="color: var(--wl-secondary);"><%= currentCategory %></span></h5>
+    <a href="/listings" class="wl-btn wl-btn-outline wl-btn-sm"><i class="fa-solid fa-xmark me-1"></i> Clear Filters</a>
   </div>
 <% } else if (currentSearch) { %>
-  <div class="mt-3 mb-2">
-    <h4>Search results for "<%= currentSearch %>"</h4>
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h5 class="fw-bold mb-0">Destinations matching "<%= currentSearch %>"</h5>
+    <a href="/listings" class="wl-btn wl-btn-outline wl-btn-sm"><i class="fa-solid fa-xmark me-1"></i> Clear Search</a>
   </div>
 <% } else if (currentCategory) { %>
-  <div class="mt-3 mb-2">
-    <h4><%= currentCategory %></h4>
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h5 class="fw-bold mb-0"><%= currentCategory %> Collection</h5>
+    <a href="/listings" class="wl-btn wl-btn-outline wl-btn-sm"><i class="fa-solid fa-xmark me-1"></i> All Categories</a>
   </div>
 <% } %>
 
-<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+<!-- Listings Grid -->
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
   <% if (allListings.length === 0) { %>
-    <div class="col-12 mt-3 mb-5">
-      <% if (currentSearch && currentCategory) { %>
-        <h5>No listings found for "<%= currentSearch %>" in <%= currentCategory %>.</h5>
-        <p class="text-muted">
-          Try <a href="/listings/search?q=<%= encodeURIComponent(currentSearch) %>">viewing all results for "<%= currentSearch %>"</a> or <a href="/listings">browse all listings</a>.
-        </p>
-      <% } else if (currentSearch) { %>
-        <h5>No listings found for "<%= currentSearch %>".</h5>
-        <p class="text-muted">Try searching with different keywords or <a href="/listings">browse all listings</a>.</p>
-      <% } else if (currentCategory) { %>
-        <h5>No listings found in <%= currentCategory %>.</h5>
-        <p class="text-muted"><a href="/listings">Browse all listings</a></p>
-      <% } else { %>
-        <h5>No listings found.</h5>
-        <p class="text-muted"><a href="/listings">Browse all listings</a></p>
-      <% } %>
-    </div>
-  <% } %>
-  <% for(let listing of allListings) { %>
-    <a href="/listings/<%= listing._id %>" class="listing-link">
-    <div class="card col listing-card" >
-      <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" style="height: 20rem;"/>
-      <div class="card-img-overlay">abcd</div>
-      <div class="card-body">
-        <p class="card-text">
-          <b><%= listing.title %></b> <br />
-          &#8377;<%= listing.price?.toLocaleString("en-IN") || "0" %>/ night
-          <i class="tax-info">&nbsp; &nbsp; +5% GST</i>
-        </p>
+    <div class="col-12 py-5">
+      <div class="wl-form-card text-center py-5">
+        <div class="mb-3 text-muted">
+          <i class="fa-solid fa-map-location-dot fs-1" style="color: var(--wl-secondary);"></i>
+        </div>
+        <h4 class="fw-bold mb-2">No Stays Found</h4>
+        <% if (currentSearch && currentCategory) { %>
+          <p class="text-muted mb-4">We couldn't find any stays matching "<strong><%= currentSearch %></strong>" in <strong><%= currentCategory %></strong>.</p>
+        <% } else if (currentSearch) { %>
+          <p class="text-muted mb-4">No destinations found for "<strong><%= currentSearch %></strong>". Try alternative keywords or broader locations.</p>
+        <% } else if (currentCategory) { %>
+          <p class="text-muted mb-4">There are currently no active listings under the <strong><%= currentCategory %></strong> category.</p>
+        <% } else { %>
+          <p class="text-muted mb-4">No accommodations are available at the moment. Please check back soon.</p>
+        <% } %>
+        <div class="d-flex justify-content-center gap-3">
+          <a href="/listings" class="wl-btn wl-btn-primary">Browse All Stays</a>
+          <% if (typeof currUser !== "undefined" && currUser && currUser.role === "HOST") { %>
+            <a href="/listings/new" class="wl-btn wl-btn-outline">List a Stay Here</a>
+          <% } %>
+        </div>
       </div>
     </div>
-    </a>
+  <% } %>
+
+  <% for(let listing of allListings) { %>
+    <div class="col">
+      <div class="card listing-card wl-listing-card h-100">
+        <!-- Media Container -->
+        <div class="wl-card-media">
+          <a href="/listings/<%= listing._id %>" class="listing-link">
+            <img 
+              src="<%= listing.image?.url || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' %>" 
+              class="card-img-top" 
+              alt="<%= listing.title %>"
+              loading="lazy"
+            />
+          </a>
+          
+          <% if (listing.category) { %>
+            <span class="wl-card-badge"><%= listing.category %></span>
+          <% } %>
+
+          <!-- Wishlist Heart Button -->
+          <% if (typeof currUser !== 'undefined' && currUser) { %>
+            <% const isInWishlist = typeof wishlistListingIds !== 'undefined' && wishlistListingIds.includes(listing._id.toString()); %>
+            <form action="/wishlist/toggle/<%= listing._id %>" method="POST" class="d-inline">
+              <button type="submit" class="wishlist-floating-btn" title="<%= isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' %>" aria-label="Wishlist">
+                <i class="fa-solid fa-heart <%= isInWishlist ? 'wishlist-heart-filled' : 'wishlist-heart-empty' %>"></i>
+              </button>
+            </form>
+          <% } %>
+        </div>
+
+        <!-- Card Body -->
+        <a href="/listings/<%= listing._id %>" class="listing-link text-decoration-none">
+          <div class="wl-card-content">
+            <div class="wl-card-header-row">
+              <h3 class="wl-card-title"><%= listing.title %></h3>
+            </div>
+            
+            <div class="wl-card-location">
+              <i class="fa-solid fa-location-dot me-1 small" style="color: var(--wl-secondary);"></i>
+              <span><%= listing.location %>, <%= listing.country %></span>
+            </div>
+
+            <div class="wl-card-pricing">
+              <div>
+                <span class="wl-card-rate">&#8377;<%= listing.price?.toLocaleString("en-IN") || "0" %></span>
+                <span class="wl-card-rate-period">/ night</span>
+                <i class="tax-info">&nbsp; &nbsp; +5% GST</i>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
   <% } %>
 </div>
 
-
+<!-- Tax Display Toggle Script -->
 <script>
-  let taxSwitch = document.getElementById("flexSwitchCheckDefault");
-  taxSwitch.addEventListener("click",()=>{
-    let taxInfo = document.getElementsByClassName("tax-info");
-    for(info of taxInfo){
-      if(info.style.display != "inline"){
-          info.style.display = "inline";
-      }else{
-        info.style.display = "none";
-      }
-    }
-  })
+  (() => {
+    const taxSwitch = document.getElementById("flexSwitchCheckDefault");
+    if (!taxSwitch) return;
+    
+    taxSwitch.addEventListener("change", () => {
+      const taxInfos = document.querySelectorAll(".tax-info");
+      taxInfos.forEach(info => {
+        info.style.display = taxSwitch.checked ? "inline" : "none";
+      });
+    });
+  })();
 </script>

@@ -1,96 +1,114 @@
 <% layout("layouts/boilerplate") %>
-<div class="row mt-3">
-    <div class="col-8 offset-2" >
-    <h3>Edit your Listing</h3>
-<form method="POST" action="/listings/<%= listing._id %>?_method=PUT&_csrf=<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>" novalidate class="needs-validation" enctype="multipart/form-data">
-    <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
 
+<div class="row justify-content-center my-4 my-md-5">
+  <div class="col-12 col-md-10 col-lg-8">
     <div class="mb-3">
-        <label for="title" class="form-label">Title</label>
-        <input name="listing[title]" id="title" value="<%= listing.title %>" type="text" class="form-control" required/>
-        <div class="invalid-feedback">
-          Please provide a title.
-        </div>
-        <div class="=valid-feedback">
-            Looks Good.
-        </div>
+      <a href="/listings/<%= listing._id %>" class="wl-btn wl-btn-ghost wl-btn-sm">
+        <i class="fa-solid fa-arrow-left me-1"></i>Back to Listing Details
+      </a>
     </div>
 
-    <div class="mb-3">
-        <label for="category" class="form-label">Category</label>
-        <select name="listing[category]" id="category" class="form-select" required>
+    <div class="wl-form-card p-4 p-md-5">
+      <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+        <div class="stat-icon-wrapper rounded-circle" style="width: 52px; height: 52px; background-color: var(--wl-primary-subtle); color: var(--wl-primary); display: flex; align-items: center; justify-content: center;">
+          <i class="fa-solid fa-pen-to-square fa-lg"></i>
+        </div>
+        <div>
+          <h2 class="fw-bold mb-0 fs-4">Edit Listing</h2>
+          <p class="text-muted small mb-0">Update your property details, pricing, or photos</p>
+        </div>
+      </div>
+
+      <form method="POST" action="/listings/<%= listing._id %>?_method=PUT&_csrf=<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>" novalidate class="needs-validation" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+
+        <div class="mb-3">
+          <label for="title" class="form-label">Property Title <span class="text-danger">*</span></label>
+          <input 
+            name="listing[title]" 
+            id="title" 
+            value="<%= listing.title %>" 
+            type="text" 
+            class="form-control" 
+            required
+          />
+          <div class="invalid-feedback">Please provide a title.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+          <select name="listing[category]" id="category" class="form-select" required>
             <option value="" disabled <%= !listing.category ? "selected" : "" %>>Select a category</option>
             <% const categories = [
-                "Trending",
-                "Rooms",
-                "Iconic Cities",
-                "Mountains",
-                "Castles",
-                "Amazing Pools",
-                "Camping",
-                "Farms",
-                "Arctic",
-                "Domes",
-                "Boats"
+              "Trending",
+              "Rooms",
+              "Iconic Cities",
+              "Mountains",
+              "Castles",
+              "Amazing Pools",
+              "Camping",
+              "Farms",
+              "Arctic",
+              "Domes",
+              "Boats"
             ]; %>
             <% for(let cat of categories) { %>
-                <option value="<%= cat %>" <%= listing.category === cat ? "selected" : "" %>><%= cat %></option>
+              <option value="<%= cat %>" <%= listing.category === cat ? "selected" : "" %>><%= cat %></option>
             <% } %>
-        </select>
-        <div class="invalid-feedback">
-            Please select a category.
+          </select>
+          <div class="invalid-feedback">Please select a category.</div>
         </div>
-    </div>
 
-    <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-        <textarea name="listing[description]" id="description" class="form-control" required><%= listing.description %></textarea>
-        <div class="invalid-feedback">
-          Please provide a description.
+        <div class="mb-3">
+          <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+          <textarea name="listing[description]" id="description" class="form-control" rows="4" required><%= listing.description %></textarea>
+          <div class="invalid-feedback">Please provide a description.</div>
         </div>
-    </div>
-    <div class="mb-3">
-      Original Listing Image <br>
-      <img src="<%= originalImageUrl %>" />
-    </div>
-     
-    <div class="mb-3">
-        <label for="image" class="form-label">Upload Image Link</label>
-        <input name="listing[image]" id="image" type="file" class="form-control" />
-        <!-- <div class="invalid-feedback">
-          Please provide an image link.
-        </div> -->
-    </div>
 
-    <div class="row">
-        <div class="mb-3 col-md-4">
-            <label for="price" class="form-label">Price</label>
-            <input name="listing[price]" id="price" value="<%= listing.price %>" type="number" class="form-control" required />
-            <div class="invalid-feedback">
-            Please enter a valid price.
+        <!-- Current Image Preview -->
+        <div class="mb-3">
+          <label class="form-label d-block">Current Cover Photo</label>
+          <div class="border rounded-3 p-2 d-inline-block bg-light">
+            <img src="<%= originalImageUrl %>" alt="<%= listing.title %>" class="rounded-2" style="height: 120px; width: 180px; object-fit: cover;" />
           </div>
         </div>
 
-        <div class="mb-3 col-md-8">
-            <label for="country" class="form-label">Country</label>
-            <input name="listing[country]" id="country" value="<%= listing.country %>" type="text" class="form-control" required/>
-            <div class="invalid-feedback">
-            Please enter the country.
+        <div class="mb-3">
+          <label for="image" class="form-label">Replace Cover Photo (Optional)</label>
+          <input name="listing[image]" id="image" type="file" class="form-control" />
+          <div class="form-text small text-muted">Leave empty to keep current photo.</div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-md-4">
+            <label for="price" class="form-label">Nightly Rate (&#8377;) <span class="text-danger">*</span></label>
+            <input name="listing[price]" id="price" value="<%= listing.price %>" type="number" min="0" class="form-control" required />
+            <div class="invalid-feedback">Please enter a valid price.</div>
+          </div>
+
+          <div class="col-12 col-md-8">
+            <label for="country" class="form-label">Country <span class="text-danger">*</span></label>
+            <input name="listing[country]" id="country" value="<%= listing.country %>" type="text" class="form-control" required />
+            <div class="invalid-feedback">Please enter the country.</div>
           </div>
         </div>
-    </div>
 
-
-    <div class="mb-3">
-        <label for="location" class="form-label">Location</label>
-        <input name="listing[location]" id="location" value="<%= listing.location %>" type="text" class="form-control" required />
-        <div class="invalid-feedback">
-          Please enter the location.
+        <div class="mb-4">
+          <label for="location" class="form-label">City / Location <span class="text-danger">*</span></label>
+          <input name="listing[location]" id="location" value="<%= listing.location %>" type="text" class="form-control" required />
+          <div class="invalid-feedback">Please enter the location.</div>
         </div>
+
+        <div class="d-flex gap-2 pt-2 border-top">
+          <button class="wl-btn wl-btn-primary edit-btn px-4 py-2 fw-semibold">
+            <i class="fa-solid fa-check me-1"></i>Save Changes
+          </button>
+          <a href="/listings/<%= listing._id %>" class="wl-btn wl-btn-outline">
+            Cancel
+          </a>
+        </div>
+      </form>
     </div>
-    <br><br>
-    <button class="btn btn-dark edit-btn mt-3 mb-3">Edit</button>
-</form>
-</div>
+  </div>
 </div>
 <script src="/js/script.js"></script>

@@ -1,420 +1,1059 @@
-body{
-    font-family: "Plus Jakarta Sans",sans-serif !important;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+/* ==========================================================================
+   WanderLust Unified Design System
+   Phase 2 Visual Identity: Deep Ocean, Muted Teal, Warm Solstice Amber
+   ========================================================================== */
+
+:root {
+  /* Brand Palette */
+  --wl-primary: #0C3B4E;          /* Deep Ocean Slate - Anchor primary */
+  --wl-primary-hover: #082835;    /* Deep Ocean hover */
+  --wl-primary-subtle: #EBF4F6;   /* Pale Ocean tint */
+  
+  --wl-secondary: #1E707E;        /* Muted Coastal Teal */
+  --wl-secondary-hover: #165763;  /* Teal hover */
+  --wl-secondary-subtle: #E6F3F5; /* Teal tint */
+
+  --wl-accent: #D97706;           /* Warm Solstice Amber - Rare emphasis */
+  --wl-accent-hover: #B45309;     /* Deep Amber */
+  --wl-accent-subtle: #FEF3C7;    /* Warm Amber tint */
+
+  /* Neutral Surface & Canvas */
+  --wl-canvas: #F8F9FA;           /* Alabaster Canvas */
+  --wl-surface: #FFFFFF;          /* Pure White Container */
+  --wl-surface-subtle: #F1F5F9;   /* Off-surface Gray */
+  
+  /* Typography Scale Colors */
+  --wl-text-main: #0F172A;        /* Deep Charcoal (WCAG AAA) */
+  --wl-text-muted: #64748B;       /* Cool Slate Gray */
+  --wl-text-subtle: #94A3B8;      /* Light Slate Gray */
+
+  /* Architectural Borders */
+  --wl-border: #E2E8F0;           /* Clean 1px border */
+  --wl-border-subtle: #F1F5F9;    /* Sub-divider */
+  --wl-border-focus: #1E707E;     /* Interactive focus line */
+
+  /* Status Colors */
+  --wl-success: #15803D;          /* Forest Emerald */
+  --wl-success-subtle: #DCFCE7;
+  --wl-warning: #B45309;          /* Warm Ochre */
+  --wl-warning-subtle: #FEF3C7;
+  --wl-danger: #B91C1C;           /* Crimson */
+  --wl-danger-subtle: #FEE2E2;
+  --wl-info: #0369A1;             /* Coastal Blue */
+  --wl-info-subtle: #E0F2FE;
+
+  /* Architectural Radii (Restrained & Sophisticated) */
+  --wl-r-xs: 4px;
+  --wl-r-sm: 6px;
+  --wl-r-md: 8px;
+  --wl-r-lg: 12px;
+  --wl-r-xl: 16px;
+  --wl-r-pill: 9999px;
+
+  /* Elevation Scale */
+  --wl-shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --wl-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+  --wl-shadow-md: 0 4px 8px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --wl-shadow-hover: 0 8px 16px -4px rgba(15, 23, 42, 0.08), 0 3px 6px -2px rgba(15, 23, 42, 0.04);
+  --wl-shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.1);
+  --wl-shadow-modal: 0 20px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+
+  /* Transitions */
+  --wl-trans: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.container{
-    flex:1;
+/* ==========================================================================
+   Base & Typography
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-/* navbar */
-
-.navbar{
-    height:5rem;
-    background-color: white;
-}
-.fa-compass{
-    color: #fe424d;
-    font-size: 2rem;
-}
-.nav-link{
-    color:black !important;
-}
-
-/*Footer*/
-.f-info-links a{
-    text-decoration: none;
-    color: #222222;
-}
-.f-info-links a:hover{
-    text-decoration: underline;
-}
-
-.f-info-links,.f-info-socials,.f-info-brand{
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.f-info-socials i{
-    margin-right: 1rem;
-    font-size: 1.2rem;
-}
-
-.f-info{
-    text-align: center;
-    height: 8rem;
-    background-color: #ebebeb;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: space-evenly;
-}
-
-/*card*/
-.listing-card{
-    border: none !important;
-    margin-bottom: 2rem;
-}
-.card-img-top{
-    border-radius: 1rem !important;
-    width:100% !important;
-    object-fit: cover !important;
-}
-
-.card-body{
-    padding: 0 !important;
-}
-
-.card-text p{
-    font-weight: 400 !important;
-}
-
-.listing-link{
-    text-decoration: none;
-}
-
-/*card effect*/
-.card-img-overlay{
-    opacity:0;
-}
-
-.card-img-overlay:hover{
-    opacity: 0.2;
-    background-color: white;
-}
-
-/* make the whole card link text black */
-.listing-link {
-    text-decoration: none !important;
-    color: black !important;
-    display: block;   /* ensures the link covers the whole card */
-}
-
-/* explicitly set inner text color */
-.listing-link p,
-.listing-link b {
-    color: black !important;
-}
-
-/*new page*/
-.add-btn{
-    background-color: #fe424d !important;
-    border: none !important;
-}
-
-/*edit page*/
-.edit-btn{
-    background-color: #fe424d !important;
-    border: none !important;
-}
-/*show page*/
-.show-img{
-    height: 30vh;
-}
-
-.btns{
-    display: flex;
-}
-
-.show-card{
-    padding-left: 0;
-    padding-right: 0;
-}
-
-#map {
-  height: 400px;
-  width: 100%;
-  border-radius: 12px;
-  margin-top: 15px;
-  margin-bottom: 30px;
-  overflow: hidden;
-}
-
-@media (max-width: 768px) {
-  #map {
-    height: 300px;
-  }
-}
-
-/* review section styling */
-.review-card {
-  border: 1px solid #e2e8f0 !important;
-  background-color: #fff;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.review-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* wishlist button & heart styling */
-.wishlist-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.6rem;
+body.wl-app {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  background-color: var(--wl-canvas);
+  color: var(--wl-text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.wl-main-container {
+  flex: 1;
+  padding-top: 1.5rem;
+  padding-bottom: 3.5rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--wl-text-main);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: var(--wl-secondary);
+  text-decoration: none;
+  transition: var(--wl-trans);
+}
+
+a:hover {
+  color: var(--wl-secondary-hover);
+}
+
+/* ==========================================================================
+   Navigation Bar
+   ========================================================================== */
+
+.wl-navbar {
+  background-color: var(--wl-surface);
+  border-bottom: 1px solid var(--wl-border);
+  box-shadow: var(--wl-shadow-xs);
+  min-height: 4.5rem;
+  padding: 0.65rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+}
+
+.wl-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none !important;
+  color: var(--wl-primary) !important;
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
+}
+
+.wl-brand-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--wl-r-md);
+  background: linear-gradient(135deg, var(--wl-primary) 0%, var(--wl-secondary) 100%);
+  color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-size: 1.15rem;
+  box-shadow: 0 2px 6px rgba(12, 59, 78, 0.2);
 }
 
-.wishlist-btn:hover {
-  transform: scale(1.18);
+.wl-brand-name {
+  color: var(--wl-primary);
 }
 
-.wishlist-btn:active {
-  transform: scale(0.92);
+.wl-brand-name span {
+  color: var(--wl-secondary);
 }
 
-.wishlist-heart-filled {
-  color: #fe424d;
-  filter: drop-shadow(0 2px 4px rgba(254, 66, 77, 0.3));
+/* Legacy compass fallback */
+.fa-compass {
+  color: var(--wl-secondary);
+  font-size: 1.75rem;
 }
 
-.wishlist-heart-empty {
-  color: #555555;
+.navbar-nav .nav-link {
+  color: var(--wl-text-muted) !important;
+  font-weight: 500;
+  font-size: 0.925rem;
+  padding: 0.5rem 0.85rem !important;
+  border-radius: var(--wl-r-md);
+  transition: var(--wl-trans);
 }
 
-/* Show page wishlist action button */
-.wishlist-btn-show {
+.navbar-nav .nav-link:hover {
+  color: var(--wl-primary) !important;
+  background-color: var(--wl-primary-subtle);
+}
+
+.navbar-nav .nav-link.active {
+  color: var(--wl-primary) !important;
+  font-weight: 600;
+}
+
+/* Search Capsule */
+.wl-search-capsule {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.45rem 1rem;
-  border-radius: 2rem;
-  border: 1px solid #d1d5db;
-  background-color: #ffffff;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 0.95rem;
-  color: #222222;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-r-pill);
+  box-shadow: var(--wl-shadow-xs);
+  padding: 0.35rem 0.45rem 0.35rem 1rem;
+  transition: var(--wl-trans);
+  max-width: 380px;
+  width: 100%;
 }
 
-.wishlist-btn-show:hover {
-  background-color: #f8fafc;
-  border-color: #9ca3af;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.wl-search-capsule:focus-within {
+  border-color: var(--wl-secondary);
+  box-shadow: 0 0 0 3px rgba(30, 112, 126, 0.12);
 }
 
-.wishlist-btn-show:active {
-  transform: scale(0.96);
-}
-
-.wishlist-btn-show .fa-heart {
-  font-size: 1.15rem;
-}
-
-/* Wishlist card styling */
-.wishlist-card {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  border-radius: 1rem !important;
-  overflow: hidden;
+.wl-search-input {
   border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--wl-text-main);
+  padding: 0.25rem 0.5rem;
+  width: 100%;
 }
 
-.wishlist-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12) !important;
+.wl-search-input:focus {
+  outline: none !important;
 }
 
-.wishlist-card .card-img-top {
-  height: 18rem;
-  object-fit: cover;
-  border-radius: 1rem 1rem 0 0 !important;
+.wl-search-input::placeholder {
+  color: var(--wl-text-subtle);
+  font-size: 0.85rem;
 }
 
-/* Floating heart button on cards */
+.wl-search-btn {
+  background-color: var(--wl-primary);
+  border: none;
+  border-radius: var(--wl-r-pill);
+  color: #ffffff;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.825rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: var(--wl-trans);
+}
+
+.wl-search-btn:hover {
+  background-color: var(--wl-secondary);
+  transform: scale(1.04);
+}
+
+/* User Menu Dropdown */
+.wl-user-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.75rem 0.35rem 0.85rem;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-r-pill);
+  background-color: var(--wl-surface);
+  color: var(--wl-text-main);
+  cursor: pointer;
+  transition: var(--wl-trans);
+}
+
+.wl-user-menu-btn:hover {
+  border-color: var(--wl-text-subtle);
+  box-shadow: var(--wl-shadow-sm);
+}
+
+.wl-user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--wl-r-pill);
+  background-color: var(--wl-primary-subtle);
+  color: var(--wl-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.wl-dropdown-menu {
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-r-lg);
+  box-shadow: var(--wl-shadow-hover);
+  padding: 0.5rem;
+  min-width: 220px;
+  margin-top: 0.5rem !important;
+}
+
+.wl-dropdown-item {
+  border-radius: var(--wl-r-sm);
+  padding: 0.55rem 0.85rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--wl-text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.wl-dropdown-item:hover {
+  background-color: var(--wl-canvas);
+  color: var(--wl-primary);
+}
+
+.wl-dropdown-item i {
+  color: var(--wl-text-muted);
+  width: 18px;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Buttons & Action Primitives
+   ========================================================================== */
+
+.wl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--wl-r-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: var(--wl-trans);
+  text-decoration: none !important;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.wl-btn-primary,
+.add-btn,
+.edit-btn {
+  background-color: var(--wl-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--wl-primary) !important;
+}
+
+.wl-btn-primary:hover,
+.add-btn:hover,
+.edit-btn:hover {
+  background-color: var(--wl-primary-hover) !important;
+  border-color: var(--wl-primary-hover) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(12, 59, 78, 0.2);
+}
+
+.wl-btn-secondary {
+  background-color: var(--wl-secondary) !important;
+  color: #ffffff !important;
+  border-color: var(--wl-secondary) !important;
+}
+
+.wl-btn-secondary:hover {
+  background-color: var(--wl-secondary-hover) !important;
+  border-color: var(--wl-secondary-hover) !important;
+  color: #ffffff !important;
+}
+
+.wl-btn-accent {
+  background-color: var(--wl-accent) !important;
+  color: #ffffff !important;
+  border-color: var(--wl-accent) !important;
+}
+
+.wl-btn-accent:hover {
+  background-color: var(--wl-accent-hover) !important;
+  border-color: var(--wl-accent-hover) !important;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+  color: #ffffff !important;
+}
+
+.wl-btn-outline,
+.btn-white {
+  background-color: var(--wl-surface) !important;
+  color: var(--wl-text-main) !important;
+  border: 1px solid var(--wl-border) !important;
+}
+
+.wl-btn-outline:hover,
+.btn-white:hover {
+  background-color: var(--wl-surface-subtle) !important;
+  border-color: #cbd5e1 !important;
+  color: var(--wl-text-main) !important;
+}
+
+.wl-btn-ghost {
+  background-color: transparent !important;
+  color: var(--wl-text-muted) !important;
+  border-color: transparent !important;
+}
+
+.wl-btn-ghost:hover {
+  background-color: var(--wl-primary-subtle) !important;
+  color: var(--wl-primary) !important;
+}
+
+.wl-btn-danger {
+  background-color: var(--wl-danger) !important;
+  color: #ffffff !important;
+  border-color: var(--wl-danger) !important;
+}
+
+.wl-btn-danger:hover {
+  background-color: #991b1b !important;
+  color: #ffffff !important;
+}
+
+.wl-btn-sm {
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8125rem;
+  border-radius: var(--wl-r-sm);
+}
+
+.wl-btn-lg {
+  padding: 0.75rem 1.65rem;
+  font-size: 1rem;
+  border-radius: var(--wl-r-md);
+}
+
+/* ==========================================================================
+   Filter & Category Bar (Homepage)
+   ========================================================================== */
+
+.wl-filters-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--wl-border);
+}
+
+.wl-category-track {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  padding-bottom: 0.25rem;
+  scroll-behavior: smooth;
+  flex: 1;
+}
+
+.wl-category-track::-webkit-scrollbar {
+  height: 4px;
+}
+
+.wl-category-track::-webkit-scrollbar-thumb {
+  background-color: var(--wl-border);
+  border-radius: var(--wl-r-pill);
+}
+
+.wl-category-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--wl-r-md);
+  color: var(--wl-text-muted);
+  text-decoration: none !important;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: var(--wl-trans);
+  border: 1px solid transparent;
+}
+
+.wl-category-chip i {
+  font-size: 1.15rem;
+  color: var(--wl-text-muted);
+  transition: var(--wl-trans);
+}
+
+.wl-category-chip:hover {
+  color: var(--wl-primary);
+  background-color: var(--wl-primary-subtle);
+}
+
+.wl-category-chip:hover i {
+  color: var(--wl-primary);
+  transform: translateY(-1px);
+}
+
+.wl-category-chip.active {
+  color: var(--wl-primary);
+  background-color: var(--wl-surface);
+  border-color: var(--wl-primary);
+  box-shadow: var(--wl-shadow-xs);
+}
+
+.wl-category-chip.active i {
+  color: var(--wl-primary);
+}
+
+/* Tax Toggle Container */
+.wl-tax-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.95rem;
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-r-md);
+  background-color: var(--wl-surface);
+  box-shadow: var(--wl-shadow-xs);
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--wl-text-main);
+  user-select: none;
+}
+
+.wl-tax-toggle .form-check-input {
+  cursor: pointer;
+}
+
+.wl-tax-toggle .form-check-input:checked {
+  background-color: var(--wl-secondary);
+  border-color: var(--wl-secondary);
+}
+
+/* ==========================================================================
+   Listing Cards (Architectural & Clean Proportions)
+   ========================================================================== */
+
+.listing-card,
+.wl-listing-card {
+  background-color: var(--wl-surface);
+  border: 1px solid var(--wl-border) !important;
+  border-radius: var(--wl-r-lg) !important;
+  overflow: hidden;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.listing-card:hover,
+.wl-listing-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--wl-shadow-hover) !important;
+  border-color: #cbd5e1 !important;
+}
+
+.listing-link {
+  text-decoration: none !important;
+  color: inherit !important;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.wl-card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background-color: var(--wl-surface-subtle);
+}
+
+.wl-card-media .card-img-top {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 0 !important;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.listing-card:hover .wl-card-media .card-img-top,
+.wl-listing-card:hover .wl-card-media .card-img-top {
+  transform: scale(1.04);
+}
+
+/* Remove awkward text overlay from original template */
+.card-img-overlay {
+  display: none !important;
+}
+
+.wl-card-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 5;
+  background: rgba(12, 59, 78, 0.85);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--wl-r-xs);
+}
+
+/* Floating Wishlist Button on Card */
 .wishlist-floating-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 10px;
+  right: 10px;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(4px);
-  border: none;
-  border-radius: 50%;
-  width: 38px;
-  height: 38px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: var(--wl-r-pill);
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+  box-shadow: var(--wl-shadow-xs);
   cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition: var(--wl-trans);
 }
 
 .wishlist-floating-btn:hover {
-  transform: scale(1.15);
+  transform: scale(1.12);
   background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--wl-shadow-sm);
 }
 
-.wishlist-floating-btn .fa-heart {
-  font-size: 1.1rem;
+.wishlist-heart-filled {
+  color: #E11D48; /* Elegant Ruby Rose */
 }
 
-/* Empty wishlist container */
-.empty-wishlist-container {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 3.5rem 2rem;
-  background: #ffffff;
-  border-radius: 1.25rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  border: 1px solid #f1f5f9;
+.wishlist-heart-empty {
+  color: #64748B;
 }
 
-.empty-wishlist-icon {
-  font-size: 3.5rem;
-  color: #fe424d;
-  opacity: 0.9;
-  margin-bottom: 1.25rem;
-  display: inline-block;
-  animation: pulse-heart 2.2s infinite ease-in-out;
+/* Card Body Content */
+.wl-card-content {
+  padding: 0.95rem 1rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
-@keyframes pulse-heart {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
+.wl-card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
-/* Booking Card & Form Styling */
-.booking-card {
-  border-radius: 1rem !important;
-  border: 1px solid #e2e8f0 !important;
-  background-color: #ffffff;
+.wl-card-title {
+  font-size: 0.975rem;
+  font-weight: 700;
+  color: var(--wl-text-main);
+  margin: 0;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wl-card-location {
+  font-size: 0.825rem;
+  color: var(--wl-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.wl-card-pricing {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--wl-border-subtle);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.wl-card-rate {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--wl-primary);
+}
+
+.wl-card-rate-period {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--wl-text-muted);
+}
+
+.tax-info {
+  display: none;
+  font-size: 0.75rem;
+  color: var(--wl-text-muted);
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Listing Details Page (Show Page)
+   ========================================================================== */
+
+.wl-detail-hero {
+  border-radius: var(--wl-r-xl);
+  overflow: hidden;
+  position: relative;
+  background-color: var(--wl-surface-subtle);
+  margin-bottom: 2rem;
+  max-height: 480px;
+  box-shadow: var(--wl-shadow-sm);
+}
+
+.wl-detail-hero img {
+  width: 100%;
+  height: 100%;
+  max-height: 480px;
+  object-fit: cover;
+  display: block;
+}
+
+.wl-host-card {
+  background-color: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-r-lg);
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.wl-host-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--wl-r-pill);
+  background-color: var(--wl-primary-subtle);
+  color: var(--wl-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.booking-card,
+.wl-sticky-reservation {
+  background-color: var(--wl-surface) !important;
+  border: 1px solid var(--wl-border) !important;
+  border-radius: var(--wl-r-xl) !important;
+  box-shadow: var(--wl-shadow-hover) !important;
+  padding: 1.5rem;
+  position: sticky;
+  top: 6rem;
+  z-index: 20;
+}
+
+.wl-reservation-price {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--wl-primary);
 }
 
 .booking-inputs-box {
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
+  background-color: var(--wl-canvas);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-r-md);
+  padding: 0.75rem;
+  margin-bottom: 1rem;
 }
 
-/* User Dashboard Styling */
-.dashboard-welcome-card {
-  background: linear-gradient(135deg, #ffffff 0%, #fbfbfc 100%);
-  border: 1px solid #f1f5f9 !important;
+#map {
+  height: 380px;
+  width: 100%;
+  border-radius: var(--wl-r-lg);
+  border: 1px solid var(--wl-border);
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--wl-shadow-xs);
 }
 
-.dashboard-avatar-circle {
-  width: 54px;
-  height: 54px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Reviews */
+.review-card {
+  background-color: var(--wl-surface) !important;
+  border: 1px solid var(--wl-border) !important;
+  border-radius: var(--wl-r-lg) !important;
+  padding: 1.25rem;
+  transition: var(--wl-trans);
 }
 
-.dashboard-stat-card {
-  background: #ffffff;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+.review-card:hover {
+  border-color: #cbd5e1 !important;
+  box-shadow: var(--wl-shadow-sm) !important;
 }
 
-.dashboard-stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07) !important;
-  border-color: #e2e8f0 !important;
+/* ==========================================================================
+   Bookings & Payment Views
+   ========================================================================== */
+
+.wl-booking-card {
+  background-color: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-r-lg);
+  box-shadow: var(--wl-shadow-xs);
+  transition: var(--wl-trans);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
 }
 
-.stat-icon-wrapper {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-}
-
-.dashboard-booking-snippet {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.dashboard-booking-snippet:hover {
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
-}
-
-.btn-white {
-  background-color: #ffffff;
-  color: #333333;
-  border-color: #e2e8f0;
-}
-
-.btn-white:hover {
-  background-color: #f8fafc;
-  color: #111111;
+.wl-booking-card:hover {
+  box-shadow: var(--wl-shadow-md);
   border-color: #cbd5e1;
 }
 
-#bookingFilterTabs .nav-link.active {
-  background-color: #222222;
-  color: #ffffff !important;
+.wl-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: var(--wl-r-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
+.status-confirmed,
+.bg-success.bg-opacity-10 {
+  background-color: var(--wl-success-subtle) !important;
+  color: var(--wl-success) !important;
+}
+
+.status-pending,
+.bg-warning.bg-opacity-10,
+.bg-warning.bg-opacity-25 {
+  background-color: var(--wl-warning-subtle) !important;
+  color: var(--wl-warning) !important;
+}
+
+.status-cancelled,
+.bg-danger.bg-opacity-10 {
+  background-color: var(--wl-danger-subtle) !important;
+  color: var(--wl-danger) !important;
+}
+
+.status-completed,
+.bg-primary.bg-opacity-10 {
+  background-color: var(--wl-primary-subtle) !important;
+  color: var(--wl-primary) !important;
+}
+
+.bg-secondary.bg-opacity-10 {
+  background-color: var(--wl-surface-subtle) !important;
+  color: var(--wl-text-muted) !important;
+}
+
+.bg-info.bg-opacity-10 {
+  background-color: var(--wl-info-subtle) !important;
+  color: var(--wl-info) !important;
+}
+
+/* Filter Tabs */
 #bookingFilterTabs .nav-link {
-  color: #4b5563;
-  border: 1px solid #e5e7eb;
-  transition: all 0.2s ease;
+  color: var(--wl-text-muted);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-r-pill);
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background-color: var(--wl-surface);
+  transition: var(--wl-trans);
 }
 
 #bookingFilterTabs .nav-link:hover {
-  background-color: #f3f4f6;
+  color: var(--wl-primary);
+  border-color: var(--wl-primary);
 }
 
-/* Bootstrap 5.0.2 compatibility for bg-opacity and soft status badges */
-.bg-success.bg-opacity-10 {
-  background-color: #d1e7dd !important;
-  color: #0f5132 !important;
-}
-.bg-danger.bg-opacity-10 {
-  background-color: #f8d7da !important;
-  color: #842029 !important;
-}
-.bg-warning.bg-opacity-10,
-.bg-warning.bg-opacity-25 {
-  background-color: #fff3cd !important;
-  color: #664d03 !important;
-}
-.bg-primary.bg-opacity-10 {
-  background-color: #cfe2ff !important;
-  color: #084298 !important;
-}
-.bg-secondary.bg-opacity-10 {
-  background-color: #e2e3e5 !important;
-  color: #41464b !important;
-}
-.bg-info.bg-opacity-10 {
-  background-color: #cff4fc !important;
-  color: #055160 !important;
-}
-.bg-dark.bg-opacity-75 {
-  background-color: rgba(33, 37, 41, 0.75) !important;
+#bookingFilterTabs .nav-link.active {
+  background-color: var(--wl-primary);
   color: #ffffff !important;
-}
-.bg-dark.bg-opacity-10 {
-  background-color: #d3d3d4 !important;
-  color: #141619 !important;
-}
-.bg-light.bg-opacity-50 {
-  background-color: rgba(248, 249, 250, 0.6) !important;
-}
-.bg-light.bg-opacity-25 {
-  background-color: rgba(248, 249, 250, 0.35) !important;
+  border-color: var(--wl-primary);
 }
 
+/* ==========================================================================
+   Dashboard Components
+   ========================================================================== */
 
+.dashboard-welcome-card {
+  background: linear-gradient(135deg, var(--wl-surface) 0%, #f4f8f9 100%) !important;
+  border: 1px solid var(--wl-border) !important;
+  border-radius: var(--wl-r-xl) !important;
+  padding: 1.75rem;
+  box-shadow: var(--wl-shadow-sm);
+}
 
+.dashboard-stat-card {
+  background-color: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-r-lg);
+  padding: 1.25rem;
+  box-shadow: var(--wl-shadow-xs);
+  transition: var(--wl-trans);
+}
 
+.dashboard-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--wl-shadow-md);
+}
+
+.stat-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--wl-r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+}
+
+/* ==========================================================================
+   Form Controls
+   ========================================================================== */
+
+.wl-form-card {
+  background-color: var(--wl-surface);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-r-xl);
+  box-shadow: var(--wl-shadow-md);
+  padding: 2rem;
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--wl-text-main);
+  margin-bottom: 0.4rem;
+}
+
+.form-control,
+.form-select {
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-r-md);
+  padding: 0.58rem 0.85rem;
+  font-size: 0.9rem;
+  color: var(--wl-text-main);
+  background-color: var(--wl-surface);
+  transition: var(--wl-trans);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--wl-secondary);
+  box-shadow: 0 0 0 3px rgba(30, 112, 126, 0.12);
+  outline: none;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.wl-footer {
+  background-color: #082835;
+  color: #94A3B8;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 3.5rem 0 1.5rem 0;
+  margin-top: auto;
+  font-size: 0.875rem;
+}
+
+.wl-footer h5 {
+  color: #FFFFFF;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 1.15rem;
+  letter-spacing: -0.01em;
+}
+
+.wl-footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.wl-footer ul li {
+  margin-bottom: 0.65rem;
+}
+
+.wl-footer a {
+  color: #94A3B8;
+  text-decoration: none;
+  transition: var(--wl-trans);
+}
+
+.wl-footer a:hover {
+  color: #FFFFFF;
+  padding-left: 3px;
+}
+
+.wl-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 1.5rem;
+  margin-top: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.wl-footer-socials a {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--wl-r-pill);
+  background: rgba(255, 255, 255, 0.06);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #94A3B8;
+  margin-left: 0.5rem;
+}
+
+.wl-footer-socials a:hover {
+  background: var(--wl-secondary);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Flash & Alerts
+   ========================================================================== */
+
+.wl-toast-alert {
+  border-radius: var(--wl-r-md);
+  border: 1px solid transparent;
+  box-shadow: var(--wl-shadow-md);
+  padding: 0.9rem 1.25rem;
+  font-size: 0.925rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+/* ==========================================================================
+   Responsive Utilities
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .wl-main-container {
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+  }
+
+  .wl-filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+  }
+
+  .wl-tax-toggle {
+    align-self: flex-start;
+  }
+
+  .booking-card,
+  .wl-sticky-reservation {
+    position: static;
+    margin-top: 2rem;
+  }
+
+  .wl-footer {
+    padding-top: 2.5rem;
+  }
+}

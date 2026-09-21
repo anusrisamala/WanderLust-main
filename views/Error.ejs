@@ -1,7 +1,24 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row mt-3">
-    <div class="alert alert-danger col-6 offset-3" role="alert">
-        <p class="alert-heading"><%= err.message %></p>
+<div class="row justify-content-center my-5 py-4">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="wl-form-card text-center p-4 p-md-5">
+      <div class="mb-4">
+        <span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 72px; height: 72px; background-color: var(--wl-danger-subtle); color: var(--wl-danger);">
+          <i class="fa-solid fa-circle-exclamation fs-1"></i>
+        </span>
+      </div>
+      <h3 class="fw-bold mb-2">Something went wrong</h3>
+      <p class="text-muted mb-4 fs-6"><%= err && err.message ? err.message : 'An unexpected error occurred while processing your request.' %></p>
+      
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <a href="/listings" class="wl-btn wl-btn-primary">
+          <i class="fa-solid fa-compass me-1"></i> Back to Explore
+        </a>
+        <a href="javascript:history.back()" class="wl-btn wl-btn-outline">
+          <i class="fa-solid fa-arrow-left me-1"></i> Go Back
+        </a>
+      </div>
     </div>
+  </div>
 </div>
